@@ -165,7 +165,7 @@
             </tr>
 
             <tr v-else class="d-flex align-items-center">
-                   <span class=""> Empty </span>
+                  Empty 
 
             </tr>
        

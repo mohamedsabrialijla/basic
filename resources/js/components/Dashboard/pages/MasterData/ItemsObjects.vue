@@ -66,8 +66,6 @@
                   <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table_users .form-check-input" value="1" v-model="selectAll" @change="toggleAll" />
                 </div>
               </th>
-              <th class="min-w-125px"  v-if="routeSegment === 'standards' || routeSegment === 'drawings'" >Category</th>
-              <th class="min-w-125px">Code</th>
               <th class="min-w-125px">Name</th>
               <th class="min-w-125px">Status</th>
               <th class="min-w-125px">Joined Date</th>
@@ -83,18 +81,9 @@
               </td>
 
 
-              <td class="align-items-center" style="margin-top: 15px;"  v-if="routeSegment === 'standards' || routeSegment === 'drawings'">
-                <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.category.name}}</a>
-                </div>
-              </td>
+            
 
-              <td class="align-items-center" style="margin-top: 15px;">
-                <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.code}}</a>
-                </div>
-              </td>
-
+            
 
               <td class="align-items-center" style="margin-top: 15px;">
                 <!--begin:: Avatar -->
@@ -187,19 +176,12 @@
 
 
 
-              <div class="fv-row mb-7" v-if="routeSegment === 'standards' || routeSegment === 'drawings'">
-                <label class="required fw-semibold fs-6 mb-2">Type</label>
-                <multiselect class="" v-model="formData.category" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="itemsCategories" :multiple="false" :taggable="false" :options-limit="10" :allow-empty="false" ></multiselect>
-
-              </div>
+           
 
              
 
 
-              <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Code</label>
-                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Code" value="" v-model="formData.code" required />
-              </div>
+             
              
               <div class="fv-row mb-7" v-for="lang in languages" :key="lang.locale">
                 <label class="required fw-semibold fs-6 mb-2" :for="'name_' + lang.locale">{{ lang.name }} Name</label>
@@ -218,54 +200,7 @@
 
 
 
-              <div class="fv-row mb-7" v-if="routeSegment === 'standards' || routeSegment === 'drawings'">
-                <label class=" fw-semibold fs-6 mb-2">Link</label>
-                <input type="text" name="link"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Link" value="" v-model="formData.link" required />
-              </div>
-
-
-
-
-              <div class="fv-row mb-7" v-if="routeSegment === 'standards' || routeSegment === 'drawings'">
-                <!--begin::Label-->
-                <label class="d-block fw-semibold fs-6 mb-5">Image/File optional</label>
-              
-                <div class="image-input image-input-outline image-input-placeholder" data-kt-image-input="true">
-                  <!--begin::Preview existing avatar-->
-
-                  <div class="image-input-wrapper w-125px h-125px" :style="{'background-image': formData.logo ? `url(${formData.logo})` : 'url(/assets/avatar.svg)'}">
-                    
-                    <a :href="formData.logo" target="_blank">Open Current File</a>
-                  </div>
-
-
-                
-                  <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
-                    <i class="ki-duotone ki-pencil fs-7">
-                      <span class="path1"></span>
-                      <span class="path2"></span>
-                    </i>
-                    <input type="file" name="avatar" @change="onFileChange" accept="*" />
-                    <input type="hidden" name="avatar_remove" />
-                  </label>
-                  <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel avatar">
-                    <i class="ki-duotone ki-cross fs-2">
-                      <span class="path1"></span>
-                      <span class="path2"></span>
-                    </i>
-                  </span>
-                  <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove avatar">
-                    <i class="ki-duotone ki-cross fs-2">
-                      <span class="path1"></span>
-                      <span class="path2"></span>
-                    </i>
-                  </span>
-                </div>
-                <div class="form-text">Allowed types: Image or File.</div>
-
-                <a :href="formData.logo" target="_blank">Open Current File</a>
-              </div>
-
+            
 
 
 
@@ -452,6 +387,8 @@ export default {
                     this.isLoading = false;
                     this.totalItems = response.data.items.total
                     this.languages = this.$store.state.languages ;
+
+                    console.log(this.languages)
                 })
                 .catch(error => {
                    Swal.fire({
