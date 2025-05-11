@@ -25,23 +25,16 @@ class User extends Authenticatable
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+   
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    protected $appends = ['role','permission','role_name'];
+    protected $appends = ['role','permission','role_name','document'];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+
+
     protected function casts(): array
     {
         return [
@@ -88,6 +81,16 @@ class User extends Authenticatable
     public function getCreatedAtAttribute($value){
         return date('Y-m-d', strtotime($value));
     }
+
+
+    public function getDocumentAttribute() {
+    $raw = $this->attributes['documents'] ?? '[]';
+
+    // تحويل JSON string إلى array ثم إلى أرقام
+    $ids = array_map('intval', json_decode($raw, true));
+
+    return ItemsCategories::whereIn('id', $ids)->get();
+}
 
 
 

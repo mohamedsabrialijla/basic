@@ -387,14 +387,14 @@ export default {
                 })
                 .catch(error => {
                    Swal.fire({
-                text: error,
-                icon: "error",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn btn-primary"
-                }
-            });
+                      text: error,
+                      icon: "error",
+                      buttonsStyling: false,
+                      confirmButtonText: "Ok, got it!",
+                      customClass: {
+                          confirmButton: "btn btn-primary"
+                      }
+                  });
 
                    this.isLoading = false;
                 });
@@ -418,7 +418,7 @@ export default {
         addEditItem() {
 
           
-          this.isLoading = true;
+           this.isLoading = true;
 
            
             if(this.ItemID != ''){
@@ -428,7 +428,7 @@ export default {
             this.formData.department_id = this.formData.department.id
 
              
-          axios.post(this.URL,this.formData).then((response)=>{
+            axios.post(this.URL,this.formData).then((response)=>{
                  this.isLoading = false;
                 if(response.data.items){
                    swal.fire({

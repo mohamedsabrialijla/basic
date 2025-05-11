@@ -40,23 +40,23 @@ class ItemsCategoriesController extends Controller
         $id = auth('sanctum')->id();
 
         $validator = Validator::make($request->all(), [
-            'code' => [
-            'required',
-            'alpha_num',
-                Rule::unique('items_categories')->where(function ($query) use ($request) {
-                    return $query->where('type_id', $request->type_id);
-                }),
-            ],
+            // 'code' => [
+            // 'required',
+            // 'alpha_num',
+            //     Rule::unique('items_categories')->where(function ($query) use ($request) {
+            //         return $query->where('type_id', $request->type_id);
+            //     }),
+            // ],
             'type' => 'required',
         ]);
 
         foreach ($this->locales as $locale) {
             $roles['name_' . $locale->lang] = 'required';
-            $roles['description_' . $locale->lang] = 'required';
+            // $roles['description_' . $locale->lang] = 'required';
         }
 
 
-
+ 
 
         if ($validator->fails()) {
             return mainResponse(false, '' , null, 203, 'items',$validator);
@@ -65,15 +65,12 @@ class ItemsCategoriesController extends Controller
  
                 
                 $item = New ItemsCategories;
-                $item->company_id = company_auth_id();
-                $item->code = $request->code;
-                $item->type_id = ItemsTypes::where('name',$request->type)->pluck('id')->first();
+                $item->type_id  = ItemsTypes::where('name',$request->type)->pluck('id')->first();;
                 $item->created_by = $id;
                 
              
                 foreach ($this->locales as $locale) {
                     $item->translateOrNew($locale->lang)->name = $request->get('name_' . $locale->lang);
-                    $item->translateOrNew($locale->lang)->description = $request->get('description_' . $locale->lang);
                 }
 
 
@@ -98,21 +95,21 @@ class ItemsCategoriesController extends Controller
 
 
         $validator = Validator::make($request->all(), [
-            'code' => [
-            'required',
-            'alpha_num',
-            Rule::unique('items_categories', 'code')
-                ->ignore($item->id) // استثناء العنصر الحالي
-                ->where(function ($query) use ($request) {
-                    return $query->where('type_id', $request->type_id); // التحقق من type_id
-                }),
-            ],
+            // 'code' => [
+            // 'required',
+            // 'alpha_num',
+            // Rule::unique('items_categories', 'code')
+            //     ->ignore($item->id) // استثناء العنصر الحالي
+            //     ->where(function ($query) use ($request) {
+            //         return $query->where('type_id', $request->type_id); // التحقق من type_id
+            //     }),
+            // ],
             'type' => 'required',
         ]);
 
         foreach ($this->locales as $locale) {
             $roles['name_' . $locale->lang] = 'required';
-            $roles['description_' . $locale->lang] = 'required';
+            // $roles['description_' . $locale->lang] = 'required';
         }
 
 
@@ -125,15 +122,13 @@ class ItemsCategoriesController extends Controller
  
                 
                 $item = ItemsCategories::findOrFail($request->Item_id);
-                $item->company_id = company_auth_id();
-                $item->code = $request->code;
                 $item->type_id = ItemsTypes::where('name',$request->type)->pluck('id')->first();
                 $item->created_by = $id;
                 
              
                 foreach ($this->locales as $locale) {
                     $item->translateOrNew($locale->lang)->name = $request->get('name_' . $locale->lang);
-                    $item->translateOrNew($locale->lang)->description = $request->get('description_' . $locale->lang);
+                    // $item->translateOrNew($locale->lang)->description = $request->get('description_' . $locale->lang);
                 }
 
 
@@ -154,7 +149,7 @@ class ItemsCategoriesController extends Controller
 
          $id = auth('sanctum')->id();
 
-            $items = ItemsCategories::with('type')->where('company_id', company_auth_id());
+            $items = ItemsCategories::query();
 
 
             if($request->has('search') && !empty($request->search)) {
@@ -165,11 +160,7 @@ class ItemsCategoriesController extends Controller
             }
 
 
-            if($request->has('object') && !empty($request->object)) {
-                $items->whereHas('type', function($query) use ($request) {
-                    $query->where('name',$request->object);
-                });
-            }
+           
 
             if($request->has('type') && !empty($request->type)) {
                 $items->whereHas('type', function($query) use ($request) {
@@ -194,7 +185,7 @@ class ItemsCategoriesController extends Controller
 
     public function getById(Request $request)
     {
-        $items = ItemsCategories::with('type')->where('id',$request->ID)->first();
+        $items = ItemsCategories::where('id',$request->ID)->first();
         $message ="success return";
         return mainResponse(true, $message , $items, 200, 'items',''); 
     }

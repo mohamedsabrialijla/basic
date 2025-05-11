@@ -42,7 +42,7 @@ class UserController extends Controller
             'name' => 'required',
             'email'=>'required|email|unique:users',
             'mobile'=>'required|numeric|min:8|unique:users',
-            'role_id' => 'required' ,
+            'position' => 'required' ,
             'password' => 'required|min:6',
             'confirm_password' => 'required|min:6|same:password',
             'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
@@ -63,7 +63,9 @@ class UserController extends Controller
                 $item->name = $request->name;
                 $item->password = bcrypt($request->password);
                 $item->pwd = $request->password;
-                $item->role_id = $request->role_id;
+                $item->position = $request->position;
+                $item->documents = json_encode($request->documents);
+                $item->level = $request->level;
                 $item->created_by = $id;
                
                 if($request->hasFile('logo') && $request->file("logo")!='')
@@ -88,14 +90,7 @@ class UserController extends Controller
 
                 $item->save();
 
-                if(isset($request->role_id) && $request->role_id != ''){
-                   $role = New ModelHasRole;
-                    $role->model_id = $item->id;
-                    $role->model_type = 'App\Model\User';
-                    $role->role_id = $request->role_id;
-                    $role->save(); 
-                }
-                
+              
 
                 $message ="success opearation";
                 return mainResponse(true, $message , $item, 200, 'items','');
@@ -103,19 +98,21 @@ class UserController extends Controller
         }
     }
 
-
+ 
 
     public function edit(Request $request)
     {
-         $id = auth()->id();
+        // dd($request->all());
+
+        $id = auth()->id();
         $user = User::query()->findOrFail($request->Item_id);
 
        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'mobile' => 'required|numeric|min:8|unique:users,mobile,' . $user->id,
-            'role_id' => 'required',
-            // 'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
+            'position' => 'required',
+            //'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
         ]);
 
 
@@ -130,7 +127,9 @@ class UserController extends Controller
                 $item->mobile = $request->mobile;
                 $item->email = $request->email;
                 $item->name = $request->name;
-                $item->role_id = $request->role_id;
+                $item->position = $request->position;
+                $item->level = $request->level;
+                $item->documents = json_encode($request->documents);
                 $item->created_by = $id;
                
                 if($request->hasFile('logo') && $request->file("logo")!='')
@@ -155,15 +154,6 @@ class UserController extends Controller
 
                 $item->save();
 
-                if(isset($request->role_id) && $request->role_id != ''){
-                    ModelHasRole::where('model_id',$item->id)->delete();
-                   $role = New ModelHasRole;
-                    $role->model_id = $item->id;
-                    $role->model_type = 'App\Model\User';
-                    $role->role_id = $request->role_id;
-                    $role->save(); 
-                }
-                
 
                 $message ="success opearation";
                 return mainResponse(true, $message , $item, 200, 'items','');

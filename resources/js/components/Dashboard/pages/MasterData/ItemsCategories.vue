@@ -66,8 +66,6 @@
                   <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table_users .form-check-input" value="1" v-model="selectAll" @change="toggleAll" />
                 </div>
               </th>
-              <th class="min-w-125px">Type</th>
-              <th class="min-w-125px">Code</th>
               <th class="min-w-125px">Name</th>
               <th class="min-w-125px">Status</th>
               <th class="min-w-125px">Joined Date</th>
@@ -79,19 +77,6 @@
               <td >
                 <div class="form-check form-check-sm form-check-custom form-check-solid">
                   <input v-model="selectedItems" :value="item.id" class="form-check-input" type="checkbox"  />
-                </div>
-              </td>
-
-
-              <td class="align-items-center" style="margin-top: 15px;">
-                <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.type.name}}</a>
-                </div>
-              </td>
-
-              <td class="align-items-center" style="margin-top: 15px;">
-                <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.code}}</a>
                 </div>
               </td>
 
@@ -192,25 +177,21 @@
              
 
 
-              <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Code</label>
-                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Code" value="" v-model="formData.code" required />
-              </div>
              
               <div class="fv-row mb-7" v-for="lang in languages" :key="lang.locale">
-                <label class="required fw-semibold fs-6 mb-2" :for="'name_' + lang.locale">{{ lang.name }} Name</label>
+                <label class="required fw-semibold fs-6 mb-2" :for="'name_' + lang.locale"> Name</label>
                 <input type="text" :name="'name_' + lang.locale" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Name" value="" v-model="formData['name_' + lang.lang]"   required />
               </div>
 
             
 
-              <div class="fv-row mb-7" v-for="lang in languages" :key="lang.locale">
+              <!-- <div class="fv-row mb-7" v-for="lang in languages" :key="lang.locale">
                 <label class="required fw-semibold fs-6 mb-2">{{ lang.name }} Description</label>
                 <textarea rows="6" id="messageContent" maxlength="250"
                    v-model="formData['description_' + lang.lang]" value=""
                     placeholdr="{{ lang.name }} Description" class="form-control " >     
                 </textarea>
-              </div>
+              </div> -->
 
 
 

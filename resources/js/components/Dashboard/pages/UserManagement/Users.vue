@@ -233,12 +233,36 @@
 
 
 
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Position</label>
+                <input type="text" name="position" v-model="formData.position" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="EX:Manager ..." maxlength="12" value="" required />
+              </div>
+
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Level</label>
+                 <select class="form-control" v-model="formData.level">
+                    <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
+                 </select>
+              </div>
+
+
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Documents Approval</label>
+                <multiselect class="" v-model="formData.documents" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="itemsCategories" :multiple="true" :taggable="false" :options-limit="20" :allow-empty="false" ></multiselect>
+
+              </div>
+
+
+
 
 
               <div class="fv-row mb-7" v-if="!ItemID">
                 <label class="required fw-semibold fs-6 mb-2">Password</label>
                 <input type="password" name="password" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Your password" v-model="formData.password" value="" required />
               </div>
+
 
 
               <div class="fv-row mb-7" v-if="!ItemID">
@@ -248,23 +272,6 @@
 
 
           
-
-
-
-
-              <div class="mb-5">
-                <label class="required fw-semibold fs-6 mb-5">Role</label>
-                <div class="d-flex fv-row" v-for="(item, index) in itemsRoles" :key="item.id">
-                  <div class="form-check form-check-custom form-check-solid">
-                    <input class="form-check-input me-3" type="radio" :value="item.id" v-model="formData.role_id" :id="'role_' + item.id"  />
-                    <label class="form-check-label" :for="'role_' + item.id">
-                      <div class="fw-bold text-gray-800">{{ item.display_name }}</div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-
             </div>
             <div class="text-center pt-10">
               <button type="submit" class="btn btn-primary" @click.prevent="addEditItem" :disabled="isLoading">
@@ -368,14 +375,16 @@
 
              
 </template>
-
+ 
 <script>
 import axios from 'axios';
 import Pagination from '../../layout/pagination.vue';
+import Multiselect from 'vue-multiselect'
+
 
 export default {
   components: {
-    Pagination
+    Pagination,Multiselect
   },
     data() {
         return {
@@ -386,13 +395,15 @@ export default {
             searchQuery: '', // الكلمة المفتاحية للبحث
             isLoading: false, // حالة التحميل
             items: [], 
-            itemsRoles: [], 
+            itemsCategories:[], 
             searchQuery: '',
             formData: {
                 name: '',
                 email: '',
-                role_id: '',
+                position: '',
+                level: '1',
                 password: '',
+                documents: '',
                 logo: '',
                 logo_preview  :'./../assets/media/avatars/300-1.jpg',
             },
@@ -430,8 +441,8 @@ export default {
 
 
         getModalCreate(){
-            this.fetchItemsRoles();
             this.resetItem();
+            this.fetchItemsCategories()
             $('#kt_modal_add_item').modal('show');
             this.titleModal = 'اضافة جديد '
         },
@@ -439,10 +450,10 @@ export default {
 
         getModalEdit(item){
             this.ItemID = item.id
-            this.fetchItemsRoles();
             this.resetItem();
+            this.fetchItemsCategories()
             $('#kt_modal_add_item').modal('show');
-            this.titleModal = 'تعديل البيانات'
+            this.titleModal = 'Edit Item'
             this.URL = 'Users/editItem'
             this.getItemById() 
         },
@@ -450,7 +461,6 @@ export default {
 
         getModalEditPassword(item){
             this.ItemID = item.id
-            this.fetchItemsRoles();
             this.resetItemPassword();
             $('#kt_modal_add_item_password').modal('show');
             this.titleModal = 'تعديل الباسوورد'
@@ -475,7 +485,8 @@ export default {
           this.formData.mobile=''
           this.formData.email=''
           this.formData.name=''
-          this.formData.role_id=''
+          this.formData.position=''
+          this.formData.level= '1' ,
           this.formData.logo=''
           this.logo_preview ='./../assets/companies/img/store-logo.jpg'
 
@@ -486,9 +497,27 @@ export default {
          resetItemPassword(){
           this.formData.password=''
           this.formData.confirm_password=''
-          
-
         },
+ 
+
+
+        async fetchItemsCategories() {
+            const typeList = ['category'];
+            axios.get('/ItemsCategories/getAllItems?pagination=0', {
+                params: {
+                    pagination: 0,
+                    type: 'documents'
+                } 
+            })
+            .then(response => {
+                this.itemsCategories = response.data.items;
+                console.log(this.itemsCategories)
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        },
+
 
 
 
@@ -542,15 +571,7 @@ export default {
         },
 
 
-        async fetchItemsRoles() {
-            axios.get('/Roles/getAllItems?pagination=0')
-                .then(response => {
-                    this.itemsRoles = response.data.items;
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        },
+       
 
         // تحديث واختيار الدور
         selectRole(roleId) {
@@ -558,9 +579,7 @@ export default {
         },
 
 
-        // إضافة مستخدم جديد
         addEditItem() {
-
           
           this.isLoading = true;
 
@@ -578,7 +597,14 @@ export default {
                 form.append('password', this.formData.password);
                 form.append('confirm_password', this.formData.confirm_password);
               }
-              form.append('role_id', this.formData.role_id);
+              form.append('position', this.formData.position);
+              form.append('level', this.formData.level);
+              
+
+              this.formData.documents.forEach(doc => {
+                form.append('documents[]', doc.id);
+              });
+
 
               if (this.logo) {
                 form.append('logo', this.logo);
@@ -588,7 +614,7 @@ export default {
                form.append('Item_id', this.ItemID);
             }
              
-          axios.post(this.URL,form,config).then((response)=>{
+           axios.post(this.URL,form,config).then((response)=>{
                  this.isLoading = false;
                 if(response.data.items){
                    swal.fire({
@@ -680,26 +706,14 @@ export default {
                 if(response.data){
                   let data = response.data.items
                    this.formData = data;
+                   this.formData.documents = data.document
 
                 }else{
-                    Swal.fire({
-                        text: "Error happens",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn btn-primary"
-                        }
-                    });
+                    this.swalFunction('info', 'Error Happens')
                 }
             }).catch((error)=>{
 
-                    swal({
-                    text: 'Error happens',
-                    icon: 'error',
-                    timer: false,
-                    button: true
-                    });         
+                  this.swalFunction('info', 'Error Happens')       
             });
         },
 
@@ -800,10 +814,32 @@ export default {
 };
 </script>
 
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style>
 
-<style type="text/css">
-  .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image.svg'); } [data-bs-theme="dark"] .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image-dark.svg'); }
+.multiselect__option--highlight {
+    background: #3ebdb1 !important;
+    outline: none;
+    color: #fff;}
+
+    .multiselect__tag {
+    background: #3ebdb1;}
+
+    .multiselect__tag-icon:after {
+    color: ##33a196;
+    }
 
 
+
+
+    ol, p, ul {
+        line-height: 1.0;
+    }
+
+
+
+
+     .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image.svg'); } [data-bs-theme="dark"] .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image-dark.svg'); }
 
 </style>
+

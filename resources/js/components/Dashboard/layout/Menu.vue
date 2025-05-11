@@ -50,16 +50,7 @@
                                     </div>
 
 
-                                    <div class="menu-item">
-                                        <!--begin:Menu link-->
-                                        <router-link :to="`/${locale}/dashboard/user_management/roles`" class="menu-link">
-                                            <span class="menu-bullet">
-                                                <span class="bullet bullet-dot"></span>
-                                            </span>
-                                            <span class="menu-title">Roles List</span>
-                                        </router-link>
-                                        <!--end:Menu link-->
-                                    </div>
+                                   
 
                                 </div>
                                 <!--end:Menu item-->
@@ -68,6 +59,90 @@
                             <!--end:Menu sub-->
                         </div>
                         <!--end:Menu item-->
+
+
+
+
+                        <!--begin:Menu Master item-->
+                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                            <!--begin:Menu link-->
+                            <span class="menu-link">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-address-book fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Master Data </span>
+                                <span class="menu-arrow"></span>
+                            </span>
+                            <!--end:Menu link-->
+                            <!--begin:Menu sub-->
+                            <div class="menu-sub menu-sub-accordion">
+                                <!--begin:Menu item-->
+                                <div class="menu-item">
+                                    <!--begin:Menu link-->
+                                    <div class="menu-item">
+
+                              
+                                   
+                           
+                                        <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <router-link :to="`/${locale}/dashboard/master_data/category/criteria`" class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">SOI Criteria List</span>
+                                            </router-link>
+                                            <!--end:Menu link-->
+                                        </div>
+
+
+
+
+
+
+                                        <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <router-link :to="`/${locale}/dashboard/master_data/category/vendors`" class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Vendors List</span>
+                                            </router-link>
+                                            <!--end:Menu link-->
+                                        </div>
+
+
+                                        <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <router-link :to="`/${locale}/dashboard/master_data/category/documents`" class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Documents List</span>
+                                            </router-link>
+                                            <!--end:Menu link-->
+                                        </div>
+
+
+                                     
+
+
+                                        
+
+
+
+                                    </div>                               
+                                </div>
+                            </div>
+                       
+                        </div>
+                         <!--end:Menu Master item-->
+
+
 
 
 
@@ -83,7 +158,7 @@
                                         <span class="path2"></span>
                                     </i>
                                 </span>
-                                <span class="menu-title">Data Management</span>
+                                <span class="menu-title">Steps Management</span>
                                 <span class="menu-arrow"></span>
                             </span>
                             <!--end:Menu link-->
@@ -94,6 +169,8 @@
                                     <!--begin:Menu link-->
                                     <div class="menu-item">
                                         <!--begin:Menu link-->
+
+
                                         <router-link :to="`/${locale}/dashboard/master_data/step_1`" class="menu-link">
                                             <span class="menu-bullet">
                                                 <span class="bullet bullet-dot"></span>
