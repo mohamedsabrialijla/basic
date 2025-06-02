@@ -66,7 +66,6 @@
                   <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table_users .form-check-input" value="1" v-model="selectAll" @change="toggleAll" />
                 </div>
               </th>
-              <th class="min-w-125px"  v-if="routeSegment === 'standards' || routeSegment === 'drawings'" >Category</th>
               <th class="min-w-125px">Code</th>
               <th class="min-w-125px">Name</th>
               <th class="min-w-125px">Status</th>
@@ -83,12 +82,7 @@
               </td>
 
 
-              <td class="align-items-center" style="margin-top: 15px;"  v-if="routeSegment === 'standards' || routeSegment === 'drawings'">
-                <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.category.name}}</a>
-                </div>
-              </td>
-
+           
               <td class="align-items-center" style="margin-top: 15px;">
                 <div class="d-flex flex-column">
                   <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.code}}</a>
@@ -123,7 +117,6 @@
 
 
                          <div class="overlay-wrapper text-gray-600">
-                        
                           <i class="ki-duotone ki-tablet-text-up fs-2x" @click="openSteps(item.id)">
                            <span class="path1"></span>
                            <span class="path2"></span>
@@ -169,26 +162,21 @@
 
 
 
-<!--begin::Modal - Add task-->
-  <div class="modal fade" id="kt_modal_add_item" tabindex="-1" aria-hidden="true">
-    <!--begin::Modal dialog-->
-    <div class="modal-dialog modal-dialog-centered mw-650px">
-      <!--begin::Modal content-->
-      <div class="modal-content">
-        <!--begin::Modal header-->
-        <div class="modal-header" id="kt_modal_add_user_header">
-          <!--begin::Modal title-->
-          <h2 class="fw-bold">Add Edit {{routeSegment}}</h2>
-          <!--end::Modal title-->
-          <!--begin::Close-->
-          <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close" @click="closeModal">
-            <i class="ki-duotone ki-cross fs-1">
-              <span class="path1"></span>
-              <span class="path2"></span>
-            </i>
-          </div>
-          <!--end::Close-->
-        </div>
+<!--begin::Modal - Add task-->    
+
+
+<div class="modal bg-body fade" tabindex="-1" id="kt_modal_add_item">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content shadow-none">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+
+                <!--begin::Close-->
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+                <!--end::Close-->
+            </div>
 
 
         <div class="modal-body px-5 my-7">
@@ -197,103 +185,33 @@
 
 
 
-              <div class="fv-row mb-7" v-if="routeSegment === 'standards' || routeSegment === 'drawings'">
-                <label class="required fw-semibold fs-6 mb-2">Type</label>
-                <multiselect class="" v-model="formData.category" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="itemsCategories" :multiple="false" :taggable="false" :options-limit="10" :allow-empty="false" ></multiselect>
-
-              </div>
-
-             
-
-
-              <div class="fv-row mb-7">
+              
+            <div style="display: flex;">
+              <div class="fv-row col-md-4">
                 <label class="required fw-semibold fs-6 mb-2">Code</label>
                 <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Code" value="" v-model="formData.code" required />
               </div>
              
-              <div class="fv-row mb-7" v-for="lang in languages" :key="lang.locale">
-                <label class="required fw-semibold fs-6 mb-2" :for="'name_' + lang.locale">{{ lang.name }} Name</label>
-                <input type="text" :name="'name_' + lang.locale" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Name" value="" v-model="formData['name_' + lang.lang]"   required />
+              <div class="fv-row col-md-4">
+                <label class="required fw-semibold fs-6 mb-2" for="name"> Name</label>
+                <input type="text" :name="'name'" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Name" value="" v-model="formData.name"   required />
               </div>
 
-            
-
-              <div class="fv-row mb-7" v-for="lang in languages" :key="lang.locale">
-                <label class=" fw-semibold fs-6 mb-2">{{ lang.name }} Description</label>
-                <textarea rows="6" id="messageContent" maxlength="250"
-                   v-model="formData['description_' + lang.lang]" value=""
-                    placeholdr="{{ lang.name }} Description" class="form-control " >     
-                </textarea>
-              </div>
+            </div>
 
 
-
-              <div class="fv-row mb-7" v-if="routeSegment === 'standards' || routeSegment === 'drawings'">
-                <label class=" fw-semibold fs-6 mb-2">Link</label>
-                <input type="text" name="link"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Link" value="" v-model="formData.link" required />
-              </div>
-
-
-
-
-              <div class="fv-row mb-7" v-if="routeSegment === 'standards' || routeSegment === 'drawings'">
-                <!--begin::Label-->
-                <label class="d-block fw-semibold fs-6 mb-5">Image/File optional</label>
-              
-                <div class="image-input image-input-outline image-input-placeholder" data-kt-image-input="true">
-                  <!--begin::Preview existing avatar-->
-
-                  <div class="image-input-wrapper w-125px h-125px" :style="{'background-image': formData.logo ? `url(${formData.logo})` : 'url(/assets/avatar.svg)'}">
-                    
-                    <a :href="formData.logo" target="_blank">Open Current File</a>
-                  </div>
-
-
-                
-                  <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
-                    <i class="ki-duotone ki-pencil fs-7">
-                      <span class="path1"></span>
-                      <span class="path2"></span>
-                    </i>
-                    <input type="file" name="avatar" @change="onFileChange" accept="*" />
-                    <input type="hidden" name="avatar_remove" />
-                  </label>
-                  <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel avatar">
-                    <i class="ki-duotone ki-cross fs-2">
-                      <span class="path1"></span>
-                      <span class="path2"></span>
-                    </i>
-                  </span>
-                  <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove avatar">
-                    <i class="ki-duotone ki-cross fs-2">
-                      <span class="path1"></span>
-                      <span class="path2"></span>
-                    </i>
-                  </span>
-                </div>
-                <div class="form-text">Allowed types: Image or File.</div>
-
-                <a :href="formData.logo" target="_blank">Open Current File</a>
-              </div>
 
 
 
 
 
             </div>
-            <div class="text-center pt-10">
-            <button type="submit" class="btn btn-primary" @click.prevent="addEditItem" :disabled="isLoading">
-              <span  class="indicator-label">Submit</span>
-              <span  class="indicator-progress">Please wait...
-                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-              </span>
-            </button>
+           
 
-              <button style="margin: 7px;" type="submit" class="btn btn-secondary" @click.prevent="closeModal">
-              <span  class="indicator-label">Canacel</span>
-              
-            </button>
 
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
             </div>
           </form>
         </div>
@@ -351,7 +269,7 @@ export default {
 
             
             ItemID: null,
-            URL:'ItemsObjects/createItem',
+            URL:'Project/createItem',
 
             routeSegment: this.object,
         };
@@ -364,24 +282,19 @@ export default {
         
     },
 
-
+      computed: {
+          locale() {
+              return this.$route.params.locale;
+          }
+      },
    
     methods: {
 
-        onFileChange(e) {
-
-            const file = e.target.files[0];
-            if (file) {
-              this.logo = e.target.files[0];
-                this.formData.logo = URL.createObjectURL(file);
-            }
-        },
-
-
+      
         openSteps(ID){
 
             localStorage.setItem('ProjectID',ID);
-            this.$router.push({ path: `/${this.locale}/dashboard/master_data/steps` });
+            this.$router.push({ path: `/${this.locale}/dashboard/master_data/projects/steps` });
 
 
         },
@@ -389,11 +302,10 @@ export default {
 
 
         getModalCreate(){
-          this.URL = 'ItemsObjects/createItem'
+          this.URL = 'Project/createItem'
           this.resetItem();
           $('#kt_modal_add_item').modal('show');
-          this.titleModal = 'اضافة جديد '
-          this.fetchItemsCategories()
+          this.titleModal = 'Add New'
 
 
         },
@@ -403,10 +315,9 @@ export default {
             this.ItemID = item.id
             this.resetItem();
             $('#kt_modal_add_item').modal('show');
-            this.titleModal = 'تعديل البيانات'
+            this.titleModal = 'Edit Item'
             this.getItemById() 
-            this.URL = 'ItemsObjects/editItem'
-            this.fetchItemsCategories()
+            this.URL = 'Project/editItem'
         },
 
 
@@ -414,7 +325,7 @@ export default {
 
         closeModal(){
             $('#kt_modal_add_item').modal('hide');
-            this.URL = 'ItemsObjects/createItem'
+            this.URL = 'Project/createItem'
             this.ItemID = null
             // this.resetMark();
         },
@@ -454,11 +365,10 @@ export default {
         },
 
 
-        // جلب جميع المستخدمين
         async fetchItems(page,query = '') {
           this.currentPage = page;
           this.isLoading = true;
-            await axios.get('ItemsObjects/getAllItems', {
+            await axios.get('Project/getAllItems', {
                 params: {
                   search: this.searchQuery,  // تمرير قيمة البحث
                   pagination: 1,
@@ -487,23 +397,6 @@ export default {
                 });
         },
 
-        async fetchItemsCategories() {
-            const typeList = ['category'];
-            axios.get('/ItemsCategories/getAllItems?pagination=0', {
-                params: {
-                    pagination: 0,
-                    object: this.routeSegment
-                }
-            })
-            .then(response => {
-                this.itemsCategories = response.data.items;
-            })
-            .catch(error => {
-                console.log(error);
-            });
-        },
-
-
     
        
 
@@ -521,25 +414,11 @@ export default {
 
              let form = new FormData();
               form.append('code', this.formData.code);
-              if (this.formData.link) {
-                form.append('link', this.formData.link);
-              }
+              form.append('name', this.formData.name);
               
-
-              form.append('type', this.routeSegment);
-             this.languages.forEach((element) => { 
-                  form.append('name_' + element.lang, this.formData['name_' + element.lang]); 
-                  form.append('description_' + element.lang, this.formData['description_' + element.lang]); 
-              });
-
-             if(this.routeSegment == 'standards' || this.routeSegment == 'drawings'){
-
-                  form.append('category_id', this.formData.category.id);
-             }
              
-              if (this.formData.logo) {
-                form.append('logo', this.logo);
-              }
+
+             
            
             if(this.ItemID != ''){
                form.append('Item_id', this.ItemID);
@@ -549,7 +428,7 @@ export default {
                  this.isLoading = false;
                 if(response.data.items){
                    swal.fire({
-                    text: "تم حفظ التغييرات بنجاح",
+                    text: "Doning successfully",
                     icon: "success",
                     timer: 2000,
                     button: false
@@ -584,23 +463,16 @@ export default {
 
         async getItemById(){
 
-            axios.get('ItemsObjects/getById', { params: { ID: this.ItemID } }).then(response => {
+            axios.get('Project/getById', { params: { ID: this.ItemID } }).then(response => {
                 if(response.data){
                   let data = response.data.items
-                  let translations = response.data.items.translations
                   this.resetItem()
-
-                  this.formData = data;
-                   translations.forEach((element) => { 
-                              this.formData['name_'+element.locale] = element.name; 
-                              this.formData['description_'+element.locale] = element.description; 
-                        });
-
+                  this.formData = data
 
 
                 }else{
                     Swal.fire({
-                        text: "Error happens",
+                        text: "Error happens 3",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
@@ -612,7 +484,7 @@ export default {
             }).catch((error)=>{
 
                     swal({
-                    text: 'Error happens',
+                    text: 'Error happens 4',
                     icon: 'error',
                     timer: false,
                     button: true
@@ -692,16 +564,7 @@ export default {
      
   },
 
-   watch: {
-    // راقب تغيير المسار للتحديث عند الانتقال بين الصفحات
-    '$route.params.object': {
-      immediate: true, // تشغيل التحديث عند تحميل الصفحة
-      handler(newVal) {
-        // تحديث الـ breadcrumb بناءً على قيمة :object الجديدة
-        this.$route.meta.breadcrumb = `${newVal.charAt(0).toUpperCase() + newVal.slice(1)} Management`;
-      }
-    }
-  },
+
 
  
 };
@@ -732,6 +595,8 @@ export default {
 
 
      .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image.svg'); } [data-bs-theme="dark"] .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image-dark.svg'); }
+
+
 
 </style>
 

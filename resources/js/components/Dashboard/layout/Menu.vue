@@ -50,6 +50,18 @@
                                     </div>
 
 
+                                    <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <router-link :to="`/${locale}/dashboard/HR/departments`" class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Departments</span>
+                                            </router-link>
+                                            <!--end:Menu link-->
+                                        </div>
+
+
                                    
 
                                 </div>
@@ -128,6 +140,20 @@
                                         </div>
 
 
+
+
+                                        <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <router-link :to="`/${locale}/dashboard/master_data/category/te-criteria`" class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">TECh Criteria List</span>
+                                            </router-link>
+                                            <!--end:Menu link-->
+                                        </div>
+
+
                                      
 
 
@@ -171,11 +197,11 @@
                                         <!--begin:Menu link-->
 
 
-                                        <router-link :to="`/${locale}/dashboard/master_data/step_1`" class="menu-link">
+                                        <router-link :to="`/${locale}/dashboard/master_data/projects/list`" class="menu-link">
                                             <span class="menu-bullet">
                                                 <span class="bullet bullet-dot"></span>
                                             </span>
-                                            <span class="menu-title">Step_1</span>
+                                            <span class="menu-title">Projects</span>
                                         </router-link>
                                         <!--end:Menu link-->
                                     </div>

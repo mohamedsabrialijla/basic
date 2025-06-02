@@ -84,7 +84,7 @@ class DepartmentController extends Controller
     {
       
         $id = auth('sanctum')->id();
-        $item = Position::query()->findOrFail($request->Item_id);
+        $item = Department::query()->findOrFail($request->Item_id);
 
         $validator = Validator::make($request->all(), [
             'code' => 'required|alpha_num|unique:departments,code,' . $item->id, 

@@ -235,28 +235,24 @@
 
               <div class="fv-row mb-7">
                 <label class="required fw-semibold fs-6 mb-2">Position</label>
-                <input type="text" name="position" v-model="formData.position" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="EX:Manager ..." maxlength="12" value="" required />
+                <input type="text" name="position" v-model="formData.position" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="EX:Manager ..." maxlength="100" value="" required />
               </div>
 
 
-              <div class="fv-row mb-7">
+              <!-- <div class="fv-row mb-7">
                 <label class="required fw-semibold fs-6 mb-2">Level</label>
                  <select class="form-control" v-model="formData.level">
                     <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
                  </select>
-              </div>
+              </div> -->
 
-
+ 
 
               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Documents Approval</label>
-                <multiselect class="" v-model="formData.documents" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="itemsCategories" :multiple="true" :taggable="false" :options-limit="20" :allow-empty="false" ></multiselect>
+                <label class="required fw-semibold fs-6 mb-2">Department</label>
+                <multiselect class="" v-model="formData.department" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="itemsDepartments" :multiple="false" :taggable="false" :options-limit="20" :allow-empty="false" ></multiselect>
 
               </div>
-
-
-
-
 
               <div class="fv-row mb-7" v-if="!ItemID">
                 <label class="required fw-semibold fs-6 mb-2">Password</label>
@@ -396,6 +392,7 @@ export default {
             isLoading: false, // حالة التحميل
             items: [], 
             itemsCategories:[], 
+            itemsDepartments:[],
             searchQuery: '',
             formData: {
                 name: '',
@@ -442,7 +439,8 @@ export default {
 
         getModalCreate(){
             this.resetItem();
-            this.fetchItemsCategories()
+            // this.fetchItemsCategories()
+            this.fetchItemsDepartments()
             $('#kt_modal_add_item').modal('show');
             this.titleModal = 'اضافة جديد '
         },
@@ -451,7 +449,7 @@ export default {
         getModalEdit(item){
             this.ItemID = item.id
             this.resetItem();
-            this.fetchItemsCategories()
+            this.fetchItemsDepartments()
             $('#kt_modal_add_item').modal('show');
             this.titleModal = 'Edit Item'
             this.URL = 'Users/editItem'
@@ -517,6 +515,22 @@ export default {
                 console.log(error);
             });
         },
+ 
+
+        async fetchItemsDepartments() {
+            axios.get('/Departments/getAllItems?pagination=0', {
+                params: {
+                    pagination: 0,
+                } 
+            })
+            .then(response => {
+                this.itemsDepartments = response.data.items;
+                
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        },
 
 
 
@@ -539,7 +553,6 @@ export default {
         },
 
 
-        // جلب جميع المستخدمين
         async fetchItems(page,query = '') {
           this.currentPage = page;
           this.isLoading = true;
@@ -578,7 +591,7 @@ export default {
           this.formData.role_id = roleId;
         },
 
-
+ 
         addEditItem() {
           
           this.isLoading = true;
@@ -599,11 +612,18 @@ export default {
               }
               form.append('position', this.formData.position);
               form.append('level', this.formData.level);
+
+
+              if(this.formData.department){
+
+                form.append('department', this.formData.department.id)
+              }
               
 
-              this.formData.documents.forEach(doc => {
-                form.append('documents[]', doc.id);
-              });
+              // this.formData.documents.forEach(doc => {
+              //   form.append('documents[]', doc.id);
+              // });
+
 
 
               if (this.logo) {

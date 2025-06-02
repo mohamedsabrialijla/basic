@@ -12,10 +12,7 @@ use App\Models\Language;
 use App\Models\ItemsProject;
 use App\Models\ItemsTypes;
 use App\Models\Project;
-use App\Models\ScopeProject;
-use App\Models\ActivityProject;
-use App\Models\TaskProject;
-use App\Models\SubTaskProject;
+use App\Models\Step;
 use Carbon\Carbon;
 
 
@@ -50,54 +47,27 @@ class ProjectController extends Controller
 
       $rules = [
                 'name' => 'required',
-                'budget' => 'required',
-                'contract_no' => 'required',
-                'client_id' => 'required',
-                'zone_id' => 'required',
-                'manager_id' => 'required',
-                'category_id' => 'required',
-                'code' => 'required|alpha_num|unique:projects',
-                'start_date' => ['required', 'date'],
-                'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+                
                    
             
             ];
 
 
-        $custom = [
-            'start_date.required' => 'The start date is required.',
-            'start_date.date' => 'The start date must be a valid date.',
-            'end_date.required' => 'The end date is required.',
-            'end_date.date' => 'The end date must be a valid date.',
-            'end_date.after_or_equal' => 'The end date must be the same or after the start date.',
-        ];
 
 
-         $validator = Validator::make($request->all(), $rules, $custom);
+
+         $validator = Validator::make($request->all(), $rules,);
 
 
         if ($validator->fails()) {
             return mainResponse(false, '' , null, 203, 'items',$validator);
         }else{
 
-            $start_date = Carbon::parse($request->start_date);
-            $end_date = Carbon::parse($request->end_date);
-            $days_difference = $start_date->diffInDays($end_date);
-
+          
                 $item = New Project;
-                $item->company_id = company_auth_id();
-                $item->category_id = $request->category_id;
-                $item->client_id = $request->client_id;
-                $item->zone_id = $request->zone_id;
-                $item->manager_id = $request->manager_id;
-                $item->budget = $request->budget;
-                $item->contract_no = $request->contract_no;
+               
                 $item->name = $request->name;
-                $item->description = $request->description;
                 $item->code = $request->code;
-                $item->start_date = $request->start_date;
-                $item->end_date = $request->end_date;
-                $item->duration = $days_difference;
                 $item->created_by = $id;
 
 
@@ -130,54 +100,28 @@ class ProjectController extends Controller
             
             $rules = [
                 'name' => 'required',
-                'budget' => 'required',
-                'contract_no' => 'required',
-                'client_id' => 'required',
-                'zone_id' => 'required',
-                'manager_id' => 'required',
-                'category_id' => 'required',
+                
                 'code' => 'required|alpha_num|unique:projects,code,' . $item->id, 
-                'start_date' => ['required', 'date'],
-                'end_date' => ['required', 'date', 'after_or_equal:start_date'],
                    
             
             ];
 
 
-        $custom = [
-            'start_date.required' => 'The start date is required.',
-            'start_date.date' => 'The start date must be a valid date.',
-            'end_date.required' => 'The end date is required.',
-            'end_date.date' => 'The end date must be a valid date.',
-            'end_date.after_or_equal' => 'The end date must be the same or after the start date.',
-        ];
 
-
-         $validator = Validator::make($request->all(), $rules, $custom);
+         $validator = Validator::make($request->all(), $rules);
 
 
         if ($validator->fails()) {
             return mainResponse(false, '' , null, 203, 'items',$validator);
         }else{
 
-            $start_date = Carbon::parse($request->start_date);
-            $end_date = Carbon::parse($request->end_date);
-            $days_difference = $start_date->diffInDays($end_date);
+           
 
                 $item = Project::findOrFail($request->Item_id);
-                $item->company_id = company_auth_id();
-                $item->category_id = $request->category_id;
-                $item->client_id = $request->client_id;
-                $item->zone_id = $request->zone_id;
-                $item->manager_id = $request->manager_id;
-                $item->budget = $request->budget;
-                $item->contract_no = $request->contract_no;
+               
                 $item->name = $request->name;
-                $item->description = $request->description;
                 $item->code = $request->code;
-                $item->start_date = $request->start_date;
-                $item->end_date = $request->end_date;
-                $item->duration = $days_difference;
+                
                 $item->created_by = $id;
 
                 $item->save();
@@ -198,7 +142,7 @@ class ProjectController extends Controller
 
          $id = auth('sanctum')->id();
 
-            $items = Project::with('category','manager','zone','client')->where('company_id', company_auth_id());
+            $items = Project::query();
 
 
             if($request->has('search') && !empty($request->search)) {
@@ -227,14 +171,14 @@ class ProjectController extends Controller
 
     public function getById(Request $request)
     {
-        $items = Project::with('category','manager','zone','client')->where('id',$request->ID)->first();
+        $items = Project::query()->where('id',$request->ID)->first();
         $message ="success return";
         return mainResponse(true, $message , $items, 200, 'items',''); 
     }
 
     public function delete($id)
     {
-        if(ItemsProject::where('id',$id)->delete()){
+        if(Project::where('id',$id)->delete()){
             $message ="success return";
             return mainResponse(true, $message , '', 200, 'items','');
         }else{
@@ -242,6 +186,16 @@ class ProjectController extends Controller
             return mainResponse(false, $message , '', 203, 'items','');
         }
         
+    }
+
+
+
+
+    public function getAllItemsAllSteps(Request $request)
+    {
+            $items = Step::where('project_id',$request->project_id)->get();
+            $message = "success return";
+            return mainResponse(true, $message, $items, 200, 'items', '');
     }
 
     

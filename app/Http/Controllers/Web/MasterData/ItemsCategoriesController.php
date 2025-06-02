@@ -10,7 +10,10 @@ use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\Language;
 use App\Models\ItemsCategories;
+use App\Models\CategoryTitle;
+use App\Models\CategoryFeature;
 use App\Models\ItemsTypes;
+use Illuminate\Support\Str;
 
 
 
@@ -36,17 +39,13 @@ class ItemsCategoriesController extends Controller
 
     public function create(Request $request)
     {
-      
+       
+
+
         $id = auth('sanctum')->id();
 
         $validator = Validator::make($request->all(), [
-            // 'code' => [
-            // 'required',
-            // 'alpha_num',
-            //     Rule::unique('items_categories')->where(function ($query) use ($request) {
-            //         return $query->where('type_id', $request->type_id);
-            //     }),
-            // ],
+          
             'type' => 'required',
         ]);
 
@@ -67,6 +66,12 @@ class ItemsCategoriesController extends Controller
                 $item = New ItemsCategories;
                 $item->type_id  = ItemsTypes::where('name',$request->type)->pluck('id')->first();;
                 $item->created_by = $id;
+                $item->slug = Str::slug($request->name_en);
+                $item->order = $request->order;
+                if($request->users){
+                    $item->users = json_encode($request->users);
+                }
+                
                 
              
                 foreach ($this->locales as $locale) {
@@ -76,7 +81,31 @@ class ItemsCategoriesController extends Controller
 
                 $item->save();
 
-                $message ="تمت العملية بنجاح";
+ 
+
+                if ($request->type == 'te-criteria') {
+                    foreach ($request->forms as $index => $form) {
+                        // حفظ العنوان
+                        $title = new CategoryTitle();
+                        $title->items_category_id = $item->id;
+                        $title->title = $form['title'];
+                        $title->order = $item->order . '.' . ($index + 1);
+                        $title->save(); 
+
+                        // حفظ features
+                        foreach ($form['features'] as $key => $featureData) {
+                            $feature = new CategoryFeature();
+                            $feature->items_category_id = $item->id;
+                            $feature->title_id = $title->id;
+                            $feature->name= $featureData['name']; 
+                            $feature->value = $form['features_value'][$key]['number'] ?? null; 
+                            $feature->save();
+                        }
+                    }
+                }
+
+
+                $message ="success Doing";
                 return mainResponse(true, $message , $item, 200, 'items','');
 
                
@@ -89,6 +118,7 @@ class ItemsCategoriesController extends Controller
 
     public function edit(Request $request)
     {
+        // dd($request->all());
       
         $id = auth('sanctum')->id();
         $item = ItemsCategories::query()->findOrFail($request->Item_id);
@@ -123,7 +153,13 @@ class ItemsCategoriesController extends Controller
                 
                 $item = ItemsCategories::findOrFail($request->Item_id);
                 $item->type_id = ItemsTypes::where('name',$request->type)->pluck('id')->first();
+                if($request->users){
+                    $item->users = json_encode($request->users);
+                }
+                
                 $item->created_by = $id;
+                $item->order = $request->order;
+                $item->slug = Str::slug($request->name_en);
                 
              
                 foreach ($this->locales as $locale) {
@@ -134,7 +170,40 @@ class ItemsCategoriesController extends Controller
 
                 $item->save();
 
-                $message ="تمت العملية بنجاح";
+
+
+                 if ($request->type == 'te-criteria' && $request->forms || $request->type == 'te-criteria' &&  $request->forms != '') {
+
+                    CategoryTitle::where('items_category_id',$item->id)->delete();
+                    CategoryFeature::where('items_category_id',$item->id)->delete();
+                    
+                    foreach ($request->forms as $index => $form) {
+
+                        $title = new CategoryTitle();
+                        $title->items_category_id = $item->id;
+                        $title->title = $form['title'];
+                        $title->critiera = $form['critiera'];
+                        $title->order = $item->order . '.' . ($index + 1);
+                        $title->save(); 
+
+
+                        if(isset($form['features']) && $form['features'] != ''){
+                            foreach ($form['features'] as $key => $featureData) {
+                                $feature = new CategoryFeature();
+                                $feature->items_category_id = $item->id;
+                                $feature->title_id = $title->id;
+                                $feature->name= $featureData['name']; 
+                                $feature->value = $form['features_value'][$key]['number'] ?? null; 
+                                $feature->save();
+                            }
+                        }
+                    }
+                }
+
+
+
+
+                $message ="success Doing";
                 return mainResponse(true, $message , $item, 200, 'items','');
 
                
@@ -149,7 +218,7 @@ class ItemsCategoriesController extends Controller
 
          $id = auth('sanctum')->id();
 
-            $items = ItemsCategories::query();
+            $items = ItemsCategories::query()->with('type','features.features_value');
 
 
             if($request->has('search') && !empty($request->search)) {
@@ -171,10 +240,36 @@ class ItemsCategoriesController extends Controller
 
 
             if(isset($request->pagination) && $request->pagination == 1) {
-                $items = $items->orderBy('id','DESC')->paginate(10); 
+                $items = $items->orderBy('order','ASC')->paginate(10); 
             } else {
-                $items = $items->orderBy('id','DESC')->get();
+                $items = $items->orderBy('order','ASC')->get();
             }
+
+            $message = "success return";
+
+            return mainResponse(true, $message, $items, 200, 'items', '');
+    }
+
+
+    public function getAllItemsByType(Request $request)
+    {
+
+         $id = auth('sanctum')->id();
+
+            $items = ItemsCategories::query()->with('type');
+
+
+
+            if($request->has('type') && !empty($request->type)) {
+                $items->whereHas('type', function($query) use ($request) {
+                    $query->where('name',$request->type);
+                });
+            }
+
+
+
+                $items = $items->orderBy('order','ASC')->get();
+            
 
             $message = "success return";
 
@@ -185,7 +280,7 @@ class ItemsCategoriesController extends Controller
 
     public function getById(Request $request)
     {
-        $items = ItemsCategories::where('id',$request->ID)->first();
+        $items = ItemsCategories::with('features.features_value')->where('id',$request->ID)->with('type')->first();
         $message ="success return";
         return mainResponse(true, $message , $items, 200, 'items',''); 
     }

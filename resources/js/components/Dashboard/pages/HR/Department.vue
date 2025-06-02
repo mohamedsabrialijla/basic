@@ -354,7 +354,6 @@ export default {
         },
 
 
-        // جلب جميع المستخدمين
         async fetchItems(page,query = '') {
           this.currentPage = page;
           this.isLoading = true;
@@ -390,15 +389,14 @@ export default {
     
        
 
-        // إضافة مستخدم جديد
         addEditItem() {
-
           
           this.isLoading = true;
 
-           
             if(this.ItemID != ''){
                this.formData.Item_id = this.ItemID;
+
+               this.URL = 'Departments/editItem'
 
             }
              

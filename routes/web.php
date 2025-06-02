@@ -177,6 +177,7 @@ Route::group([
         Route::group(['prefix' => 'ItemsCategories'], function () {
 
             Route::get('getAllItems', [App\Http\Controllers\Web\MasterData\ItemsCategoriesController::class,'getAll']);
+            Route::get('getAllItemsByType', [App\Http\Controllers\Web\MasterData\ItemsCategoriesController::class,'getAllItemsByType']);
             Route::get('getById', [App\Http\Controllers\Web\MasterData\ItemsCategoriesController::class,'getById']);
             Route::post('createItem', [App\Http\Controllers\Web\MasterData\ItemsCategoriesController::class,'create']);
             Route::post('editItem', [App\Http\Controllers\Web\MasterData\ItemsCategoriesController::class,'edit']);
@@ -200,86 +201,14 @@ Route::group([
 
 
 
-
-        Route::group(['prefix' => 'ItemsClassResources'], function () {
-
-            Route::get('getAllItems', [App\Http\Controllers\Web\Resources\ItemsClassController::class,'getAll']);
-            Route::get('getById', [App\Http\Controllers\Web\Resources\ItemsClassController::class,'getById']);
-            Route::post('createItem', [App\Http\Controllers\Web\Resources\ItemsClassController::class,'create']);
-            Route::post('editItem', [App\Http\Controllers\Web\Resources\ItemsClassController::class,'edit']);
-            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Resources\ItemsClassController::class,'delete']);
-            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Resources\ItemsClassController::class,'deleteAllItem']);
-        
-        });
-
-
-        Route::group(['prefix' => 'ItemsTypesResources'], function () {
-
-            Route::get('getAllItems', [App\Http\Controllers\Web\Resources\ItemsTypesController::class,'getAll']);
-            Route::get('getById', [App\Http\Controllers\Web\Resources\ItemsTypesController::class,'getById']);
-            Route::post('createItem', [App\Http\Controllers\Web\Resources\ItemsTypesController::class,'create']);
-            Route::post('editItem', [App\Http\Controllers\Web\Resources\ItemsTypesController::class,'edit']);
-            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Resources\ItemsTypesController::class,'delete']);
-            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Resources\ItemsTypesController::class,'deleteAllItem']);
-        
-        });
+     
 
 
 
-        Route::group(['prefix' => 'ItemsModelsResources'], function () {
-
-            Route::get('getAllItems', [App\Http\Controllers\Web\Resources\ItemsModelsController::class,'getAll']);
-            Route::get('getById', [App\Http\Controllers\Web\Resources\ItemsModelsController::class,'getById']);
-            Route::post('createItem', [App\Http\Controllers\Web\Resources\ItemsModelsController::class,'create']);
-            Route::post('editItem', [App\Http\Controllers\Web\Resources\ItemsModelsController::class,'edit']);
-            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Resources\ItemsModelsController::class,'delete']);
-            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Resources\ItemsModelsController::class,'deleteAllItem']);
-        
-        });
-
-
-        Route::group(['prefix' => 'ItemsEntitiesResources'], function () {
-
-            Route::get('getAllItems', [App\Http\Controllers\Web\Resources\ItemsEntitiesController::class,'getAll']);
-            Route::get('getById', [App\Http\Controllers\Web\Resources\ItemsEntitiesController::class,'getById']);
-            Route::post('createItem', [App\Http\Controllers\Web\Resources\ItemsEntitiesController::class,'create']);
-            Route::post('editItem', [App\Http\Controllers\Web\Resources\ItemsEntitiesController::class,'edit']);
-            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Resources\ItemsEntitiesController::class,'delete']);
-            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Resources\ItemsEntitiesController::class,'deleteAllItem']);
-        
-        });
-
-
-
-        Route::group(['prefix' => 'ItemsResources'], function () {
-
-            Route::get('getAllItems', [App\Http\Controllers\Web\Resources\ItemsResourcesController::class,'getAll']);
-            Route::get('getById', [App\Http\Controllers\Web\Resources\ItemsResourcesController::class,'getById']);
-            Route::post('createItem', [App\Http\Controllers\Web\Resources\ItemsResourcesController::class,'create']);
-            Route::post('editItem', [App\Http\Controllers\Web\Resources\ItemsResourcesController::class,'edit']);
-            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Resources\ItemsResourcesController::class,'delete']);
-            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Resources\ItemsResourcesController::class,'deleteAllItem']);
-        
-        });
-
-
-
-        Route::group(['prefix' => 'ItemsProjects'], function () {
-
-            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\ItemsProjectController::class,'getAll']);
-            Route::get('getById', [App\Http\Controllers\Web\Projects\ItemsProjectController::class,'getById']);
-            Route::post('createItem', [App\Http\Controllers\Web\Projects\ItemsProjectController::class,'create']);
-            Route::post('editItem', [App\Http\Controllers\Web\Projects\ItemsProjectController::class,'edit']);
-            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Projects\ItemsProjectController::class,'delete']);
-            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Projects\ItemsProjectController::class,'deleteAllItem']);
-        
-        });
-
-
-
-        Route::group(['prefix' => 'Projects'], function () {
+        Route::group(['prefix' => 'Project'], function () {
 
             Route::get('getAllItems', [App\Http\Controllers\Web\Projects\ProjectController::class,'getAll']);
+            Route::get('getAllItemsAllSteps', [App\Http\Controllers\Web\Projects\ProjectController::class,'getAllItemsAllSteps']);
             Route::get('getById', [App\Http\Controllers\Web\Projects\ProjectController::class,'getById']);
             Route::post('createItem', [App\Http\Controllers\Web\Projects\ProjectController::class,'create']);
             Route::post('editItem', [App\Http\Controllers\Web\Projects\ProjectController::class,'edit']);
@@ -289,17 +218,21 @@ Route::group([
         });
 
 
-        Route::group(['prefix' => 'ScopeProject'], function () {
 
-            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\ScopeProjectController::class,'getAll']);
-            Route::get('getById', [App\Http\Controllers\Web\Projects\ScopeProjectController::class,'getById']);
-            Route::post('createItem', [App\Http\Controllers\Web\Projects\ScopeProjectController::class,'create']);
-            Route::post('editItem', [App\Http\Controllers\Web\Projects\ScopeProjectController::class,'edit']);
-            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Projects\ScopeProjectController::class,'delete']);
-            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Projects\ScopeProjectController::class,'deleteAllItem']);
+
+        Route::group(['prefix' => 'Steps'], function () {
+
+            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\StepsController::class,'getAll']);
+            Route::get('getById', [App\Http\Controllers\Web\Projects\StepsController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\Projects\StepsController::class,'create']);
+            Route::post('editItem', [App\Http\Controllers\Web\Projects\StepsController::class,'edit']);
+            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Projects\StepsController::class,'delete']);
+            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Projects\StepsController::class,'deleteAllItem']);
         
         });
 
+
+       
 
 
 

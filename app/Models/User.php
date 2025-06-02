@@ -31,7 +31,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $appends = ['role','permission','role_name','document'];
+    // protected $appends = ['role','permission','role_name','department_name'];
+    protected $appends = ['department_name'];
 
 
 
@@ -44,31 +45,31 @@ class User extends Authenticatable
     }
 
 
-    public function getRoleAttribute()
-    {
+    // public function getRoleAttribute()
+    // {
         
-        $role = ModelHasRole::where('model_id', $this->id)->pluck('role_id')->first();
-        $Permissions = role_has_permissions::where('role_id',$role)->pluck('permission_id')->toArray();
-        $per = Permission::whereIn('id',$Permissions)->pluck('name')->toArray();
+    //     $role = ModelHasRole::where('model_id', $this->id)->pluck('role_id')->first();
+    //     $Permissions = role_has_permissions::where('role_id',$role)->pluck('permission_id')->toArray();
+    //     $per = Permission::whereIn('id',$Permissions)->pluck('name')->toArray();
         
-        return $per;
-    }
+    //     return $per;
+    // }
 
-     public function getPermissionAttribute()
-    {
-        $p = ModelHasRole::where('model_id',$this->id)->first();
-        return $p ;
+    //  public function getPermissionAttribute()
+    // {
+    //     $p = ModelHasRole::where('model_id',$this->id)->first();
+    //     return $p ;
         
-    }
+    // }
 
-    public function getRoleNameAttribute()
-    {
-        $p = ModelHasRole::where('model_id',$this->id)->first();
-        if($p != '')
-            return Role::where('id',$p->role_id)->first();
-        return '';
+    // public function getRoleNameAttribute()
+    // {
+    //     $p = ModelHasRole::where('model_id',$this->id)->first();
+    //     if($p != '')
+    //         return Role::where('id',$p->role_id)->first();
+    //     return '';
         
-    }
+    // }
 
 
     public function getLogoAttribute($value)
@@ -83,15 +84,25 @@ class User extends Authenticatable
     }
 
 
-    public function getDocumentAttribute() {
-    $raw = $this->attributes['documents'] ?? '[]';
+//     public function getDocumentAttribute() {
+//     $raw = $this->attributes['documents'] ?? '[]';
 
-    // تحويل JSON string إلى array ثم إلى أرقام
-    $ids = array_map('intval', json_decode($raw, true));
+//     // تحويل JSON string إلى array ثم إلى أرقام
+//     $ids = array_map('intval', json_decode($raw, true));
 
-    return ItemsCategories::whereIn('id', $ids)->get();
-}
+//     return ItemsCategories::whereIn('id', $ids)->get();
+// }
 
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department');
+    }
+
+
+
+    public function getDepartmentNameAttribute(){
+        return DepartmentTranslation::where('department_id',$this->department)->pluck('name')->first();
+    }
 
 }

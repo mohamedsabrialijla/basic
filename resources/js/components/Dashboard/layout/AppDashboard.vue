@@ -16,7 +16,7 @@
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
                         <!--begin::Aside-->
-                        <Menu></Menu>
+                        <Menu ></Menu>
                         <!--end::Aside-->
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">

@@ -21,6 +21,9 @@ import PositionHistory from './components/Dashboard/pages/HR/PositionHistory.vue
 // Master Data Begin
 import ItemsCategories from './components/Dashboard/pages/MasterData/ItemsCategories.vue';
 import ItemsObjects from './components/Dashboard/pages/MasterData/ItemsObjects.vue';
+import Projects from './components/Dashboard/pages/MasterData/Projects.vue';
+import Steps from './components/Dashboard/pages/MasterData/Steps.vue';
+import StepTemplate from './components/Dashboard/pages/MasterData/StepTemplate.vue';
 
 
 
@@ -115,7 +118,6 @@ const routes = [
     props: true,
     meta: { requiresAuth: true },
         beforeEnter: (to, from, next) => {
-            // قم بتحديث breadcrumb بناءً على قيمة :object من الرابط
             to.meta.breadcrumb = `${to.params.category.charAt(0).toUpperCase() + to.params.category.slice(1)} Category Management`;
             next();
         }
@@ -124,17 +126,40 @@ const routes = [
 
 
 
-    {
-    path: '/:locale/dashboard/master_data/:object',
-    component: ItemsObjects,
-    props: true,
-    meta: { requiresAuth: true },
-        beforeEnter: (to, from, next) => {
-            // قم بتحديث breadcrumb بناءً على قيمة :object من الرابط
-            to.meta.breadcrumb = `${to.params.object.charAt(0).toUpperCase() + to.params.object.slice(1)} Management`;
-            next();
-        }
+    { 
+        path: '/:locale/dashboard/master_data/projects/list', 
+        component: Projects, 
+        meta: { requiresAuth: true, breadcrumb: 'Projects Management' } 
     },
+
+
+    { 
+        path: '/:locale/dashboard/master_data/projects/steps', 
+        component: Steps, 
+        meta: { requiresAuth: true, breadcrumb: 'Steps Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/master_data/projects/step-template', 
+        component: StepTemplate, 
+        meta: { requiresAuth: true, breadcrumb: 'Steps Management' } 
+    },
+
+
+
+    // {
+    // path: '/:locale/dashboard/master_data/:object',
+    // component: ItemsObjects,
+    // props: true,
+    // meta: { requiresAuth: true },
+    //     beforeEnter: (to, from, next) => {
+    //         // قم بتحديث breadcrumb بناءً على قيمة :object من الرابط
+    //         to.meta.breadcrumb = `${to.params.object.charAt(0).toUpperCase() + to.params.object.slice(1)} Management`;
+    //         next();
+    //     }
+    // },
+
 
 
 

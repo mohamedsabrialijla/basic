@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class ItemsCategories extends Model
 {
     use SoftDeletes, Translatable;
+    protected $appends = ['users'];
     protected $fillable = ['code', 'order_by'];
     protected $hidden = [  'pivot', 'updated_at', 'deleted_at'];
     public $translatedAttributes = ['name'];
@@ -28,6 +29,20 @@ class ItemsCategories extends Model
     public function type()
     {
         return $this->belongsTo(ItemsTypes::class,'type_id');
+    }
+
+
+    public function getUsersAttribute() {
+       
+             $raw = $this->attributes['users'] ?? '[]';
+            $ids = array_map('intval', json_decode($raw, true));
+
+            return User::whereIn('id', $ids)->get();
+        
+    }
+
+    public function features() {
+        return $this->hasMany(CategoryTitle::class, 'items_category_id');
     }
     
    

@@ -42,7 +42,7 @@ class UserController extends Controller
             'name' => 'required',
             'email'=>'required|email|unique:users',
             'mobile'=>'required|numeric|min:8|unique:users',
-            'position' => 'required' ,
+            'department' => 'required' ,
             'password' => 'required|min:6',
             'confirm_password' => 'required|min:6|same:password',
             'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
@@ -63,9 +63,8 @@ class UserController extends Controller
                 $item->name = $request->name;
                 $item->password = bcrypt($request->password);
                 $item->pwd = $request->password;
-                $item->position = $request->position;
-                $item->documents = json_encode($request->documents);
-                $item->level = $request->level;
+                $item->department = $request->department;
+                // $item->documents = json_encode($request->documents);
                 $item->created_by = $id;
                
                 if($request->hasFile('logo') && $request->file("logo")!='')
@@ -111,7 +110,7 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'mobile' => 'required|numeric|min:8|unique:users,mobile,' . $user->id,
-            'position' => 'required',
+            'department' => 'required',
             //'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -127,9 +126,8 @@ class UserController extends Controller
                 $item->mobile = $request->mobile;
                 $item->email = $request->email;
                 $item->name = $request->name;
-                $item->position = $request->position;
-                $item->level = $request->level;
-                $item->documents = json_encode($request->documents);
+                $item->department = $request->department;
+                // $item->documents = json_encode($request->documents);
                 $item->created_by = $id;
                
                 if($request->hasFile('logo') && $request->file("logo")!='')
@@ -201,7 +199,7 @@ class UserController extends Controller
             $id = auth('sanctum')->id();
 
             // استعلام الأساسي لجلب المستخدمين من نفس الشركة
-            $items = User::query()->where('company_id', company_auth_id());
+            $items = User::with('department')->where('company_id', company_auth_id());
 
             // التحقق من وجود كلمة البحث في الطلب
             if($request->has('search') && !empty($request->search)) {
@@ -232,7 +230,7 @@ class UserController extends Controller
 
     public function getById(Request $request)
     {
-        $items = User::query()->where('id',$request->ID)->first();
+        $items = User::with('department')->where('id',$request->ID)->first();
         $message ="success return";
         return mainResponse(true, $message , $items, 200, 'items',''); 
     }
