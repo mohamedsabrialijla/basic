@@ -27,11 +27,7 @@
             <!--end::Menu 1-->
             <!--end::Filter-->
             <!--begin::Export-->
-            <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_export_items">
-            <i class="ki-duotone ki-exit-up fs-2">
-              <span class="path1"></span>
-              <span class="path2"></span>
-            </i>Export</button>
+           
             <!--end::Export-->
             <!--begin::Add user-->
             <button @click="getModalCreate()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_item">
@@ -66,9 +62,8 @@
                   <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table_users .form-check-input" value="1" v-model="selectAll" @change="toggleAll" />
                 </div>
               </th>
-              <th class="min-w-125px">Code</th>
-              <th class="min-w-125px">Name</th>
-              <th class="min-w-125px">Status</th>
+              <th class="min-w-125px">section</th>
+              <th class="min-w-125px">type</th>
               <th class="min-w-125px">Joined Date</th>
               <th class="text-center min-w-100px">Actions</th>
             </tr>
@@ -83,28 +78,21 @@
 
 
            
-              <td class="align-items-center" style="margin-top: 15px;">
+            
+
+              <td class="align-items-center" style="margin-top: 15px;">               
+             
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.code}}</a>
+                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.title}}</a>
                 </div>
               </td>
 
-
-              <td class="align-items-center" style="margin-top: 15px;">
-                <!--begin:: Avatar -->
-               
-                <!--end::Avatar-->
-                <!--begin::User details-->
-                <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.name}}</a>
-                  <!-- <span>{{item.code}} </span> -->
-                </div>
-                <!--begin::User details-->
-              </td>
               <td>
-                <div v-if="item.status=='active'" class="badge badge-light-success fw-bold">{{item.status}}</div>
-                <div v-else class="badge badge-light-danger fw-bold">{{item.status}}</div>
+                 <div class="d-flex flex-column">
+                  <a href="#" class="text-gray-800 text-hover-primary mb-1 text-uppercase">{{item.type}}</a>
+                </div>
               </td>
+              
               <td>{{item.created_at}}</td>
              
 
@@ -115,25 +103,6 @@
                         </div>
 
 
-
-                         <div class="overlay-wrapper text-gray-600">
-                          <i class="ki-duotone ki-tablet-text-up fs-2x" @click="openSteps(item.id)">
-                           <span class="path1"></span>
-                           <span class="path2"></span>
-                          </i>
-                        </div> 
-
-
-                       <!--  <div class="overlay-wrapper text-gray-600">
-               
-
-
-                          <i class="ki-duotone ki-file fs-2x" @click="openRFP(item.id)">
-                           <span class="path1"></span>
-                           <span class="path2"></span>
-                          </i>
-
-                        </div>  -->
 
                         
 
@@ -199,21 +168,44 @@
 
               
             <div style="display: flex; gap: 10px;">
-              <div class="fv-row col-md-4">
-                <label class="required fw-semibold fs-6 mb-2">Code</label>
-                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Code" value="" v-model="formData.code" required />
-              </div>
              
+
+
               <div class="fv-row col-md-4">
-                <label class="required fw-semibold fs-6 mb-2" for="name"> Name</label>
-                <input type="text" :name="'name'" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Name" value="" v-model="formData.name"   required />
+                <label class="required fw-semibold fs-6 mb-2" for="name"> Type</label>
+                <select class="form-control" v-model="formData.type">
+                  <option value="text">Text</option>
+                  <option value="sheet">Sheet</option>
+                </select>
+              </div>
+
+                <div class="fv-row col-md-4">
+                <label class="required fw-semibold fs-6 mb-2" for="name"> Title</label>
+                <input type="text" :name="'name'" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Name" value="" v-model="formData.title"   required />
               </div>
 
 
-              
+               <div class="fv-row col-md-4">
+                <label class="required fw-semibold fs-6 mb-2" for="name"> Order</label>
+                <input type="text" :name="'name'" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Order" value="" v-model="formData.order"   required />
+              </div>
 
             </div>
 
+
+            <div class="row">
+              
+            
+
+
+              <div class="fv-row col-md-12">
+                <label class="required fw-semibold fs-6 mb-2" for="name"> Description</label>
+                 <div id="kt_docs_quill_basic" name="kt_docs_quill_basic">
+                
+            </div>
+              </div>
+
+            </div>
 
 
            
@@ -254,7 +246,14 @@ import axios from 'axios';
 import Pagination from '../../layout/pagination.vue';
 import { mapState } from 'vuex';
 import Multiselect from 'vue-multiselect'
+import Quill from 'quill';
+import QuillBetterTable from 'quill-better-table';
+import 'quill/dist/quill.snow.css';
+import 'quill-better-table/dist/quill-better-table.css';
 
+ Quill.register({
+  'modules/better-table': QuillBetterTable
+}, true);
 
  
 export default {
@@ -281,7 +280,7 @@ export default {
                 name: '',
                 description: '',
             },
-            // quill: null,
+            quill: null,
 
             logo:'',
 
@@ -299,18 +298,31 @@ export default {
         this.fetchItems(this.currentPage);
 
 
-      //   this.quill = new Quill('#kt_docs_quill_basic', {
-      //     modules: {
-      //         toolbar: [
-      //             [{ header: [1, 2, false] }],
-      //             ['bold', 'italic', 'underline'],
-      //             [{ color: [] }, { background: [] }], // ✅ أدوات الألوان
-      //             ['image', 'code-block']
-      //         ]
-      //     },
-      //     placeholder: 'Type your text here...',
-      //     theme: 'snow'
-      // });
+        this.quill = new Quill('#kt_docs_quill_basic', {
+  theme: 'snow',
+  modules: {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ['bold', 'italic', 'underline'],
+      [{ color: [] }, { background: [] }],
+      ['image', 'code-block'],
+      ['table'] // مخصص، تحتاج لإضافة زر مخصص لهذا
+    ],
+    'better-table': {
+      operationMenu: {
+        items: {
+          unmergeCells: {
+            text: 'Unmerge Cells',
+          }
+        },
+        color: {
+          colors: ['red', 'green', 'yellow', 'blue', 'white'],
+          text: 'Background Colors:'
+        }
+      }
+    }
+  }
+});
 
         
     },
@@ -334,7 +346,7 @@ export default {
 
 
 
-        openRFP(ID){
+        openSteps(ID){
 
             localStorage.setItem('ProjectID',ID);
             this.$router.push({ path: `/${this.locale}/dashboard/master_data/projects/rfp` });
@@ -345,6 +357,7 @@ export default {
 
 
         getModalCreate(){
+          this.quill.root.innerHTML = ''
           this.URL = 'Project/createItem'
           this.resetItem();
           $('#kt_modal_add_item').modal('show');
@@ -416,7 +429,7 @@ export default {
                   search: this.searchQuery,  // تمرير قيمة البحث
                   pagination: 1,
                   page:page,
-                  type_item: 'project',
+                  object: this.routeSegment,
                 }
               })
                 .then(response => {
@@ -458,14 +471,15 @@ export default {
              let form = new FormData();
               form.append('code', this.formData.code);
               form.append('name', this.formData.name);
-              form.append('type_item', 'project');
-              // form.append('title', this.formData.title);
+              form.append('title', this.formData.title);
+              form.append('order', this.formData.order);
               
-              // form.append('type', this.formData.type);
-              // console.log(this.quill.root.innerHTML);
+              form.append('type', this.formData.type);
+              form.append('type_item', 'rfp');
+              console.log(this.quill.root.innerHTML);
 
-              // let content = this.quill.root.innerHTML; 
-              // form.append('description', content);
+              let content = this.quill.root.innerHTML; 
+              form.append('description', content);
               
              
 
@@ -514,11 +528,14 @@ export default {
 
         async getItemById(){
 
+
             axios.get('Project/getById', { params: { ID: this.ItemID } }).then(response => {
                 if(response.data){
                   let data = response.data.items
                   this.resetItem()
                   this.formData = data
+
+                  this.quill.root.innerHTML = data.description
 
 
                 }else{

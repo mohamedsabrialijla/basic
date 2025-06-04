@@ -16,7 +16,8 @@
                     <!--begin::Content wrapper-->
                     <div class="d-flex flex-column-fluid">
                         <!--begin::Aside-->
-                        <Menu ></Menu>
+                        <Menu v-if="showMenu"></Menu>
+                        <MenuVendor v-if="showMenuVendor" ></MenuVendor>
                         <!--end::Aside-->
                         <!--begin::Container-->
                         <div class="d-flex flex-column flex-column-fluid container-fluid">
@@ -54,6 +55,7 @@ import HeaderDashboard from './HeaderDashboard.vue';
 import FooterDashboard from './FooterDashboard.vue';
 import Breadcrumb from './Breadcrumb.vue';
 import Menu from './Menu.vue';
+import MenuVendor from './MenuVendor.vue';
 import store from './../../../store';
 
 import { mapActions } from 'vuex';
@@ -65,10 +67,19 @@ export default {
         Menu,
         Breadcrumb,
         store,
+        MenuVendor,
     },
 
 
+    computed: {
+        showMenu() {
+          return !this.$route.path.includes('/vendor');
+        },
 
+        showMenuVendor() {
+          return !this.$route.path.includes('/dashboard');
+        }
+      },
 
      
  

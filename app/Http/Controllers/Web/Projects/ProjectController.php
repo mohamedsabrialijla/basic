@@ -45,13 +45,26 @@ class ProjectController extends Controller
  
         $id = auth('sanctum')->id();
 
-      $rules = [
-                'name' => 'required',
-                
+       if($request->type_item == 'project'){
+
+
+                $rules = [
+                'name' => 'required',                
+                'code' => 'required', 
                    
             
+               ];
+
+            }else{
+
+                 $rules = [
+                 'title' => 'required',
+                'description' => 'required',
+                'type' => 'required',
+                  
             ];
 
+            }
 
 
 
@@ -66,11 +79,13 @@ class ProjectController extends Controller
           
                 $item = New Project;
                
+                $item->order = $request->order;
                 $item->name = $request->name;
+                $item->title = $request->title;
+                $item->type = $request->type;
+                $item->description = $request->description;
                 $item->code = $request->code;
                 $item->created_by = $id;
-
-
 
                 $item->save();
 
@@ -97,14 +112,27 @@ class ProjectController extends Controller
 
         $item = Project::query()->findOrFail($request->Item_id);
 
-            
-            $rules = [
-                'name' => 'required',
-                
+            if($request->type_item == 'project'){
+
+
+                $rules = [
+                'name' => 'required',                
                 'code' => 'required|alpha_num|unique:projects,code,' . $item->id, 
                    
             
+               ];
+
+            }else{
+
+                 $rules = [
+                 'title' => 'required',
+                'description' => 'required',
+                'type' => 'required',
+                  
             ];
+
+            }
+           
 
 
 
@@ -115,13 +143,13 @@ class ProjectController extends Controller
             return mainResponse(false, '' , null, 203, 'items',$validator);
         }else{
 
-           
-
                 $item = Project::findOrFail($request->Item_id);
-               
+                $item->order = $request->order;
                 $item->name = $request->name;
+                $item->title = $request->title;
+                $item->type = $request->type;
+                $item->description = $request->description;
                 $item->code = $request->code;
-                
                 $item->created_by = $id;
 
                 $item->save();
@@ -142,7 +170,7 @@ class ProjectController extends Controller
 
          $id = auth('sanctum')->id();
 
-            $items = Project::query();
+            $items = Project::query()->where('type_item', $request->type_item);
 
 
             if($request->has('search') && !empty($request->search)) {

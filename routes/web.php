@@ -17,9 +17,17 @@ Route::group([
     return view('basic.dashboard'); // هذه الصفحة تحتوي على #dashboard-app
     })->where('pathMatch', '.*');
 
+
+   Route::get('/vendor/{pathMatch?}', function () {
+    return view('basic.dashboard'); // هذه الصفحة تحتوي على #dashboard-app
+    })->where('pathMatch', '.*');
+
+
+
+
     Route::get('/{pathMatch?}', function () {
         return view('basic.landing'); // هذه الصفحة تحتوي على #app
-    })->where('pathMatch', '^(?!dashboard).*')->where('pathMatch', '^(?!web).*'); // أي شيء لا يبدأ بـ "dashboard"
+    })->where('pathMatch', '^(?!dashboard).*')->where('pathMatch', '^(?!vendor).*')->where('pathMatch', '^(?!web).*'); // أي شيء لا يبدأ بـ "dashboard"
 
 
 

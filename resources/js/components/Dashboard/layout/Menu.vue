@@ -197,6 +197,14 @@
                                         <!--begin:Menu link-->
 
 
+                                        <router-link :to="`/${locale}/dashboard/master_data/projects/rfp`" class="menu-link">
+                                            <span class="menu-bullet">
+                                                <span class="bullet bullet-dot"></span>
+                                            </span>
+                                            <span class="menu-title">RFP File</span>
+                                        </router-link>
+
+
                                         <router-link :to="`/${locale}/dashboard/master_data/projects/list`" class="menu-link">
                                             <span class="menu-bullet">
                                                 <span class="bullet bullet-dot"></span>

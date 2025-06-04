@@ -225,8 +225,14 @@ export default {
         const response = await axios.post('login',this.formData);
         localStorage.setItem('authToken',response.data.items.token);
 
-        let url = window.location.origin ;
-        window.open(url+'/dashboard',"_self")
+        if(response.data.items.vendor == 1){
+          let url = window.location.origin ;
+          window.open(url+'/vendor',"_self")
+        }else{
+          let url = window.location.origin ;
+          window.open(url+'/dashboard',"_self")
+        }
+        
         // this.$router.push('/'+ this.$route.params.locale +'/dashboard').then(() => {
         //     window.location.reload(); // إعادة تحميل الصفحة
         // });
@@ -237,4 +243,6 @@ export default {
     }
   }
 };
+
+
 </script>

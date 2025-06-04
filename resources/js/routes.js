@@ -5,6 +5,8 @@ import Landing from './components/Website/pages/Landing.vue';
 import Login from './components/Website/auth/Login.vue';
 import AuthLayout from './components/Website/auth/AuthLayout.vue';
 import Dashboard from './components/Dashboard/pages/Dashboard.vue';
+import DashboardVendor from './components/Dashboard/pages/DashboardVendor.vue';
+import Pricing from './components/Dashboard/pages/vendor/Pricing.vue';
 
 import Users from './components/Dashboard/pages/UserManagement/Users.vue';
 import Roles from './components/Dashboard/pages/UserManagement/Roles.vue';
@@ -23,6 +25,7 @@ import ItemsCategories from './components/Dashboard/pages/MasterData/ItemsCatego
 import ItemsObjects from './components/Dashboard/pages/MasterData/ItemsObjects.vue';
 import Projects from './components/Dashboard/pages/MasterData/Projects.vue';
 import Steps from './components/Dashboard/pages/MasterData/Steps.vue';
+import RFP from './components/Dashboard/pages/MasterData/RFP.vue';
 import StepTemplate from './components/Dashboard/pages/MasterData/StepTemplate.vue';
 
 
@@ -47,6 +50,19 @@ const routes = [
     { 
         path: '/:locale/dashboard', 
         component: Dashboard, 
+        meta: { requiresAuth: true } 
+    },
+
+    { 
+        path: '/:locale/vendor', 
+        component: DashboardVendor, 
+        meta: { requiresAuth: true } 
+    },
+
+
+    { 
+        path: '/:locale/vendor/pricing', 
+        component: Pricing, 
         meta: { requiresAuth: true } 
     },
     
@@ -137,6 +153,13 @@ const routes = [
         path: '/:locale/dashboard/master_data/projects/steps', 
         component: Steps, 
         meta: { requiresAuth: true, breadcrumb: 'Steps Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/master_data/projects/rfp', 
+        component: RFP, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP File Management' } 
     },
 
 
