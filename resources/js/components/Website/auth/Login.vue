@@ -224,19 +224,13 @@ export default {
       try {
         const response = await axios.post('login',this.formData);
         localStorage.setItem('authToken',response.data.items.token);
-
-        if(response.data.items.vendor == 1){
-          let url = window.location.origin ;
-          window.open(url+'/vendor',"_self")
-        }else{
+        localStorage.setItem('user_type', response.data.items.user_type); 
+       
           let url = window.location.origin ;
           window.open(url+'/dashboard',"_self")
-        }
         
-        // this.$router.push('/'+ this.$route.params.locale +'/dashboard').then(() => {
-        //     window.location.reload(); // إعادة تحميل الصفحة
-        // });
-            // this.$router.push('/'+ this.$route.params.locale +'/dashboard');  // تأكد من المسار الصحيح
+        
+        
       } catch (error) {
         alert('Login failed');
       }

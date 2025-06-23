@@ -1,186 +1,116 @@
 <template>
-    <div
-        id="kt_app_sidebar"
-        style="display: inline-block"
-        class="app-sidebar flex-column flex-shrink-0 custom_margin"
-        data-kt-drawer="true"
-        data-kt-drawer-name="app-sidebar"
-        data-kt-drawer-activate="{default: true, lg: false}"
-        data-kt-drawer-overlay="true"
-        data-kt-drawer-width="auto"
-        data-kt-drawer-direction="start"
-        data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle"
-    >
-        <!--begin::Sidebar secondary menu-->
-        <div
-            class="card py-5 bg-gray-200 liner-gray"
-            data-kt-sticky="true"
-            data-kt-sticky-name="app-sidebar-menu-sticky"
-            data-kt-sticky-offset="{default: false, xl: '500px'}"
-            data-kt-sticky-width="250px"
-            data-kt-sticky-left="auto"
-            data-kt-sticky-top="100px"
-            data-kt-sticky-animation="false"
-            data-kt-sticky-zindex="95"
-        >
-            <div
-                class="hover-scroll-y mx-2 px-1 px-lg-2"
-                data-kt-scroll="true"
-                data-kt-scroll-activate="{default: false, lg: true}"
-                data-kt-scroll-height="auto"
-                data-kt-scroll-dependencies="#kt_app_header, #kt_app_footer"
-                data-kt-scroll-wrappers="#kt_app_toolbar"
-                data-kt-scroll-offset="5px"
-            >
-                <div
-                    id="kt_app_sidebar_menu"
-                    data-kt-menu="true"
-                    class="menu menu-sub-indention menu-rounded menu-column menu-active-bg menu-title-gray-600 menu-icon-gray-500 menu-state-primary menu-arrow-gray-500 fw-semibold fs-6"
-                >
-                    <div class="menu-item px-3 ProfileBox">
-                        <div
-                            class="menu-content d-flex align-items-center px-3"
-                            :class="locale === 'ar' ? 'margin-ar' : 'margin-en'"
-                        >
-                            <!--begin::Avatar-->
-                            <div class="symbol symbol-50px me-5">
-                                <img
-                                    v-if="user && user.logo"
-                                    :src="user.logo"
-                                    alt="Logo"
-                                />
-                                <img
-                                    v-else
-                                    :src="'../../assets_user/media/avatars/blank.png'"
-                                    alt="Logo"
-                                />
-                            </div>
-                            <!--end::Avatar-->
-
-                            <!--begin::Username-->
-                            <div class="d-flex flex-column">
-                                <div
-                                    class="fw-bold d-flex align-items-center fs-5"
-                                    @click="logout()"
-                                >
-                                    {{ user ? user.name : "Loading..." }}
-                                    <!-- <span
-                                        class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
-                                        >Pro</span
-                                    > -->
-                                </div>
-
-                                <a
-                                    href="#"
-                                    class="fw-semibold text-muted text-hover-primary fs-7"
-                                >
-                                    {{ user ? user.email : "Loading..." }}
-                                </a>
-                            </div>
-                            <!--end::Username-->
-                        </div>
-                    </div>
-
-                    <!--begin:Menu item-->
-                    <!-- <div class="menu-item">
-                        <div class="menu-content">
-                            <span class="menu-section fs-5 fw-bolder ps-1 py-1"
-                                >Home</span
-                            >
-                        </div>
-                    </div> -->
-                    <!--end:Menu item-->
-                    <!--begin:Menu item-->
-                    <div class="menu-item">
-                        <!--begin:Menu link-->
-
-                        <router-link
-                            :to="`/${locale}/vendor`"
-                            class="menu-link"
-                        >
-                            <span class="menu-bullet">
-                                <span class="bullet bullet-dot"></span>
-                            </span>
-                            <span class="menu-title"> My Data</span>
-                        </router-link>
-                        <!--end:Menu link-->
-                    </div>
-
-
-                    <div class="menu-item">
-                        <!--begin:Menu link-->
-
-                        <router-link
-                            :to="`/${locale}/vendor/pricing`"
-                            class="menu-link"
-                        >
-                            <span class="menu-bullet">
-                                <span class="bullet bullet-dot"></span>
-                            </span>
-                            <span class="menu-title"> Pricing Sheet </span>
-                        </router-link>
-                        <!--end:Menu link-->
-                    </div>
-
-
-
-
-                    <!--end:Menu item-->
-                </div>
+   
+       <div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
+            <!--begin::Logo-->
+            <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
+              <!--begin::Logo image-->
+              <a href="index.html">
+                <img alt="Logo" src="/assets/media/logos/default-dark.png" class="h-25px app-sidebar-logo-default" />
+                <img alt="Logo" src="/assets/media/logos/default-dark.png" class="h-20px app-sidebar-logo-minimize" />
+              </a>
+              
+              <div id="kt_app_sidebar_toggle" class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary h-30px w-30px position-absolute top-50 start-100 translate-middle rotate" data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body" data-kt-toggle-name="app-sidebar-minimize">
+                <i class="ki-duotone ki-black-left-line fs-3 rotate-180">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                </i>
+              </div>
+              <!--end::Sidebar toggle-->
             </div>
-        </div>
-        <!--end::Sidebar secondary menu-->
-    </div>
+            <!--end::Logo-->
+            <!--begin::sidebar menu-->
+            <div class="app-sidebar-menu overflow-hidden flex-column-fluid">
+              <!--begin::Menu wrapper-->
+              <div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper">
+                <!--begin::Scroll wrapper-->
+                <div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
+                  <!--begin::Menu-->
+                  <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
+                    <!--begin:Menu item-->
+           
+               
+            
+
+
+                                  <!--begin:Menu item-->
+                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                            <!--begin:Menu link-->
+                            <span class="menu-link">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-abstract-28 fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Steps Management</span>
+                                <span class="menu-arrow"></span>
+                            </span>
+                            <!--end:Menu link-->
+                            <!--begin:Menu sub-->
+                            <div class="menu-sub menu-sub-accordion">
+                                <!--begin:Menu item-->
+                                <div data-kt-menu-trigger="click" class="menu-item menu-accordion mb-1">
+                                    <!--begin:Menu link-->
+                                    <div class="menu-item">
+                                        <!--begin:Menu link-->
+
+
+                                        <router-link :to="`/${locale}/dashboard/master_data/projects/rfp`" class="menu-link">
+                                            <span class="menu-bullet">
+                                                <span class="bullet bullet-dot"></span>
+                                            </span>
+                                            <span class="menu-title">RFP File</span>
+                                        </router-link>
+
+
+                                        <router-link :to="`/${locale}/dashboard/master_data/projects/list`" class="menu-link">
+                                            <span class="menu-bullet">
+                                                <span class="bullet bullet-dot"></span>
+                                            </span>
+                                            <span class="menu-title">Projects</span>
+                                        </router-link>
+                                        <!--end:Menu link-->
+                                    </div>
+
+
+                            
+
+                                </div>
+                                <!--end:Menu item-->
+                              
+                            </div>
+                            <!--end:Menu sub-->
+                        </div>
+                        
+
+         
+                  
+                   
+                  
+
+
+
+                  </div>
+                  <!--end::Menu-->
+                </div>
+                <!--end::Scroll wrapper-->
+              </div>
+              <!--end::Menu wrapper-->
+            </div>
+      
+            <!--end::Footer-->
+          </div>
+
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+    export default {
+       name : 'Menu',
 
-export default {
-    name: "Header",
-
-    data() {
-        return {};
-    },
-
-    computed: {
-        setting() {
-            return this.$store.getters.getSetting;
-        },
-
-        user() {
-            return this.$store.getters.getUser;
-        },
-
-        locale() {
-            return this.$route.params.locale;
-        },
-
-    },
-
-    mounted() {
-        this.$store.dispatch("fetchSetting");
-        this.$store.dispatch("fetchUser");
-    },
-
-    methods: {
-        logout() {
-            localStorage.clear();
-            localStorage.removeItem("authToken");
-            let url = window.location.origin;
-            window.open(url + "/" + this.locale + "/login", "_self");
-        },
-    },
-};
+       computed: {
+    locale() {
+        return this.$route.params.locale;
+    }
+}
+    }
 </script>
-<style type="text/css">
-.custom_margin {
-    margin-top: 15px !important;
-}
-
-.liner-gray {
-    background: linear-gradient(to bottom, white 12%, #f2f2f2 100%);
-    position: relative;
-    z-index: 10;
-}
-</style>

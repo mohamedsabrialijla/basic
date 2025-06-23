@@ -48,7 +48,7 @@ const store = createStore({
             return axios.get('UserAuth/getAuth') // تأكد من أن الرابط صحيح
                 .then(response => {
                     commit('setUser', response.data.items);
-                 
+
                 })
                 .catch(error => {
                     console.log("Error fetching User auth:", error);

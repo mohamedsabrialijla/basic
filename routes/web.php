@@ -228,6 +228,22 @@ Route::group([
 
 
 
+        Route::group(['prefix' => 'RFPStep'], function () {
+
+            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\RFPStepController::class,'getAll']);
+            Route::get('getAllItemsAllSteps', [App\Http\Controllers\Web\Projects\RFPStepController::class,'getAllItemsAllSteps']);
+            Route::get('getById', [App\Http\Controllers\Web\Projects\RFPStepController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\Projects\RFPStepController::class,'create']);
+            Route::post('editItem', [App\Http\Controllers\Web\Projects\RFPStepController::class,'edit']);
+            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Projects\RFPStepController::class,'delete']);
+            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Projects\RFPStepController::class,'deleteAllItem']);
+            Route::post('editItemStep', [App\Http\Controllers\Web\Projects\RFPStepController::class,'editStep']);
+
+        });
+
+
+
+
         Route::group(['prefix' => 'Steps'], function () {
 
             Route::get('getAllItems', [App\Http\Controllers\Web\Projects\StepsController::class,'getAll']);
@@ -240,6 +256,20 @@ Route::group([
         });
 
 
+        Route::group(['prefix' => 'Gantt'], function () {
+
+            Route::get('/gantt', [App\Http\Controllers\Web\Projects\GanttTaskController::class, 'index']);
+            Route::post('/gantt', [App\Http\Controllers\Web\Projects\GanttTaskController::class, 'store']);
+            Route::put('/gantt/{id}', [App\Http\Controllers\Web\Projects\GanttTaskController::class, 'update']);
+            Route::delete('/gantt/{id}', [App\Http\Controllers\Web\Projects\GanttTaskController::class, 'destroy']);
+            Route::post('/gantt-tasks/save', [GanttTaskController::class, 'store']);
+
+        
+        });
+
+
+
+       
        
 
 

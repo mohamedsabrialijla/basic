@@ -22,7 +22,7 @@
               <td colspan="7">Technical Evaluation Sheet</td>
               
               <td colspan="3" style="color: red;">Title:</td>
-              <td colspan="8" style="color: red;"><input class="form-control" type="text" v-model="formData.st4Title"></td>
+              <td colspan="7" style="color: red;"><input class="form-control" type="text" v-model="formData.st4Title"></td>
            
               <td colspan="2">Date: </td>
               <td colspan="2"><input class="form-control" type="date" v-model="formData.st4d"></td>
@@ -62,7 +62,7 @@
               <td></td>              
               <td></td>              
               <td></td>              
-              <td colspan="10"></td>
+              <td colspan="8"></td>
              
           </tr>
 
@@ -89,7 +89,7 @@
 
               <td
                 v-if="featureIndex === 0"
-                :rowspan="criterion.features.length"
+                :rowspan="criterion.features.length "
               >
                 {{
                   criterion.features.reduce((acc, f) => {
@@ -101,9 +101,15 @@
                 }}
               </td> 
 
-              <td :rowspan="criterion.features.length">
+              <td v-if="criterion.features.length > 1" :rowspan="criterion.features.length - 1" >
                       {{ feature.critiera }}
               </td>
+
+               <td v-else :rowspan="criterion.features.length" >
+                      {{ feature.critiera }}
+              </td>
+             
+
              <td v-for="b in 8" :key="b">
                 <input
                   type="text"

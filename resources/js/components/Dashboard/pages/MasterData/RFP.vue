@@ -175,7 +175,8 @@
                 <label class="required fw-semibold fs-6 mb-2" for="name"> Type</label>
                 <select class="form-control" v-model="formData.type">
                   <option value="text">Text</option>
-                  <option value="sheet">Sheet</option>
+                  <option value="PricingSheet">PricingSheet</option>
+                  <option value="TechnicalSheet">TechnicalSheet</option>
                 </select>
               </div>
 
@@ -299,30 +300,30 @@ export default {
 
 
         this.quill = new Quill('#kt_docs_quill_basic', {
-  theme: 'snow',
-  modules: {
-    toolbar: [
-      [{ header: [1, 2, false] }],
-      ['bold', 'italic', 'underline'],
-      [{ color: [] }, { background: [] }],
-      ['image', 'code-block'],
-      ['table'] // مخصص، تحتاج لإضافة زر مخصص لهذا
-    ],
-    'better-table': {
-      operationMenu: {
-        items: {
-          unmergeCells: {
-            text: 'Unmerge Cells',
-          }
-        },
-        color: {
-          colors: ['red', 'green', 'yellow', 'blue', 'white'],
-          text: 'Background Colors:'
-        }
-      }
-    }
-  }
-});
+            theme: 'snow',
+            modules: {
+              toolbar: [
+                [{ header: [1, 2, false] }],
+                ['bold', 'italic', 'underline'],
+                [{ color: [] }, { background: [] }],
+                ['image', 'code-block'],
+                ['table'] // مخصص، تحتاج لإضافة زر مخصص لهذا
+              ],
+              'better-table': {
+                operationMenu: {
+                  items: {
+                    unmergeCells: {
+                      text: 'Unmerge Cells',
+                    }
+                  },
+                  color: {
+                    colors: ['red', 'green', 'yellow', 'blue', 'white'],
+                    text: 'Background Colors:'
+                  }
+                }
+              }
+            }
+          });
 
         
     },
@@ -476,7 +477,6 @@ export default {
               
               form.append('type', this.formData.type);
               form.append('type_item', 'rfp');
-              console.log(this.quill.root.innerHTML);
 
               let content = this.quill.root.innerHTML; 
               form.append('description', content);

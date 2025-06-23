@@ -6,7 +6,8 @@ import Login from './components/Website/auth/Login.vue';
 import AuthLayout from './components/Website/auth/AuthLayout.vue';
 import Dashboard from './components/Dashboard/pages/Dashboard.vue';
 import DashboardVendor from './components/Dashboard/pages/DashboardVendor.vue';
-import Pricing from './components/Dashboard/pages/vendor/Pricing.vue';
+import Pricing from './components/Dashboard/pages/buyer/Pricing.vue';
+import PricingSheet from './components/Dashboard/pages/buyer/PricingSheet.vue';
 
 import Users from './components/Dashboard/pages/UserManagement/Users.vue';
 import Roles from './components/Dashboard/pages/UserManagement/Roles.vue';
@@ -24,6 +25,8 @@ import PositionHistory from './components/Dashboard/pages/HR/PositionHistory.vue
 import ItemsCategories from './components/Dashboard/pages/MasterData/ItemsCategories.vue';
 import ItemsObjects from './components/Dashboard/pages/MasterData/ItemsObjects.vue';
 import Projects from './components/Dashboard/pages/MasterData/Projects.vue';
+import RFPIndex from './components/Dashboard/pages/MasterData/IndexRFP.vue';
+import RFPStep from './components/Dashboard/pages/MasterData/RFPStep.vue';
 import Steps from './components/Dashboard/pages/MasterData/Steps.vue';
 import RFP from './components/Dashboard/pages/MasterData/RFP.vue';
 import StepTemplate from './components/Dashboard/pages/MasterData/StepTemplate.vue';
@@ -61,8 +64,15 @@ const routes = [
 
 
     { 
-        path: '/:locale/vendor/pricing', 
+        path: '/:locale/dashboard/buyer/pricing', 
         component: Pricing, 
+        meta: { requiresAuth: true } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/buyer/pricing-sheet', 
+        component: PricingSheet, 
         meta: { requiresAuth: true } 
     },
     
@@ -146,6 +156,21 @@ const routes = [
         path: '/:locale/dashboard/master_data/projects/list', 
         component: Projects, 
         meta: { requiresAuth: true, breadcrumb: 'Projects Management' } 
+    },
+
+
+
+    { 
+        path: '/:locale/dashboard/master_data/projects/rfp-index', 
+        component: RFPIndex, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/master_data/projects/rfp-step', 
+        component: RFPStep, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
     },
 
 

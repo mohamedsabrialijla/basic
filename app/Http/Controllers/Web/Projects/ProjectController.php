@@ -185,9 +185,9 @@ class ProjectController extends Controller
 
 
             if(isset($request->pagination) && $request->pagination == 1) {
-                $items = $items->orderBy('id','DESC')->paginate(10); 
+                $items = $items->orderBy('order','Asc')->paginate(10); 
             } else {
-                $items = $items->orderBy('id','DESC')->get();
+                $items = $items->orderBy('order','Asc')->get();
             }
 
             $message = "success return";

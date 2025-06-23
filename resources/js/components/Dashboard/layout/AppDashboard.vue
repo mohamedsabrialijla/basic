@@ -1,53 +1,54 @@
 <template>
-  
-        <div class="d-flex flex-column flex-root">
-            <!--begin::Page-->
-            <div class="page d-flex flex-row flex-column-fluid">
-                <!--begin::Wrapper-->
-                <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
-                    
-                    <!--begin::Header-->
-                            
-                            <HeaderDashboard></HeaderDashboard>
+ 
 
-                    <!--end::Header-->
-
-
-                    <!--begin::Content wrapper-->
-                    <div class="d-flex flex-column-fluid">
-                        <!--begin::Aside-->
-                        <Menu v-if="showMenu"></Menu>
-                        <MenuVendor v-if="showMenuVendor" ></MenuVendor>
-                        <!--end::Aside-->
-                        <!--begin::Container-->
-                        <div class="d-flex flex-column flex-column-fluid container-fluid">
-                            <!--begin::Toolbar-->
-                              <Breadcrumb></Breadcrumb>
-                            <!--end::Toolbar-->                            
-
-                                <router-view :key="$route.fullPath"></router-view>
-
-
-                            <!--begin::Footer-->
-                            
-                            <FooterDashboard></FooterDashboard>
-
-                            <!--end::Footer-->
+ <div class="d-flex flex-column flex-root app-root" id="kt_app_root">
+      <!--begin::Page-->
+      <div class="app-page flex-column flex-column-fluid" id="kt_app_page">
+        <!--begin::Header-->
+        
 
 
 
-                        </div>
-                        <!--end::Container-->
-                    </div>
-                    <!--end::Content wrapper-->
-                </div>
-                <!--end::Wrapper-->
-            </div>
-            <!--end::Page-->
+           <!--begin::Header-->
+            <HeaderDashboard></HeaderDashboard>
+            <!--end::Header-->
+
+
+
+
+
+
+
+          <!-- Menu -->
+
+        <div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
+          
+
+
+          <!--begin::Aside-->
+          <component :is="menuComponent" :userType="userType" />
+          <!--end::Aside-->
+
+
+
+          <!--begin::Main-->
+          <div style="padding: 30px 0px 0px 30px;">
+                <router-view :key="$route.fullPath"></router-view>
+          </div>
+          <!--end:::Main-->
+
+
+
+
+          
         </div>
-        <!--end::Root-->
+        <!--end::Wrapper-->
+      </div>
+      <!--end::Page-->
+    </div>
 
-    
+
+
 </template>
 
 <script>
@@ -56,65 +57,87 @@ import FooterDashboard from './FooterDashboard.vue';
 import Breadcrumb from './Breadcrumb.vue';
 import Menu from './Menu.vue';
 import MenuVendor from './MenuVendor.vue';
-import store from './../../../store';
+import MenuBuyer from './MenuBuyer.vue';
 
-import { mapActions } from 'vuex';
+import DashboardVendor from '../pages/DashboardVendor.vue';
+import DashboardBuyer from '../pages/DashboardBuyer.vue';
+import DashboardAdmin from '../pages/Dashboard.vue';
+import { mapGetters } from 'vuex';
+
+import { mapActions, mapState } from 'vuex';
 
 export default {
-    components: {
-        HeaderDashboard,
-        FooterDashboard,
-        Menu,
-        Breadcrumb,
-        store,
-        MenuVendor,
-    },
+  components: {
+    HeaderDashboard,
+    FooterDashboard,
+    Breadcrumb,
+    Menu,
+    MenuVendor,
+    MenuBuyer,
+    DashboardVendor,
+    DashboardBuyer,
+    DashboardAdmin
+  }, 
 
+   data() {
+    return {
+      userType: localStorage.getItem('user_type') || '', // أو من Vuex لاحقًا
+    }
+  },
 
-    computed: {
-        showMenu() {
-          return !this.$route.path.includes('/vendor');
-        },
-
-        showMenuVendor() {
-          return !this.$route.path.includes('/dashboard');
-        }
-      },
-
-     
+  computed: {
+    ...mapGetters(['getUser']),
  
-    mounted() {
-
-        let url = window.location.origin ;
-        this.loadScript(url+'/assets/js/custom/apps/user-management/users/list/table.js');
-        
-        // this.loadScript(url+'/assets/js/custom/apps/user-management/users/list/export-users.js');
-        // this.loadScript(url+'/assets/js/custom/apps/user-management/users/list/add.js');
-        
-
-
-        this.fetchLanguages();
-        this.fetchUser();
-
-
-
-
-
+    user() {
+      return this.getUser;
     },
 
-   methods: {
+    // اختار المينيو المناسب
+    menuComponent() {
 
-    ...mapActions(['fetchLanguages']), // ربط دالة fetchLanguages هنا
-    ...mapActions(['fetchUser']), // ربط دالة fetchLanguages هنا
+      if (this.userType === 'vendor') return 'MenuVendor';
+      if (this.userType === 'buyer') return 'MenuBuyer';
+      return 'Menu';
+    },
 
-    
+    contentComponent() {
+      if (this.userType === 'vendor') return 'DashboardVendor';
+      if (this.userType === 'buyer') return 'DashboardBuyer';
+      return 'Dashboard';
+    }
+  },
+
+  mounted() {
+    const url = window.location.origin;
+    this.loadScript(url + '/assets/js/custom/apps/user-management/users/list/table.js');
+
+    this.fetchLanguages();
+    this.fetchUser();
+        console.log("User:", this.user); // الوصول إلى بيانات المستخدم
+
+  },
+
+  methods: {
+    ...mapActions(['fetchLanguages', 'fetchUser']),
+
     loadScript(src) {
-      let script = document.createElement('script');
+      const script = document.createElement('script');
       script.src = src;
-      script.async = true; // جعل التحميل غير متزامن لتحسين الأداء
+      script.async = true;
       document.body.appendChild(script);
     }
-  }
-};
-</script>
+  },
 
+
+    watch: {
+    user(newUser) {
+      if (newUser) {
+        setTimeout(() => {
+        }, 500); // تأخير لمدة 500 ميلي ثانية
+      }
+    },
+  },
+
+
+}
+</script>

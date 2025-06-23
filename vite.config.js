@@ -26,5 +26,7 @@ export default defineConfig({
             vue: 'vue/dist/vue.esm-bundler.js',
         },
     },
+    optimizeDeps: {
+        force: true, // ✅ هذا السطر هو الذي يفرض إعادة تحسين الحزم
+    },
 });
-

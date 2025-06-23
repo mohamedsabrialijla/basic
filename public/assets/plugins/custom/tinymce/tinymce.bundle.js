@@ -32843,221 +32843,6 @@ tinymce.IconManager.add('default', {
  */
 
 (function () {
-    'use strict';
-
-    var global$2 = tinymce.util.Tools.resolve('tinymce.PluginManager');
-
-    var global$1 = tinymce.util.Tools.resolve('tinymce.dom.RangeUtils');
-
-    var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    const option = name => editor => editor.options.get(name);
-    const register$2 = editor => {
-      const registerOption = editor.options.register;
-      registerOption('allow_html_in_named_anchor', {
-        processor: 'boolean',
-        default: false
-      });
-    };
-    const allowHtmlInNamedAnchor = option('allow_html_in_named_anchor');
-
-    const namedAnchorSelector = 'a:not([href])';
-    const isEmptyString = str => !str;
-    const getIdFromAnchor = elm => {
-      const id = elm.getAttribute('id') || elm.getAttribute('name');
-      return id || '';
-    };
-    const isAnchor = elm => elm.nodeName.toLowerCase() === 'a';
-    const isNamedAnchor = elm => isAnchor(elm) && !elm.getAttribute('href') && getIdFromAnchor(elm) !== '';
-    const isEmptyNamedAnchor = elm => isNamedAnchor(elm) && !elm.firstChild;
-
-    const removeEmptyNamedAnchorsInSelection = editor => {
-      const dom = editor.dom;
-      global$1(dom).walk(editor.selection.getRng(), nodes => {
-        global.each(nodes, node => {
-          if (isEmptyNamedAnchor(node)) {
-            dom.remove(node, false);
-          }
-        });
-      });
-    };
-    const isValidId = id => /^[A-Za-z][A-Za-z0-9\-:._]*$/.test(id);
-    const getNamedAnchor = editor => editor.dom.getParent(editor.selection.getStart(), namedAnchorSelector);
-    const getId = editor => {
-      const anchor = getNamedAnchor(editor);
-      if (anchor) {
-        return getIdFromAnchor(anchor);
-      } else {
-        return '';
-      }
-    };
-    const createAnchor = (editor, id) => {
-      editor.undoManager.transact(() => {
-        if (!allowHtmlInNamedAnchor(editor)) {
-          editor.selection.collapse(true);
-        }
-        if (editor.selection.isCollapsed()) {
-          editor.insertContent(editor.dom.createHTML('a', { id }));
-        } else {
-          removeEmptyNamedAnchorsInSelection(editor);
-          editor.formatter.remove('namedAnchor', undefined, undefined, true);
-          editor.formatter.apply('namedAnchor', { value: id });
-          editor.addVisual();
-        }
-      });
-    };
-    const updateAnchor = (editor, id, anchorElement) => {
-      anchorElement.removeAttribute('name');
-      anchorElement.id = id;
-      editor.addVisual();
-      editor.undoManager.add();
-    };
-    const insert = (editor, id) => {
-      const anchor = getNamedAnchor(editor);
-      if (anchor) {
-        updateAnchor(editor, id, anchor);
-      } else {
-        createAnchor(editor, id);
-      }
-      editor.focus();
-    };
-
-    const insertAnchor = (editor, newId) => {
-      if (!isValidId(newId)) {
-        editor.windowManager.alert('ID should start with a letter, followed only by letters, numbers, dashes, dots, colons or underscores.');
-        return false;
-      } else {
-        insert(editor, newId);
-        return true;
-      }
-    };
-    const open = editor => {
-      const currentId = getId(editor);
-      editor.windowManager.open({
-        title: 'Anchor',
-        size: 'normal',
-        body: {
-          type: 'panel',
-          items: [{
-              name: 'id',
-              type: 'input',
-              label: 'ID',
-              placeholder: 'example'
-            }]
-        },
-        buttons: [
-          {
-            type: 'cancel',
-            name: 'cancel',
-            text: 'Cancel'
-          },
-          {
-            type: 'submit',
-            name: 'save',
-            text: 'Save',
-            primary: true
-          }
-        ],
-        initialData: { id: currentId },
-        onSubmit: api => {
-          if (insertAnchor(editor, api.getData().id)) {
-            api.close();
-          }
-        }
-      });
-    };
-
-    const register$1 = editor => {
-      editor.addCommand('mceAnchor', () => {
-        open(editor);
-      });
-    };
-
-    const isNamedAnchorNode = node => isEmptyString(node.attr('href')) && !isEmptyString(node.attr('id') || node.attr('name'));
-    const isEmptyNamedAnchorNode = node => isNamedAnchorNode(node) && !node.firstChild;
-    const setContentEditable = state => nodes => {
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        if (isEmptyNamedAnchorNode(node)) {
-          node.attr('contenteditable', state);
-        }
-      }
-    };
-    const setup = editor => {
-      editor.on('PreInit', () => {
-        editor.parser.addNodeFilter('a', setContentEditable('false'));
-        editor.serializer.addNodeFilter('a', setContentEditable(null));
-      });
-    };
-
-    const registerFormats = editor => {
-      editor.formatter.register('namedAnchor', {
-        inline: 'a',
-        selector: namedAnchorSelector,
-        remove: 'all',
-        split: true,
-        deep: true,
-        attributes: { id: '%value' },
-        onmatch: (node, _fmt, _itemName) => {
-          return isNamedAnchor(node);
-        }
-      });
-    };
-
-    const onSetupEditable = editor => api => {
-      const nodeChanged = () => {
-        api.setEnabled(editor.selection.isEditable());
-      };
-      editor.on('NodeChange', nodeChanged);
-      nodeChanged();
-      return () => {
-        editor.off('NodeChange', nodeChanged);
-      };
-    };
-    const register = editor => {
-      const onAction = () => editor.execCommand('mceAnchor');
-      editor.ui.registry.addToggleButton('anchor', {
-        icon: 'bookmark',
-        tooltip: 'Anchor',
-        onAction,
-        onSetup: buttonApi => {
-          const unbindSelectorChanged = editor.selection.selectorChangedWithUnbind('a:not([href])', buttonApi.setActive).unbind;
-          const unbindEditableChanged = onSetupEditable(editor)(buttonApi);
-          return () => {
-            unbindSelectorChanged();
-            unbindEditableChanged();
-          };
-        }
-      });
-      editor.ui.registry.addMenuItem('anchor', {
-        icon: 'bookmark',
-        text: 'Anchor...',
-        onAction,
-        onSetup: onSetupEditable(editor)
-      });
-    };
-
-    var Plugin = () => {
-      global$2.add('anchor', editor => {
-        register$2(editor);
-        setup(editor);
-        register$1(editor);
-        register(editor);
-        editor.on('PreInit', () => {
-          registerFormats(editor);
-        });
-      });
-    };
-
-    Plugin();
-
-})();
-
-/**
- * TinyMCE version 7.2.1 (2024-07-03)
- */
-
-(function () {
   'use strict';
 
   var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
@@ -33279,6 +33064,221 @@ tinymce.IconManager.add('default', {
   };
 
   Plugin();
+
+})();
+
+/**
+ * TinyMCE version 7.2.1 (2024-07-03)
+ */
+
+(function () {
+    'use strict';
+
+    var global$2 = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    var global$1 = tinymce.util.Tools.resolve('tinymce.dom.RangeUtils');
+
+    var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
+
+    const option = name => editor => editor.options.get(name);
+    const register$2 = editor => {
+      const registerOption = editor.options.register;
+      registerOption('allow_html_in_named_anchor', {
+        processor: 'boolean',
+        default: false
+      });
+    };
+    const allowHtmlInNamedAnchor = option('allow_html_in_named_anchor');
+
+    const namedAnchorSelector = 'a:not([href])';
+    const isEmptyString = str => !str;
+    const getIdFromAnchor = elm => {
+      const id = elm.getAttribute('id') || elm.getAttribute('name');
+      return id || '';
+    };
+    const isAnchor = elm => elm.nodeName.toLowerCase() === 'a';
+    const isNamedAnchor = elm => isAnchor(elm) && !elm.getAttribute('href') && getIdFromAnchor(elm) !== '';
+    const isEmptyNamedAnchor = elm => isNamedAnchor(elm) && !elm.firstChild;
+
+    const removeEmptyNamedAnchorsInSelection = editor => {
+      const dom = editor.dom;
+      global$1(dom).walk(editor.selection.getRng(), nodes => {
+        global.each(nodes, node => {
+          if (isEmptyNamedAnchor(node)) {
+            dom.remove(node, false);
+          }
+        });
+      });
+    };
+    const isValidId = id => /^[A-Za-z][A-Za-z0-9\-:._]*$/.test(id);
+    const getNamedAnchor = editor => editor.dom.getParent(editor.selection.getStart(), namedAnchorSelector);
+    const getId = editor => {
+      const anchor = getNamedAnchor(editor);
+      if (anchor) {
+        return getIdFromAnchor(anchor);
+      } else {
+        return '';
+      }
+    };
+    const createAnchor = (editor, id) => {
+      editor.undoManager.transact(() => {
+        if (!allowHtmlInNamedAnchor(editor)) {
+          editor.selection.collapse(true);
+        }
+        if (editor.selection.isCollapsed()) {
+          editor.insertContent(editor.dom.createHTML('a', { id }));
+        } else {
+          removeEmptyNamedAnchorsInSelection(editor);
+          editor.formatter.remove('namedAnchor', undefined, undefined, true);
+          editor.formatter.apply('namedAnchor', { value: id });
+          editor.addVisual();
+        }
+      });
+    };
+    const updateAnchor = (editor, id, anchorElement) => {
+      anchorElement.removeAttribute('name');
+      anchorElement.id = id;
+      editor.addVisual();
+      editor.undoManager.add();
+    };
+    const insert = (editor, id) => {
+      const anchor = getNamedAnchor(editor);
+      if (anchor) {
+        updateAnchor(editor, id, anchor);
+      } else {
+        createAnchor(editor, id);
+      }
+      editor.focus();
+    };
+
+    const insertAnchor = (editor, newId) => {
+      if (!isValidId(newId)) {
+        editor.windowManager.alert('ID should start with a letter, followed only by letters, numbers, dashes, dots, colons or underscores.');
+        return false;
+      } else {
+        insert(editor, newId);
+        return true;
+      }
+    };
+    const open = editor => {
+      const currentId = getId(editor);
+      editor.windowManager.open({
+        title: 'Anchor',
+        size: 'normal',
+        body: {
+          type: 'panel',
+          items: [{
+              name: 'id',
+              type: 'input',
+              label: 'ID',
+              placeholder: 'example'
+            }]
+        },
+        buttons: [
+          {
+            type: 'cancel',
+            name: 'cancel',
+            text: 'Cancel'
+          },
+          {
+            type: 'submit',
+            name: 'save',
+            text: 'Save',
+            primary: true
+          }
+        ],
+        initialData: { id: currentId },
+        onSubmit: api => {
+          if (insertAnchor(editor, api.getData().id)) {
+            api.close();
+          }
+        }
+      });
+    };
+
+    const register$1 = editor => {
+      editor.addCommand('mceAnchor', () => {
+        open(editor);
+      });
+    };
+
+    const isNamedAnchorNode = node => isEmptyString(node.attr('href')) && !isEmptyString(node.attr('id') || node.attr('name'));
+    const isEmptyNamedAnchorNode = node => isNamedAnchorNode(node) && !node.firstChild;
+    const setContentEditable = state => nodes => {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        if (isEmptyNamedAnchorNode(node)) {
+          node.attr('contenteditable', state);
+        }
+      }
+    };
+    const setup = editor => {
+      editor.on('PreInit', () => {
+        editor.parser.addNodeFilter('a', setContentEditable('false'));
+        editor.serializer.addNodeFilter('a', setContentEditable(null));
+      });
+    };
+
+    const registerFormats = editor => {
+      editor.formatter.register('namedAnchor', {
+        inline: 'a',
+        selector: namedAnchorSelector,
+        remove: 'all',
+        split: true,
+        deep: true,
+        attributes: { id: '%value' },
+        onmatch: (node, _fmt, _itemName) => {
+          return isNamedAnchor(node);
+        }
+      });
+    };
+
+    const onSetupEditable = editor => api => {
+      const nodeChanged = () => {
+        api.setEnabled(editor.selection.isEditable());
+      };
+      editor.on('NodeChange', nodeChanged);
+      nodeChanged();
+      return () => {
+        editor.off('NodeChange', nodeChanged);
+      };
+    };
+    const register = editor => {
+      const onAction = () => editor.execCommand('mceAnchor');
+      editor.ui.registry.addToggleButton('anchor', {
+        icon: 'bookmark',
+        tooltip: 'Anchor',
+        onAction,
+        onSetup: buttonApi => {
+          const unbindSelectorChanged = editor.selection.selectorChangedWithUnbind('a:not([href])', buttonApi.setActive).unbind;
+          const unbindEditableChanged = onSetupEditable(editor)(buttonApi);
+          return () => {
+            unbindSelectorChanged();
+            unbindEditableChanged();
+          };
+        }
+      });
+      editor.ui.registry.addMenuItem('anchor', {
+        icon: 'bookmark',
+        text: 'Anchor...',
+        onAction,
+        onSetup: onSetupEditable(editor)
+      });
+    };
+
+    var Plugin = () => {
+      global$2.add('anchor', editor => {
+        register$2(editor);
+        setup(editor);
+        register$1(editor);
+        register(editor);
+        editor.on('PreInit', () => {
+          registerFormats(editor);
+        });
+      });
+    };
+
+    Plugin();
 
 })();
 
@@ -33689,1751 +33689,6 @@ tinymce.IconManager.add('default', {
           }
         });
         return get(editor);
-      });
-    };
-
-    Plugin();
-
-})();
-
-/**
- * TinyMCE version 7.2.1 (2024-07-03)
- */
-
-(function () {
-    'use strict';
-
-    var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
-
-    const fireInsertCustomChar = (editor, chr) => {
-      return editor.dispatch('insertCustomChar', { chr });
-    };
-
-    const insertChar = (editor, chr) => {
-      const evtChr = fireInsertCustomChar(editor, chr).chr;
-      editor.execCommand('mceInsertContent', false, evtChr);
-    };
-
-    const hasProto = (v, constructor, predicate) => {
-      var _a;
-      if (predicate(v, constructor.prototype)) {
-        return true;
-      } else {
-        return ((_a = v.constructor) === null || _a === void 0 ? void 0 : _a.name) === constructor.name;
-      }
-    };
-    const typeOf = x => {
-      const t = typeof x;
-      if (x === null) {
-        return 'null';
-      } else if (t === 'object' && Array.isArray(x)) {
-        return 'array';
-      } else if (t === 'object' && hasProto(x, String, (o, proto) => proto.isPrototypeOf(o))) {
-        return 'string';
-      } else {
-        return t;
-      }
-    };
-    const isType = type => value => typeOf(value) === type;
-    const isSimpleType = type => value => typeof value === type;
-    const eq = t => a => t === a;
-    const isArray$1 = isType('array');
-    const isNull = eq(null);
-    const isUndefined = eq(undefined);
-    const isNullable = a => a === null || a === undefined;
-    const isNonNullable = a => !isNullable(a);
-    const isFunction = isSimpleType('function');
-
-    const constant = value => {
-      return () => {
-        return value;
-      };
-    };
-    const never = constant(false);
-
-    class Optional {
-      constructor(tag, value) {
-        this.tag = tag;
-        this.value = value;
-      }
-      static some(value) {
-        return new Optional(true, value);
-      }
-      static none() {
-        return Optional.singletonNone;
-      }
-      fold(onNone, onSome) {
-        if (this.tag) {
-          return onSome(this.value);
-        } else {
-          return onNone();
-        }
-      }
-      isSome() {
-        return this.tag;
-      }
-      isNone() {
-        return !this.tag;
-      }
-      map(mapper) {
-        if (this.tag) {
-          return Optional.some(mapper(this.value));
-        } else {
-          return Optional.none();
-        }
-      }
-      bind(binder) {
-        if (this.tag) {
-          return binder(this.value);
-        } else {
-          return Optional.none();
-        }
-      }
-      exists(predicate) {
-        return this.tag && predicate(this.value);
-      }
-      forall(predicate) {
-        return !this.tag || predicate(this.value);
-      }
-      filter(predicate) {
-        if (!this.tag || predicate(this.value)) {
-          return this;
-        } else {
-          return Optional.none();
-        }
-      }
-      getOr(replacement) {
-        return this.tag ? this.value : replacement;
-      }
-      or(replacement) {
-        return this.tag ? this : replacement;
-      }
-      getOrThunk(thunk) {
-        return this.tag ? this.value : thunk();
-      }
-      orThunk(thunk) {
-        return this.tag ? this : thunk();
-      }
-      getOrDie(message) {
-        if (!this.tag) {
-          throw new Error(message !== null && message !== void 0 ? message : 'Called getOrDie on None');
-        } else {
-          return this.value;
-        }
-      }
-      static from(value) {
-        return isNonNullable(value) ? Optional.some(value) : Optional.none();
-      }
-      getOrNull() {
-        return this.tag ? this.value : null;
-      }
-      getOrUndefined() {
-        return this.value;
-      }
-      each(worker) {
-        if (this.tag) {
-          worker(this.value);
-        }
-      }
-      toArray() {
-        return this.tag ? [this.value] : [];
-      }
-      toString() {
-        return this.tag ? `some(${ this.value })` : 'none()';
-      }
-    }
-    Optional.singletonNone = new Optional(false);
-
-    const nativePush = Array.prototype.push;
-    const map = (xs, f) => {
-      const len = xs.length;
-      const r = new Array(len);
-      for (let i = 0; i < len; i++) {
-        const x = xs[i];
-        r[i] = f(x, i);
-      }
-      return r;
-    };
-    const each = (xs, f) => {
-      for (let i = 0, len = xs.length; i < len; i++) {
-        const x = xs[i];
-        f(x, i);
-      }
-    };
-    const findUntil = (xs, pred, until) => {
-      for (let i = 0, len = xs.length; i < len; i++) {
-        const x = xs[i];
-        if (pred(x, i)) {
-          return Optional.some(x);
-        } else if (until(x, i)) {
-          break;
-        }
-      }
-      return Optional.none();
-    };
-    const find = (xs, pred) => {
-      return findUntil(xs, pred, never);
-    };
-    const flatten = xs => {
-      const r = [];
-      for (let i = 0, len = xs.length; i < len; ++i) {
-        if (!isArray$1(xs[i])) {
-          throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
-        }
-        nativePush.apply(r, xs[i]);
-      }
-      return r;
-    };
-    const bind = (xs, f) => flatten(map(xs, f));
-
-    var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    const option = name => editor => editor.options.get(name);
-    const register$2 = editor => {
-      const registerOption = editor.options.register;
-      const charMapProcessor = value => isFunction(value) || isArray$1(value);
-      registerOption('charmap', { processor: charMapProcessor });
-      registerOption('charmap_append', { processor: charMapProcessor });
-    };
-    const getCharMap$1 = option('charmap');
-    const getCharMapAppend = option('charmap_append');
-
-    const isArray = global.isArray;
-    const UserDefined = 'User Defined';
-    const getDefaultCharMap = () => {
-      return [
-        {
-          name: 'Currency',
-          characters: [
-            [
-              36,
-              'dollar sign'
-            ],
-            [
-              162,
-              'cent sign'
-            ],
-            [
-              8364,
-              'euro sign'
-            ],
-            [
-              163,
-              'pound sign'
-            ],
-            [
-              165,
-              'yen sign'
-            ],
-            [
-              164,
-              'currency sign'
-            ],
-            [
-              8352,
-              'euro-currency sign'
-            ],
-            [
-              8353,
-              'colon sign'
-            ],
-            [
-              8354,
-              'cruzeiro sign'
-            ],
-            [
-              8355,
-              'french franc sign'
-            ],
-            [
-              8356,
-              'lira sign'
-            ],
-            [
-              8357,
-              'mill sign'
-            ],
-            [
-              8358,
-              'naira sign'
-            ],
-            [
-              8359,
-              'peseta sign'
-            ],
-            [
-              8360,
-              'rupee sign'
-            ],
-            [
-              8361,
-              'won sign'
-            ],
-            [
-              8362,
-              'new sheqel sign'
-            ],
-            [
-              8363,
-              'dong sign'
-            ],
-            [
-              8365,
-              'kip sign'
-            ],
-            [
-              8366,
-              'tugrik sign'
-            ],
-            [
-              8367,
-              'drachma sign'
-            ],
-            [
-              8368,
-              'german penny symbol'
-            ],
-            [
-              8369,
-              'peso sign'
-            ],
-            [
-              8370,
-              'guarani sign'
-            ],
-            [
-              8371,
-              'austral sign'
-            ],
-            [
-              8372,
-              'hryvnia sign'
-            ],
-            [
-              8373,
-              'cedi sign'
-            ],
-            [
-              8374,
-              'livre tournois sign'
-            ],
-            [
-              8375,
-              'spesmilo sign'
-            ],
-            [
-              8376,
-              'tenge sign'
-            ],
-            [
-              8377,
-              'indian rupee sign'
-            ],
-            [
-              8378,
-              'turkish lira sign'
-            ],
-            [
-              8379,
-              'nordic mark sign'
-            ],
-            [
-              8380,
-              'manat sign'
-            ],
-            [
-              8381,
-              'ruble sign'
-            ],
-            [
-              20870,
-              'yen character'
-            ],
-            [
-              20803,
-              'yuan character'
-            ],
-            [
-              22291,
-              'yuan character, in hong kong and taiwan'
-            ],
-            [
-              22278,
-              'yen/yuan character variant one'
-            ]
-          ]
-        },
-        {
-          name: 'Text',
-          characters: [
-            [
-              169,
-              'copyright sign'
-            ],
-            [
-              174,
-              'registered sign'
-            ],
-            [
-              8482,
-              'trade mark sign'
-            ],
-            [
-              8240,
-              'per mille sign'
-            ],
-            [
-              181,
-              'micro sign'
-            ],
-            [
-              183,
-              'middle dot'
-            ],
-            [
-              8226,
-              'bullet'
-            ],
-            [
-              8230,
-              'three dot leader'
-            ],
-            [
-              8242,
-              'minutes / feet'
-            ],
-            [
-              8243,
-              'seconds / inches'
-            ],
-            [
-              167,
-              'section sign'
-            ],
-            [
-              182,
-              'paragraph sign'
-            ],
-            [
-              223,
-              'sharp s / ess-zed'
-            ]
-          ]
-        },
-        {
-          name: 'Quotations',
-          characters: [
-            [
-              8249,
-              'single left-pointing angle quotation mark'
-            ],
-            [
-              8250,
-              'single right-pointing angle quotation mark'
-            ],
-            [
-              171,
-              'left pointing guillemet'
-            ],
-            [
-              187,
-              'right pointing guillemet'
-            ],
-            [
-              8216,
-              'left single quotation mark'
-            ],
-            [
-              8217,
-              'right single quotation mark'
-            ],
-            [
-              8220,
-              'left double quotation mark'
-            ],
-            [
-              8221,
-              'right double quotation mark'
-            ],
-            [
-              8218,
-              'single low-9 quotation mark'
-            ],
-            [
-              8222,
-              'double low-9 quotation mark'
-            ],
-            [
-              60,
-              'less-than sign'
-            ],
-            [
-              62,
-              'greater-than sign'
-            ],
-            [
-              8804,
-              'less-than or equal to'
-            ],
-            [
-              8805,
-              'greater-than or equal to'
-            ],
-            [
-              8211,
-              'en dash'
-            ],
-            [
-              8212,
-              'em dash'
-            ],
-            [
-              175,
-              'macron'
-            ],
-            [
-              8254,
-              'overline'
-            ],
-            [
-              164,
-              'currency sign'
-            ],
-            [
-              166,
-              'broken bar'
-            ],
-            [
-              168,
-              'diaeresis'
-            ],
-            [
-              161,
-              'inverted exclamation mark'
-            ],
-            [
-              191,
-              'turned question mark'
-            ],
-            [
-              710,
-              'circumflex accent'
-            ],
-            [
-              732,
-              'small tilde'
-            ],
-            [
-              176,
-              'degree sign'
-            ],
-            [
-              8722,
-              'minus sign'
-            ],
-            [
-              177,
-              'plus-minus sign'
-            ],
-            [
-              247,
-              'division sign'
-            ],
-            [
-              8260,
-              'fraction slash'
-            ],
-            [
-              215,
-              'multiplication sign'
-            ],
-            [
-              185,
-              'superscript one'
-            ],
-            [
-              178,
-              'superscript two'
-            ],
-            [
-              179,
-              'superscript three'
-            ],
-            [
-              188,
-              'fraction one quarter'
-            ],
-            [
-              189,
-              'fraction one half'
-            ],
-            [
-              190,
-              'fraction three quarters'
-            ]
-          ]
-        },
-        {
-          name: 'Mathematical',
-          characters: [
-            [
-              402,
-              'function / florin'
-            ],
-            [
-              8747,
-              'integral'
-            ],
-            [
-              8721,
-              'n-ary sumation'
-            ],
-            [
-              8734,
-              'infinity'
-            ],
-            [
-              8730,
-              'square root'
-            ],
-            [
-              8764,
-              'similar to'
-            ],
-            [
-              8773,
-              'approximately equal to'
-            ],
-            [
-              8776,
-              'almost equal to'
-            ],
-            [
-              8800,
-              'not equal to'
-            ],
-            [
-              8801,
-              'identical to'
-            ],
-            [
-              8712,
-              'element of'
-            ],
-            [
-              8713,
-              'not an element of'
-            ],
-            [
-              8715,
-              'contains as member'
-            ],
-            [
-              8719,
-              'n-ary product'
-            ],
-            [
-              8743,
-              'logical and'
-            ],
-            [
-              8744,
-              'logical or'
-            ],
-            [
-              172,
-              'not sign'
-            ],
-            [
-              8745,
-              'intersection'
-            ],
-            [
-              8746,
-              'union'
-            ],
-            [
-              8706,
-              'partial differential'
-            ],
-            [
-              8704,
-              'for all'
-            ],
-            [
-              8707,
-              'there exists'
-            ],
-            [
-              8709,
-              'diameter'
-            ],
-            [
-              8711,
-              'backward difference'
-            ],
-            [
-              8727,
-              'asterisk operator'
-            ],
-            [
-              8733,
-              'proportional to'
-            ],
-            [
-              8736,
-              'angle'
-            ]
-          ]
-        },
-        {
-          name: 'Extended Latin',
-          characters: [
-            [
-              192,
-              'A - grave'
-            ],
-            [
-              193,
-              'A - acute'
-            ],
-            [
-              194,
-              'A - circumflex'
-            ],
-            [
-              195,
-              'A - tilde'
-            ],
-            [
-              196,
-              'A - diaeresis'
-            ],
-            [
-              197,
-              'A - ring above'
-            ],
-            [
-              256,
-              'A - macron'
-            ],
-            [
-              198,
-              'ligature AE'
-            ],
-            [
-              199,
-              'C - cedilla'
-            ],
-            [
-              200,
-              'E - grave'
-            ],
-            [
-              201,
-              'E - acute'
-            ],
-            [
-              202,
-              'E - circumflex'
-            ],
-            [
-              203,
-              'E - diaeresis'
-            ],
-            [
-              274,
-              'E - macron'
-            ],
-            [
-              204,
-              'I - grave'
-            ],
-            [
-              205,
-              'I - acute'
-            ],
-            [
-              206,
-              'I - circumflex'
-            ],
-            [
-              207,
-              'I - diaeresis'
-            ],
-            [
-              298,
-              'I - macron'
-            ],
-            [
-              208,
-              'ETH'
-            ],
-            [
-              209,
-              'N - tilde'
-            ],
-            [
-              210,
-              'O - grave'
-            ],
-            [
-              211,
-              'O - acute'
-            ],
-            [
-              212,
-              'O - circumflex'
-            ],
-            [
-              213,
-              'O - tilde'
-            ],
-            [
-              214,
-              'O - diaeresis'
-            ],
-            [
-              216,
-              'O - slash'
-            ],
-            [
-              332,
-              'O - macron'
-            ],
-            [
-              338,
-              'ligature OE'
-            ],
-            [
-              352,
-              'S - caron'
-            ],
-            [
-              217,
-              'U - grave'
-            ],
-            [
-              218,
-              'U - acute'
-            ],
-            [
-              219,
-              'U - circumflex'
-            ],
-            [
-              220,
-              'U - diaeresis'
-            ],
-            [
-              362,
-              'U - macron'
-            ],
-            [
-              221,
-              'Y - acute'
-            ],
-            [
-              376,
-              'Y - diaeresis'
-            ],
-            [
-              562,
-              'Y - macron'
-            ],
-            [
-              222,
-              'THORN'
-            ],
-            [
-              224,
-              'a - grave'
-            ],
-            [
-              225,
-              'a - acute'
-            ],
-            [
-              226,
-              'a - circumflex'
-            ],
-            [
-              227,
-              'a - tilde'
-            ],
-            [
-              228,
-              'a - diaeresis'
-            ],
-            [
-              229,
-              'a - ring above'
-            ],
-            [
-              257,
-              'a - macron'
-            ],
-            [
-              230,
-              'ligature ae'
-            ],
-            [
-              231,
-              'c - cedilla'
-            ],
-            [
-              232,
-              'e - grave'
-            ],
-            [
-              233,
-              'e - acute'
-            ],
-            [
-              234,
-              'e - circumflex'
-            ],
-            [
-              235,
-              'e - diaeresis'
-            ],
-            [
-              275,
-              'e - macron'
-            ],
-            [
-              236,
-              'i - grave'
-            ],
-            [
-              237,
-              'i - acute'
-            ],
-            [
-              238,
-              'i - circumflex'
-            ],
-            [
-              239,
-              'i - diaeresis'
-            ],
-            [
-              299,
-              'i - macron'
-            ],
-            [
-              240,
-              'eth'
-            ],
-            [
-              241,
-              'n - tilde'
-            ],
-            [
-              242,
-              'o - grave'
-            ],
-            [
-              243,
-              'o - acute'
-            ],
-            [
-              244,
-              'o - circumflex'
-            ],
-            [
-              245,
-              'o - tilde'
-            ],
-            [
-              246,
-              'o - diaeresis'
-            ],
-            [
-              248,
-              'o slash'
-            ],
-            [
-              333,
-              'o macron'
-            ],
-            [
-              339,
-              'ligature oe'
-            ],
-            [
-              353,
-              's - caron'
-            ],
-            [
-              249,
-              'u - grave'
-            ],
-            [
-              250,
-              'u - acute'
-            ],
-            [
-              251,
-              'u - circumflex'
-            ],
-            [
-              252,
-              'u - diaeresis'
-            ],
-            [
-              363,
-              'u - macron'
-            ],
-            [
-              253,
-              'y - acute'
-            ],
-            [
-              254,
-              'thorn'
-            ],
-            [
-              255,
-              'y - diaeresis'
-            ],
-            [
-              563,
-              'y - macron'
-            ],
-            [
-              913,
-              'Alpha'
-            ],
-            [
-              914,
-              'Beta'
-            ],
-            [
-              915,
-              'Gamma'
-            ],
-            [
-              916,
-              'Delta'
-            ],
-            [
-              917,
-              'Epsilon'
-            ],
-            [
-              918,
-              'Zeta'
-            ],
-            [
-              919,
-              'Eta'
-            ],
-            [
-              920,
-              'Theta'
-            ],
-            [
-              921,
-              'Iota'
-            ],
-            [
-              922,
-              'Kappa'
-            ],
-            [
-              923,
-              'Lambda'
-            ],
-            [
-              924,
-              'Mu'
-            ],
-            [
-              925,
-              'Nu'
-            ],
-            [
-              926,
-              'Xi'
-            ],
-            [
-              927,
-              'Omicron'
-            ],
-            [
-              928,
-              'Pi'
-            ],
-            [
-              929,
-              'Rho'
-            ],
-            [
-              931,
-              'Sigma'
-            ],
-            [
-              932,
-              'Tau'
-            ],
-            [
-              933,
-              'Upsilon'
-            ],
-            [
-              934,
-              'Phi'
-            ],
-            [
-              935,
-              'Chi'
-            ],
-            [
-              936,
-              'Psi'
-            ],
-            [
-              937,
-              'Omega'
-            ],
-            [
-              945,
-              'alpha'
-            ],
-            [
-              946,
-              'beta'
-            ],
-            [
-              947,
-              'gamma'
-            ],
-            [
-              948,
-              'delta'
-            ],
-            [
-              949,
-              'epsilon'
-            ],
-            [
-              950,
-              'zeta'
-            ],
-            [
-              951,
-              'eta'
-            ],
-            [
-              952,
-              'theta'
-            ],
-            [
-              953,
-              'iota'
-            ],
-            [
-              954,
-              'kappa'
-            ],
-            [
-              955,
-              'lambda'
-            ],
-            [
-              956,
-              'mu'
-            ],
-            [
-              957,
-              'nu'
-            ],
-            [
-              958,
-              'xi'
-            ],
-            [
-              959,
-              'omicron'
-            ],
-            [
-              960,
-              'pi'
-            ],
-            [
-              961,
-              'rho'
-            ],
-            [
-              962,
-              'final sigma'
-            ],
-            [
-              963,
-              'sigma'
-            ],
-            [
-              964,
-              'tau'
-            ],
-            [
-              965,
-              'upsilon'
-            ],
-            [
-              966,
-              'phi'
-            ],
-            [
-              967,
-              'chi'
-            ],
-            [
-              968,
-              'psi'
-            ],
-            [
-              969,
-              'omega'
-            ]
-          ]
-        },
-        {
-          name: 'Symbols',
-          characters: [
-            [
-              8501,
-              'alef symbol'
-            ],
-            [
-              982,
-              'pi symbol'
-            ],
-            [
-              8476,
-              'real part symbol'
-            ],
-            [
-              978,
-              'upsilon - hook symbol'
-            ],
-            [
-              8472,
-              'Weierstrass p'
-            ],
-            [
-              8465,
-              'imaginary part'
-            ]
-          ]
-        },
-        {
-          name: 'Arrows',
-          characters: [
-            [
-              8592,
-              'leftwards arrow'
-            ],
-            [
-              8593,
-              'upwards arrow'
-            ],
-            [
-              8594,
-              'rightwards arrow'
-            ],
-            [
-              8595,
-              'downwards arrow'
-            ],
-            [
-              8596,
-              'left right arrow'
-            ],
-            [
-              8629,
-              'carriage return'
-            ],
-            [
-              8656,
-              'leftwards double arrow'
-            ],
-            [
-              8657,
-              'upwards double arrow'
-            ],
-            [
-              8658,
-              'rightwards double arrow'
-            ],
-            [
-              8659,
-              'downwards double arrow'
-            ],
-            [
-              8660,
-              'left right double arrow'
-            ],
-            [
-              8756,
-              'therefore'
-            ],
-            [
-              8834,
-              'subset of'
-            ],
-            [
-              8835,
-              'superset of'
-            ],
-            [
-              8836,
-              'not a subset of'
-            ],
-            [
-              8838,
-              'subset of or equal to'
-            ],
-            [
-              8839,
-              'superset of or equal to'
-            ],
-            [
-              8853,
-              'circled plus'
-            ],
-            [
-              8855,
-              'circled times'
-            ],
-            [
-              8869,
-              'perpendicular'
-            ],
-            [
-              8901,
-              'dot operator'
-            ],
-            [
-              8968,
-              'left ceiling'
-            ],
-            [
-              8969,
-              'right ceiling'
-            ],
-            [
-              8970,
-              'left floor'
-            ],
-            [
-              8971,
-              'right floor'
-            ],
-            [
-              9001,
-              'left-pointing angle bracket'
-            ],
-            [
-              9002,
-              'right-pointing angle bracket'
-            ],
-            [
-              9674,
-              'lozenge'
-            ],
-            [
-              9824,
-              'black spade suit'
-            ],
-            [
-              9827,
-              'black club suit'
-            ],
-            [
-              9829,
-              'black heart suit'
-            ],
-            [
-              9830,
-              'black diamond suit'
-            ],
-            [
-              8194,
-              'en space'
-            ],
-            [
-              8195,
-              'em space'
-            ],
-            [
-              8201,
-              'thin space'
-            ],
-            [
-              8204,
-              'zero width non-joiner'
-            ],
-            [
-              8205,
-              'zero width joiner'
-            ],
-            [
-              8206,
-              'left-to-right mark'
-            ],
-            [
-              8207,
-              'right-to-left mark'
-            ]
-          ]
-        }
-      ];
-    };
-    const charmapFilter = charmap => {
-      return global.grep(charmap, item => {
-        return isArray(item) && item.length === 2;
-      });
-    };
-    const getCharsFromOption = optionValue => {
-      if (isArray(optionValue)) {
-        return charmapFilter(optionValue);
-      }
-      if (typeof optionValue === 'function') {
-        return optionValue();
-      }
-      return [];
-    };
-    const extendCharMap = (editor, charmap) => {
-      const userCharMap = getCharMap$1(editor);
-      if (userCharMap) {
-        charmap = [{
-            name: UserDefined,
-            characters: getCharsFromOption(userCharMap)
-          }];
-      }
-      const userCharMapAppend = getCharMapAppend(editor);
-      if (userCharMapAppend) {
-        const userDefinedGroup = global.grep(charmap, cg => cg.name === UserDefined);
-        if (userDefinedGroup.length) {
-          userDefinedGroup[0].characters = [
-            ...userDefinedGroup[0].characters,
-            ...getCharsFromOption(userCharMapAppend)
-          ];
-          return charmap;
-        }
-        return charmap.concat({
-          name: UserDefined,
-          characters: getCharsFromOption(userCharMapAppend)
-        });
-      }
-      return charmap;
-    };
-    const getCharMap = editor => {
-      const groups = extendCharMap(editor, getDefaultCharMap());
-      return groups.length > 1 ? [{
-          name: 'All',
-          characters: bind(groups, g => g.characters)
-        }].concat(groups) : groups;
-    };
-
-    const get = editor => {
-      const getCharMap$1 = () => {
-        return getCharMap(editor);
-      };
-      const insertChar$1 = chr => {
-        insertChar(editor, chr);
-      };
-      return {
-        getCharMap: getCharMap$1,
-        insertChar: insertChar$1
-      };
-    };
-
-    const Cell = initial => {
-      let value = initial;
-      const get = () => {
-        return value;
-      };
-      const set = v => {
-        value = v;
-      };
-      return {
-        get,
-        set
-      };
-    };
-
-    const last = (fn, rate) => {
-      let timer = null;
-      const cancel = () => {
-        if (!isNull(timer)) {
-          clearTimeout(timer);
-          timer = null;
-        }
-      };
-      const throttle = (...args) => {
-        cancel();
-        timer = setTimeout(() => {
-          timer = null;
-          fn.apply(null, args);
-        }, rate);
-      };
-      return {
-        cancel,
-        throttle
-      };
-    };
-
-    const contains = (str, substr, start = 0, end) => {
-      const idx = str.indexOf(substr, start);
-      if (idx !== -1) {
-        return isUndefined(end) ? true : idx + substr.length <= end;
-      } else {
-        return false;
-      }
-    };
-    const fromCodePoint = String.fromCodePoint;
-
-    const charMatches = (charCode, name, lowerCasePattern) => {
-      if (contains(fromCodePoint(charCode).toLowerCase(), lowerCasePattern)) {
-        return true;
-      } else {
-        return contains(name.toLowerCase(), lowerCasePattern) || contains(name.toLowerCase().replace(/\s+/g, ''), lowerCasePattern);
-      }
-    };
-    const scan = (group, pattern) => {
-      const matches = [];
-      const lowerCasePattern = pattern.toLowerCase();
-      each(group.characters, g => {
-        if (charMatches(g[0], g[1], lowerCasePattern)) {
-          matches.push(g);
-        }
-      });
-      return map(matches, m => ({
-        text: m[1],
-        value: fromCodePoint(m[0]),
-        icon: fromCodePoint(m[0])
-      }));
-    };
-
-    const patternName = 'pattern';
-    const open = (editor, charMap) => {
-      const makeGroupItems = () => [
-        {
-          label: 'Search',
-          type: 'input',
-          name: patternName
-        },
-        {
-          type: 'collection',
-          name: 'results'
-        }
-      ];
-      const makeTabs = () => map(charMap, charGroup => ({
-        title: charGroup.name,
-        name: charGroup.name,
-        items: makeGroupItems()
-      }));
-      const makePanel = () => ({
-        type: 'panel',
-        items: makeGroupItems()
-      });
-      const makeTabPanel = () => ({
-        type: 'tabpanel',
-        tabs: makeTabs()
-      });
-      const currentTab = charMap.length === 1 ? Cell(UserDefined) : Cell('All');
-      const scanAndSet = (dialogApi, pattern) => {
-        find(charMap, group => group.name === currentTab.get()).each(f => {
-          const items = scan(f, pattern);
-          dialogApi.setData({ results: items });
-        });
-      };
-      const SEARCH_DELAY = 40;
-      const updateFilter = last(dialogApi => {
-        const pattern = dialogApi.getData().pattern;
-        scanAndSet(dialogApi, pattern);
-      }, SEARCH_DELAY);
-      const body = charMap.length === 1 ? makePanel() : makeTabPanel();
-      const initialData = {
-        pattern: '',
-        results: scan(charMap[0], '')
-      };
-      const bridgeSpec = {
-        title: 'Special Character',
-        size: 'normal',
-        body,
-        buttons: [{
-            type: 'cancel',
-            name: 'close',
-            text: 'Close',
-            primary: true
-          }],
-        initialData,
-        onAction: (api, details) => {
-          if (details.name === 'results') {
-            insertChar(editor, details.value);
-            api.close();
-          }
-        },
-        onTabChange: (dialogApi, details) => {
-          currentTab.set(details.newTabName);
-          updateFilter.throttle(dialogApi);
-        },
-        onChange: (dialogApi, changeData) => {
-          if (changeData.name === patternName) {
-            updateFilter.throttle(dialogApi);
-          }
-        }
-      };
-      const dialogApi = editor.windowManager.open(bridgeSpec);
-      dialogApi.focus(patternName);
-    };
-
-    const register$1 = (editor, charMap) => {
-      editor.addCommand('mceShowCharmap', () => {
-        open(editor, charMap);
-      });
-    };
-
-    const init = (editor, all) => {
-      editor.ui.registry.addAutocompleter('charmap', {
-        trigger: ':',
-        columns: 'auto',
-        minChars: 2,
-        fetch: (pattern, _maxResults) => new Promise((resolve, _reject) => {
-          resolve(scan(all, pattern));
-        }),
-        onAction: (autocompleteApi, rng, value) => {
-          editor.selection.setRng(rng);
-          editor.insertContent(value);
-          autocompleteApi.hide();
-        }
-      });
-    };
-
-    const onSetupEditable = editor => api => {
-      const nodeChanged = () => {
-        api.setEnabled(editor.selection.isEditable());
-      };
-      editor.on('NodeChange', nodeChanged);
-      nodeChanged();
-      return () => {
-        editor.off('NodeChange', nodeChanged);
-      };
-    };
-    const register = editor => {
-      const onAction = () => editor.execCommand('mceShowCharmap');
-      editor.ui.registry.addButton('charmap', {
-        icon: 'insert-character',
-        tooltip: 'Special character',
-        onAction,
-        onSetup: onSetupEditable(editor)
-      });
-      editor.ui.registry.addMenuItem('charmap', {
-        icon: 'insert-character',
-        text: 'Special character...',
-        onAction,
-        onSetup: onSetupEditable(editor)
-      });
-    };
-
-    var Plugin = () => {
-      global$1.add('charmap', editor => {
-        register$2(editor);
-        const charMap = getCharMap(editor);
-        register$1(editor, charMap);
-        register(editor);
-        init(editor, charMap[0]);
-        return get(editor);
-      });
-    };
-
-    Plugin();
-
-})();
-
-/**
- * TinyMCE version 7.2.1 (2024-07-03)
- */
-
-(function () {
-    'use strict';
-
-    var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
-
-    const setContent = (editor, html) => {
-      editor.focus();
-      editor.undoManager.transact(() => {
-        editor.setContent(html);
-      });
-      editor.selection.setCursorLocation();
-      editor.nodeChanged();
-    };
-    const getContent = editor => {
-      return editor.getContent({ source_view: true });
-    };
-
-    const open = editor => {
-      const editorContent = getContent(editor);
-      editor.windowManager.open({
-        title: 'Source Code',
-        size: 'large',
-        body: {
-          type: 'panel',
-          items: [{
-              type: 'textarea',
-              name: 'code'
-            }]
-        },
-        buttons: [
-          {
-            type: 'cancel',
-            name: 'cancel',
-            text: 'Cancel'
-          },
-          {
-            type: 'submit',
-            name: 'save',
-            text: 'Save',
-            primary: true
-          }
-        ],
-        initialData: { code: editorContent },
-        onSubmit: api => {
-          setContent(editor, api.getData().code);
-          api.close();
-        }
-      });
-    };
-
-    const register$1 = editor => {
-      editor.addCommand('mceCodeEditor', () => {
-        open(editor);
-      });
-    };
-
-    const register = editor => {
-      const onAction = () => editor.execCommand('mceCodeEditor');
-      editor.ui.registry.addButton('code', {
-        icon: 'sourcecode',
-        tooltip: 'Source code',
-        onAction
-      });
-      editor.ui.registry.addMenuItem('code', {
-        icon: 'sourcecode',
-        text: 'Source code',
-        onAction
-      });
-    };
-
-    var Plugin = () => {
-      global.add('code', editor => {
-        register$1(editor);
-        register(editor);
-        return {};
       });
     };
 
@@ -37898,6 +36153,1751 @@ tinymce.IconManager.add('default', {
             open(editor);
           }
         });
+      });
+    };
+
+    Plugin();
+
+})();
+
+/**
+ * TinyMCE version 7.2.1 (2024-07-03)
+ */
+
+(function () {
+    'use strict';
+
+    var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    const fireInsertCustomChar = (editor, chr) => {
+      return editor.dispatch('insertCustomChar', { chr });
+    };
+
+    const insertChar = (editor, chr) => {
+      const evtChr = fireInsertCustomChar(editor, chr).chr;
+      editor.execCommand('mceInsertContent', false, evtChr);
+    };
+
+    const hasProto = (v, constructor, predicate) => {
+      var _a;
+      if (predicate(v, constructor.prototype)) {
+        return true;
+      } else {
+        return ((_a = v.constructor) === null || _a === void 0 ? void 0 : _a.name) === constructor.name;
+      }
+    };
+    const typeOf = x => {
+      const t = typeof x;
+      if (x === null) {
+        return 'null';
+      } else if (t === 'object' && Array.isArray(x)) {
+        return 'array';
+      } else if (t === 'object' && hasProto(x, String, (o, proto) => proto.isPrototypeOf(o))) {
+        return 'string';
+      } else {
+        return t;
+      }
+    };
+    const isType = type => value => typeOf(value) === type;
+    const isSimpleType = type => value => typeof value === type;
+    const eq = t => a => t === a;
+    const isArray$1 = isType('array');
+    const isNull = eq(null);
+    const isUndefined = eq(undefined);
+    const isNullable = a => a === null || a === undefined;
+    const isNonNullable = a => !isNullable(a);
+    const isFunction = isSimpleType('function');
+
+    const constant = value => {
+      return () => {
+        return value;
+      };
+    };
+    const never = constant(false);
+
+    class Optional {
+      constructor(tag, value) {
+        this.tag = tag;
+        this.value = value;
+      }
+      static some(value) {
+        return new Optional(true, value);
+      }
+      static none() {
+        return Optional.singletonNone;
+      }
+      fold(onNone, onSome) {
+        if (this.tag) {
+          return onSome(this.value);
+        } else {
+          return onNone();
+        }
+      }
+      isSome() {
+        return this.tag;
+      }
+      isNone() {
+        return !this.tag;
+      }
+      map(mapper) {
+        if (this.tag) {
+          return Optional.some(mapper(this.value));
+        } else {
+          return Optional.none();
+        }
+      }
+      bind(binder) {
+        if (this.tag) {
+          return binder(this.value);
+        } else {
+          return Optional.none();
+        }
+      }
+      exists(predicate) {
+        return this.tag && predicate(this.value);
+      }
+      forall(predicate) {
+        return !this.tag || predicate(this.value);
+      }
+      filter(predicate) {
+        if (!this.tag || predicate(this.value)) {
+          return this;
+        } else {
+          return Optional.none();
+        }
+      }
+      getOr(replacement) {
+        return this.tag ? this.value : replacement;
+      }
+      or(replacement) {
+        return this.tag ? this : replacement;
+      }
+      getOrThunk(thunk) {
+        return this.tag ? this.value : thunk();
+      }
+      orThunk(thunk) {
+        return this.tag ? this : thunk();
+      }
+      getOrDie(message) {
+        if (!this.tag) {
+          throw new Error(message !== null && message !== void 0 ? message : 'Called getOrDie on None');
+        } else {
+          return this.value;
+        }
+      }
+      static from(value) {
+        return isNonNullable(value) ? Optional.some(value) : Optional.none();
+      }
+      getOrNull() {
+        return this.tag ? this.value : null;
+      }
+      getOrUndefined() {
+        return this.value;
+      }
+      each(worker) {
+        if (this.tag) {
+          worker(this.value);
+        }
+      }
+      toArray() {
+        return this.tag ? [this.value] : [];
+      }
+      toString() {
+        return this.tag ? `some(${ this.value })` : 'none()';
+      }
+    }
+    Optional.singletonNone = new Optional(false);
+
+    const nativePush = Array.prototype.push;
+    const map = (xs, f) => {
+      const len = xs.length;
+      const r = new Array(len);
+      for (let i = 0; i < len; i++) {
+        const x = xs[i];
+        r[i] = f(x, i);
+      }
+      return r;
+    };
+    const each = (xs, f) => {
+      for (let i = 0, len = xs.length; i < len; i++) {
+        const x = xs[i];
+        f(x, i);
+      }
+    };
+    const findUntil = (xs, pred, until) => {
+      for (let i = 0, len = xs.length; i < len; i++) {
+        const x = xs[i];
+        if (pred(x, i)) {
+          return Optional.some(x);
+        } else if (until(x, i)) {
+          break;
+        }
+      }
+      return Optional.none();
+    };
+    const find = (xs, pred) => {
+      return findUntil(xs, pred, never);
+    };
+    const flatten = xs => {
+      const r = [];
+      for (let i = 0, len = xs.length; i < len; ++i) {
+        if (!isArray$1(xs[i])) {
+          throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        }
+        nativePush.apply(r, xs[i]);
+      }
+      return r;
+    };
+    const bind = (xs, f) => flatten(map(xs, f));
+
+    var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
+
+    const option = name => editor => editor.options.get(name);
+    const register$2 = editor => {
+      const registerOption = editor.options.register;
+      const charMapProcessor = value => isFunction(value) || isArray$1(value);
+      registerOption('charmap', { processor: charMapProcessor });
+      registerOption('charmap_append', { processor: charMapProcessor });
+    };
+    const getCharMap$1 = option('charmap');
+    const getCharMapAppend = option('charmap_append');
+
+    const isArray = global.isArray;
+    const UserDefined = 'User Defined';
+    const getDefaultCharMap = () => {
+      return [
+        {
+          name: 'Currency',
+          characters: [
+            [
+              36,
+              'dollar sign'
+            ],
+            [
+              162,
+              'cent sign'
+            ],
+            [
+              8364,
+              'euro sign'
+            ],
+            [
+              163,
+              'pound sign'
+            ],
+            [
+              165,
+              'yen sign'
+            ],
+            [
+              164,
+              'currency sign'
+            ],
+            [
+              8352,
+              'euro-currency sign'
+            ],
+            [
+              8353,
+              'colon sign'
+            ],
+            [
+              8354,
+              'cruzeiro sign'
+            ],
+            [
+              8355,
+              'french franc sign'
+            ],
+            [
+              8356,
+              'lira sign'
+            ],
+            [
+              8357,
+              'mill sign'
+            ],
+            [
+              8358,
+              'naira sign'
+            ],
+            [
+              8359,
+              'peseta sign'
+            ],
+            [
+              8360,
+              'rupee sign'
+            ],
+            [
+              8361,
+              'won sign'
+            ],
+            [
+              8362,
+              'new sheqel sign'
+            ],
+            [
+              8363,
+              'dong sign'
+            ],
+            [
+              8365,
+              'kip sign'
+            ],
+            [
+              8366,
+              'tugrik sign'
+            ],
+            [
+              8367,
+              'drachma sign'
+            ],
+            [
+              8368,
+              'german penny symbol'
+            ],
+            [
+              8369,
+              'peso sign'
+            ],
+            [
+              8370,
+              'guarani sign'
+            ],
+            [
+              8371,
+              'austral sign'
+            ],
+            [
+              8372,
+              'hryvnia sign'
+            ],
+            [
+              8373,
+              'cedi sign'
+            ],
+            [
+              8374,
+              'livre tournois sign'
+            ],
+            [
+              8375,
+              'spesmilo sign'
+            ],
+            [
+              8376,
+              'tenge sign'
+            ],
+            [
+              8377,
+              'indian rupee sign'
+            ],
+            [
+              8378,
+              'turkish lira sign'
+            ],
+            [
+              8379,
+              'nordic mark sign'
+            ],
+            [
+              8380,
+              'manat sign'
+            ],
+            [
+              8381,
+              'ruble sign'
+            ],
+            [
+              20870,
+              'yen character'
+            ],
+            [
+              20803,
+              'yuan character'
+            ],
+            [
+              22291,
+              'yuan character, in hong kong and taiwan'
+            ],
+            [
+              22278,
+              'yen/yuan character variant one'
+            ]
+          ]
+        },
+        {
+          name: 'Text',
+          characters: [
+            [
+              169,
+              'copyright sign'
+            ],
+            [
+              174,
+              'registered sign'
+            ],
+            [
+              8482,
+              'trade mark sign'
+            ],
+            [
+              8240,
+              'per mille sign'
+            ],
+            [
+              181,
+              'micro sign'
+            ],
+            [
+              183,
+              'middle dot'
+            ],
+            [
+              8226,
+              'bullet'
+            ],
+            [
+              8230,
+              'three dot leader'
+            ],
+            [
+              8242,
+              'minutes / feet'
+            ],
+            [
+              8243,
+              'seconds / inches'
+            ],
+            [
+              167,
+              'section sign'
+            ],
+            [
+              182,
+              'paragraph sign'
+            ],
+            [
+              223,
+              'sharp s / ess-zed'
+            ]
+          ]
+        },
+        {
+          name: 'Quotations',
+          characters: [
+            [
+              8249,
+              'single left-pointing angle quotation mark'
+            ],
+            [
+              8250,
+              'single right-pointing angle quotation mark'
+            ],
+            [
+              171,
+              'left pointing guillemet'
+            ],
+            [
+              187,
+              'right pointing guillemet'
+            ],
+            [
+              8216,
+              'left single quotation mark'
+            ],
+            [
+              8217,
+              'right single quotation mark'
+            ],
+            [
+              8220,
+              'left double quotation mark'
+            ],
+            [
+              8221,
+              'right double quotation mark'
+            ],
+            [
+              8218,
+              'single low-9 quotation mark'
+            ],
+            [
+              8222,
+              'double low-9 quotation mark'
+            ],
+            [
+              60,
+              'less-than sign'
+            ],
+            [
+              62,
+              'greater-than sign'
+            ],
+            [
+              8804,
+              'less-than or equal to'
+            ],
+            [
+              8805,
+              'greater-than or equal to'
+            ],
+            [
+              8211,
+              'en dash'
+            ],
+            [
+              8212,
+              'em dash'
+            ],
+            [
+              175,
+              'macron'
+            ],
+            [
+              8254,
+              'overline'
+            ],
+            [
+              164,
+              'currency sign'
+            ],
+            [
+              166,
+              'broken bar'
+            ],
+            [
+              168,
+              'diaeresis'
+            ],
+            [
+              161,
+              'inverted exclamation mark'
+            ],
+            [
+              191,
+              'turned question mark'
+            ],
+            [
+              710,
+              'circumflex accent'
+            ],
+            [
+              732,
+              'small tilde'
+            ],
+            [
+              176,
+              'degree sign'
+            ],
+            [
+              8722,
+              'minus sign'
+            ],
+            [
+              177,
+              'plus-minus sign'
+            ],
+            [
+              247,
+              'division sign'
+            ],
+            [
+              8260,
+              'fraction slash'
+            ],
+            [
+              215,
+              'multiplication sign'
+            ],
+            [
+              185,
+              'superscript one'
+            ],
+            [
+              178,
+              'superscript two'
+            ],
+            [
+              179,
+              'superscript three'
+            ],
+            [
+              188,
+              'fraction one quarter'
+            ],
+            [
+              189,
+              'fraction one half'
+            ],
+            [
+              190,
+              'fraction three quarters'
+            ]
+          ]
+        },
+        {
+          name: 'Mathematical',
+          characters: [
+            [
+              402,
+              'function / florin'
+            ],
+            [
+              8747,
+              'integral'
+            ],
+            [
+              8721,
+              'n-ary sumation'
+            ],
+            [
+              8734,
+              'infinity'
+            ],
+            [
+              8730,
+              'square root'
+            ],
+            [
+              8764,
+              'similar to'
+            ],
+            [
+              8773,
+              'approximately equal to'
+            ],
+            [
+              8776,
+              'almost equal to'
+            ],
+            [
+              8800,
+              'not equal to'
+            ],
+            [
+              8801,
+              'identical to'
+            ],
+            [
+              8712,
+              'element of'
+            ],
+            [
+              8713,
+              'not an element of'
+            ],
+            [
+              8715,
+              'contains as member'
+            ],
+            [
+              8719,
+              'n-ary product'
+            ],
+            [
+              8743,
+              'logical and'
+            ],
+            [
+              8744,
+              'logical or'
+            ],
+            [
+              172,
+              'not sign'
+            ],
+            [
+              8745,
+              'intersection'
+            ],
+            [
+              8746,
+              'union'
+            ],
+            [
+              8706,
+              'partial differential'
+            ],
+            [
+              8704,
+              'for all'
+            ],
+            [
+              8707,
+              'there exists'
+            ],
+            [
+              8709,
+              'diameter'
+            ],
+            [
+              8711,
+              'backward difference'
+            ],
+            [
+              8727,
+              'asterisk operator'
+            ],
+            [
+              8733,
+              'proportional to'
+            ],
+            [
+              8736,
+              'angle'
+            ]
+          ]
+        },
+        {
+          name: 'Extended Latin',
+          characters: [
+            [
+              192,
+              'A - grave'
+            ],
+            [
+              193,
+              'A - acute'
+            ],
+            [
+              194,
+              'A - circumflex'
+            ],
+            [
+              195,
+              'A - tilde'
+            ],
+            [
+              196,
+              'A - diaeresis'
+            ],
+            [
+              197,
+              'A - ring above'
+            ],
+            [
+              256,
+              'A - macron'
+            ],
+            [
+              198,
+              'ligature AE'
+            ],
+            [
+              199,
+              'C - cedilla'
+            ],
+            [
+              200,
+              'E - grave'
+            ],
+            [
+              201,
+              'E - acute'
+            ],
+            [
+              202,
+              'E - circumflex'
+            ],
+            [
+              203,
+              'E - diaeresis'
+            ],
+            [
+              274,
+              'E - macron'
+            ],
+            [
+              204,
+              'I - grave'
+            ],
+            [
+              205,
+              'I - acute'
+            ],
+            [
+              206,
+              'I - circumflex'
+            ],
+            [
+              207,
+              'I - diaeresis'
+            ],
+            [
+              298,
+              'I - macron'
+            ],
+            [
+              208,
+              'ETH'
+            ],
+            [
+              209,
+              'N - tilde'
+            ],
+            [
+              210,
+              'O - grave'
+            ],
+            [
+              211,
+              'O - acute'
+            ],
+            [
+              212,
+              'O - circumflex'
+            ],
+            [
+              213,
+              'O - tilde'
+            ],
+            [
+              214,
+              'O - diaeresis'
+            ],
+            [
+              216,
+              'O - slash'
+            ],
+            [
+              332,
+              'O - macron'
+            ],
+            [
+              338,
+              'ligature OE'
+            ],
+            [
+              352,
+              'S - caron'
+            ],
+            [
+              217,
+              'U - grave'
+            ],
+            [
+              218,
+              'U - acute'
+            ],
+            [
+              219,
+              'U - circumflex'
+            ],
+            [
+              220,
+              'U - diaeresis'
+            ],
+            [
+              362,
+              'U - macron'
+            ],
+            [
+              221,
+              'Y - acute'
+            ],
+            [
+              376,
+              'Y - diaeresis'
+            ],
+            [
+              562,
+              'Y - macron'
+            ],
+            [
+              222,
+              'THORN'
+            ],
+            [
+              224,
+              'a - grave'
+            ],
+            [
+              225,
+              'a - acute'
+            ],
+            [
+              226,
+              'a - circumflex'
+            ],
+            [
+              227,
+              'a - tilde'
+            ],
+            [
+              228,
+              'a - diaeresis'
+            ],
+            [
+              229,
+              'a - ring above'
+            ],
+            [
+              257,
+              'a - macron'
+            ],
+            [
+              230,
+              'ligature ae'
+            ],
+            [
+              231,
+              'c - cedilla'
+            ],
+            [
+              232,
+              'e - grave'
+            ],
+            [
+              233,
+              'e - acute'
+            ],
+            [
+              234,
+              'e - circumflex'
+            ],
+            [
+              235,
+              'e - diaeresis'
+            ],
+            [
+              275,
+              'e - macron'
+            ],
+            [
+              236,
+              'i - grave'
+            ],
+            [
+              237,
+              'i - acute'
+            ],
+            [
+              238,
+              'i - circumflex'
+            ],
+            [
+              239,
+              'i - diaeresis'
+            ],
+            [
+              299,
+              'i - macron'
+            ],
+            [
+              240,
+              'eth'
+            ],
+            [
+              241,
+              'n - tilde'
+            ],
+            [
+              242,
+              'o - grave'
+            ],
+            [
+              243,
+              'o - acute'
+            ],
+            [
+              244,
+              'o - circumflex'
+            ],
+            [
+              245,
+              'o - tilde'
+            ],
+            [
+              246,
+              'o - diaeresis'
+            ],
+            [
+              248,
+              'o slash'
+            ],
+            [
+              333,
+              'o macron'
+            ],
+            [
+              339,
+              'ligature oe'
+            ],
+            [
+              353,
+              's - caron'
+            ],
+            [
+              249,
+              'u - grave'
+            ],
+            [
+              250,
+              'u - acute'
+            ],
+            [
+              251,
+              'u - circumflex'
+            ],
+            [
+              252,
+              'u - diaeresis'
+            ],
+            [
+              363,
+              'u - macron'
+            ],
+            [
+              253,
+              'y - acute'
+            ],
+            [
+              254,
+              'thorn'
+            ],
+            [
+              255,
+              'y - diaeresis'
+            ],
+            [
+              563,
+              'y - macron'
+            ],
+            [
+              913,
+              'Alpha'
+            ],
+            [
+              914,
+              'Beta'
+            ],
+            [
+              915,
+              'Gamma'
+            ],
+            [
+              916,
+              'Delta'
+            ],
+            [
+              917,
+              'Epsilon'
+            ],
+            [
+              918,
+              'Zeta'
+            ],
+            [
+              919,
+              'Eta'
+            ],
+            [
+              920,
+              'Theta'
+            ],
+            [
+              921,
+              'Iota'
+            ],
+            [
+              922,
+              'Kappa'
+            ],
+            [
+              923,
+              'Lambda'
+            ],
+            [
+              924,
+              'Mu'
+            ],
+            [
+              925,
+              'Nu'
+            ],
+            [
+              926,
+              'Xi'
+            ],
+            [
+              927,
+              'Omicron'
+            ],
+            [
+              928,
+              'Pi'
+            ],
+            [
+              929,
+              'Rho'
+            ],
+            [
+              931,
+              'Sigma'
+            ],
+            [
+              932,
+              'Tau'
+            ],
+            [
+              933,
+              'Upsilon'
+            ],
+            [
+              934,
+              'Phi'
+            ],
+            [
+              935,
+              'Chi'
+            ],
+            [
+              936,
+              'Psi'
+            ],
+            [
+              937,
+              'Omega'
+            ],
+            [
+              945,
+              'alpha'
+            ],
+            [
+              946,
+              'beta'
+            ],
+            [
+              947,
+              'gamma'
+            ],
+            [
+              948,
+              'delta'
+            ],
+            [
+              949,
+              'epsilon'
+            ],
+            [
+              950,
+              'zeta'
+            ],
+            [
+              951,
+              'eta'
+            ],
+            [
+              952,
+              'theta'
+            ],
+            [
+              953,
+              'iota'
+            ],
+            [
+              954,
+              'kappa'
+            ],
+            [
+              955,
+              'lambda'
+            ],
+            [
+              956,
+              'mu'
+            ],
+            [
+              957,
+              'nu'
+            ],
+            [
+              958,
+              'xi'
+            ],
+            [
+              959,
+              'omicron'
+            ],
+            [
+              960,
+              'pi'
+            ],
+            [
+              961,
+              'rho'
+            ],
+            [
+              962,
+              'final sigma'
+            ],
+            [
+              963,
+              'sigma'
+            ],
+            [
+              964,
+              'tau'
+            ],
+            [
+              965,
+              'upsilon'
+            ],
+            [
+              966,
+              'phi'
+            ],
+            [
+              967,
+              'chi'
+            ],
+            [
+              968,
+              'psi'
+            ],
+            [
+              969,
+              'omega'
+            ]
+          ]
+        },
+        {
+          name: 'Symbols',
+          characters: [
+            [
+              8501,
+              'alef symbol'
+            ],
+            [
+              982,
+              'pi symbol'
+            ],
+            [
+              8476,
+              'real part symbol'
+            ],
+            [
+              978,
+              'upsilon - hook symbol'
+            ],
+            [
+              8472,
+              'Weierstrass p'
+            ],
+            [
+              8465,
+              'imaginary part'
+            ]
+          ]
+        },
+        {
+          name: 'Arrows',
+          characters: [
+            [
+              8592,
+              'leftwards arrow'
+            ],
+            [
+              8593,
+              'upwards arrow'
+            ],
+            [
+              8594,
+              'rightwards arrow'
+            ],
+            [
+              8595,
+              'downwards arrow'
+            ],
+            [
+              8596,
+              'left right arrow'
+            ],
+            [
+              8629,
+              'carriage return'
+            ],
+            [
+              8656,
+              'leftwards double arrow'
+            ],
+            [
+              8657,
+              'upwards double arrow'
+            ],
+            [
+              8658,
+              'rightwards double arrow'
+            ],
+            [
+              8659,
+              'downwards double arrow'
+            ],
+            [
+              8660,
+              'left right double arrow'
+            ],
+            [
+              8756,
+              'therefore'
+            ],
+            [
+              8834,
+              'subset of'
+            ],
+            [
+              8835,
+              'superset of'
+            ],
+            [
+              8836,
+              'not a subset of'
+            ],
+            [
+              8838,
+              'subset of or equal to'
+            ],
+            [
+              8839,
+              'superset of or equal to'
+            ],
+            [
+              8853,
+              'circled plus'
+            ],
+            [
+              8855,
+              'circled times'
+            ],
+            [
+              8869,
+              'perpendicular'
+            ],
+            [
+              8901,
+              'dot operator'
+            ],
+            [
+              8968,
+              'left ceiling'
+            ],
+            [
+              8969,
+              'right ceiling'
+            ],
+            [
+              8970,
+              'left floor'
+            ],
+            [
+              8971,
+              'right floor'
+            ],
+            [
+              9001,
+              'left-pointing angle bracket'
+            ],
+            [
+              9002,
+              'right-pointing angle bracket'
+            ],
+            [
+              9674,
+              'lozenge'
+            ],
+            [
+              9824,
+              'black spade suit'
+            ],
+            [
+              9827,
+              'black club suit'
+            ],
+            [
+              9829,
+              'black heart suit'
+            ],
+            [
+              9830,
+              'black diamond suit'
+            ],
+            [
+              8194,
+              'en space'
+            ],
+            [
+              8195,
+              'em space'
+            ],
+            [
+              8201,
+              'thin space'
+            ],
+            [
+              8204,
+              'zero width non-joiner'
+            ],
+            [
+              8205,
+              'zero width joiner'
+            ],
+            [
+              8206,
+              'left-to-right mark'
+            ],
+            [
+              8207,
+              'right-to-left mark'
+            ]
+          ]
+        }
+      ];
+    };
+    const charmapFilter = charmap => {
+      return global.grep(charmap, item => {
+        return isArray(item) && item.length === 2;
+      });
+    };
+    const getCharsFromOption = optionValue => {
+      if (isArray(optionValue)) {
+        return charmapFilter(optionValue);
+      }
+      if (typeof optionValue === 'function') {
+        return optionValue();
+      }
+      return [];
+    };
+    const extendCharMap = (editor, charmap) => {
+      const userCharMap = getCharMap$1(editor);
+      if (userCharMap) {
+        charmap = [{
+            name: UserDefined,
+            characters: getCharsFromOption(userCharMap)
+          }];
+      }
+      const userCharMapAppend = getCharMapAppend(editor);
+      if (userCharMapAppend) {
+        const userDefinedGroup = global.grep(charmap, cg => cg.name === UserDefined);
+        if (userDefinedGroup.length) {
+          userDefinedGroup[0].characters = [
+            ...userDefinedGroup[0].characters,
+            ...getCharsFromOption(userCharMapAppend)
+          ];
+          return charmap;
+        }
+        return charmap.concat({
+          name: UserDefined,
+          characters: getCharsFromOption(userCharMapAppend)
+        });
+      }
+      return charmap;
+    };
+    const getCharMap = editor => {
+      const groups = extendCharMap(editor, getDefaultCharMap());
+      return groups.length > 1 ? [{
+          name: 'All',
+          characters: bind(groups, g => g.characters)
+        }].concat(groups) : groups;
+    };
+
+    const get = editor => {
+      const getCharMap$1 = () => {
+        return getCharMap(editor);
+      };
+      const insertChar$1 = chr => {
+        insertChar(editor, chr);
+      };
+      return {
+        getCharMap: getCharMap$1,
+        insertChar: insertChar$1
+      };
+    };
+
+    const Cell = initial => {
+      let value = initial;
+      const get = () => {
+        return value;
+      };
+      const set = v => {
+        value = v;
+      };
+      return {
+        get,
+        set
+      };
+    };
+
+    const last = (fn, rate) => {
+      let timer = null;
+      const cancel = () => {
+        if (!isNull(timer)) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      };
+      const throttle = (...args) => {
+        cancel();
+        timer = setTimeout(() => {
+          timer = null;
+          fn.apply(null, args);
+        }, rate);
+      };
+      return {
+        cancel,
+        throttle
+      };
+    };
+
+    const contains = (str, substr, start = 0, end) => {
+      const idx = str.indexOf(substr, start);
+      if (idx !== -1) {
+        return isUndefined(end) ? true : idx + substr.length <= end;
+      } else {
+        return false;
+      }
+    };
+    const fromCodePoint = String.fromCodePoint;
+
+    const charMatches = (charCode, name, lowerCasePattern) => {
+      if (contains(fromCodePoint(charCode).toLowerCase(), lowerCasePattern)) {
+        return true;
+      } else {
+        return contains(name.toLowerCase(), lowerCasePattern) || contains(name.toLowerCase().replace(/\s+/g, ''), lowerCasePattern);
+      }
+    };
+    const scan = (group, pattern) => {
+      const matches = [];
+      const lowerCasePattern = pattern.toLowerCase();
+      each(group.characters, g => {
+        if (charMatches(g[0], g[1], lowerCasePattern)) {
+          matches.push(g);
+        }
+      });
+      return map(matches, m => ({
+        text: m[1],
+        value: fromCodePoint(m[0]),
+        icon: fromCodePoint(m[0])
+      }));
+    };
+
+    const patternName = 'pattern';
+    const open = (editor, charMap) => {
+      const makeGroupItems = () => [
+        {
+          label: 'Search',
+          type: 'input',
+          name: patternName
+        },
+        {
+          type: 'collection',
+          name: 'results'
+        }
+      ];
+      const makeTabs = () => map(charMap, charGroup => ({
+        title: charGroup.name,
+        name: charGroup.name,
+        items: makeGroupItems()
+      }));
+      const makePanel = () => ({
+        type: 'panel',
+        items: makeGroupItems()
+      });
+      const makeTabPanel = () => ({
+        type: 'tabpanel',
+        tabs: makeTabs()
+      });
+      const currentTab = charMap.length === 1 ? Cell(UserDefined) : Cell('All');
+      const scanAndSet = (dialogApi, pattern) => {
+        find(charMap, group => group.name === currentTab.get()).each(f => {
+          const items = scan(f, pattern);
+          dialogApi.setData({ results: items });
+        });
+      };
+      const SEARCH_DELAY = 40;
+      const updateFilter = last(dialogApi => {
+        const pattern = dialogApi.getData().pattern;
+        scanAndSet(dialogApi, pattern);
+      }, SEARCH_DELAY);
+      const body = charMap.length === 1 ? makePanel() : makeTabPanel();
+      const initialData = {
+        pattern: '',
+        results: scan(charMap[0], '')
+      };
+      const bridgeSpec = {
+        title: 'Special Character',
+        size: 'normal',
+        body,
+        buttons: [{
+            type: 'cancel',
+            name: 'close',
+            text: 'Close',
+            primary: true
+          }],
+        initialData,
+        onAction: (api, details) => {
+          if (details.name === 'results') {
+            insertChar(editor, details.value);
+            api.close();
+          }
+        },
+        onTabChange: (dialogApi, details) => {
+          currentTab.set(details.newTabName);
+          updateFilter.throttle(dialogApi);
+        },
+        onChange: (dialogApi, changeData) => {
+          if (changeData.name === patternName) {
+            updateFilter.throttle(dialogApi);
+          }
+        }
+      };
+      const dialogApi = editor.windowManager.open(bridgeSpec);
+      dialogApi.focus(patternName);
+    };
+
+    const register$1 = (editor, charMap) => {
+      editor.addCommand('mceShowCharmap', () => {
+        open(editor, charMap);
+      });
+    };
+
+    const init = (editor, all) => {
+      editor.ui.registry.addAutocompleter('charmap', {
+        trigger: ':',
+        columns: 'auto',
+        minChars: 2,
+        fetch: (pattern, _maxResults) => new Promise((resolve, _reject) => {
+          resolve(scan(all, pattern));
+        }),
+        onAction: (autocompleteApi, rng, value) => {
+          editor.selection.setRng(rng);
+          editor.insertContent(value);
+          autocompleteApi.hide();
+        }
+      });
+    };
+
+    const onSetupEditable = editor => api => {
+      const nodeChanged = () => {
+        api.setEnabled(editor.selection.isEditable());
+      };
+      editor.on('NodeChange', nodeChanged);
+      nodeChanged();
+      return () => {
+        editor.off('NodeChange', nodeChanged);
+      };
+    };
+    const register = editor => {
+      const onAction = () => editor.execCommand('mceShowCharmap');
+      editor.ui.registry.addButton('charmap', {
+        icon: 'insert-character',
+        tooltip: 'Special character',
+        onAction,
+        onSetup: onSetupEditable(editor)
+      });
+      editor.ui.registry.addMenuItem('charmap', {
+        icon: 'insert-character',
+        text: 'Special character...',
+        onAction,
+        onSetup: onSetupEditable(editor)
+      });
+    };
+
+    var Plugin = () => {
+      global$1.add('charmap', editor => {
+        register$2(editor);
+        const charMap = getCharMap(editor);
+        register$1(editor, charMap);
+        register(editor);
+        init(editor, charMap[0]);
+        return get(editor);
+      });
+    };
+
+    Plugin();
+
+})();
+
+/**
+ * TinyMCE version 7.2.1 (2024-07-03)
+ */
+
+(function () {
+    'use strict';
+
+    var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    const setContent = (editor, html) => {
+      editor.focus();
+      editor.undoManager.transact(() => {
+        editor.setContent(html);
+      });
+      editor.selection.setCursorLocation();
+      editor.nodeChanged();
+    };
+    const getContent = editor => {
+      return editor.getContent({ source_view: true });
+    };
+
+    const open = editor => {
+      const editorContent = getContent(editor);
+      editor.windowManager.open({
+        title: 'Source Code',
+        size: 'large',
+        body: {
+          type: 'panel',
+          items: [{
+              type: 'textarea',
+              name: 'code'
+            }]
+        },
+        buttons: [
+          {
+            type: 'cancel',
+            name: 'cancel',
+            text: 'Cancel'
+          },
+          {
+            type: 'submit',
+            name: 'save',
+            text: 'Save',
+            primary: true
+          }
+        ],
+        initialData: { code: editorContent },
+        onSubmit: api => {
+          setContent(editor, api.getData().code);
+          api.close();
+        }
+      });
+    };
+
+    const register$1 = editor => {
+      editor.addCommand('mceCodeEditor', () => {
+        open(editor);
+      });
+    };
+
+    const register = editor => {
+      const onAction = () => editor.execCommand('mceCodeEditor');
+      editor.ui.registry.addButton('code', {
+        icon: 'sourcecode',
+        tooltip: 'Source code',
+        onAction
+      });
+      editor.ui.registry.addMenuItem('code', {
+        icon: 'sourcecode',
+        text: 'Source code',
+        onAction
+      });
+    };
+
+    var Plugin = () => {
+      global.add('code', editor => {
+        register$1(editor);
+        register(editor);
+        return {};
       });
     };
 
@@ -41089,6 +41089,352 @@ tinymce.IconManager.add('default', {
 
     var global$4 = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
+    const hasProto = (v, constructor, predicate) => {
+      var _a;
+      if (predicate(v, constructor.prototype)) {
+        return true;
+      } else {
+        return ((_a = v.constructor) === null || _a === void 0 ? void 0 : _a.name) === constructor.name;
+      }
+    };
+    const typeOf = x => {
+      const t = typeof x;
+      if (x === null) {
+        return 'null';
+      } else if (t === 'object' && Array.isArray(x)) {
+        return 'array';
+      } else if (t === 'object' && hasProto(x, String, (o, proto) => proto.isPrototypeOf(o))) {
+        return 'string';
+      } else {
+        return t;
+      }
+    };
+    const isType = type => value => typeOf(value) === type;
+    const isSimpleType = type => value => typeof value === type;
+    const isString = isType('string');
+    const isObject = isType('object');
+    const isArray = isType('array');
+    const isFunction = isSimpleType('function');
+
+    var global$3 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+
+    var global$2 = tinymce.util.Tools.resolve('tinymce.EditorManager');
+
+    var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
+
+    var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
+
+    const option = name => editor => editor.options.get(name);
+    const register = editor => {
+      const registerOption = editor.options.register;
+      const filterProcessor = value => isString(value) || isFunction(value) || isObject(value);
+      registerOption('importcss_merge_classes', {
+        processor: 'boolean',
+        default: true
+      });
+      registerOption('importcss_exclusive', {
+        processor: 'boolean',
+        default: true
+      });
+      registerOption('importcss_selector_converter', { processor: 'function' });
+      registerOption('importcss_selector_filter', { processor: filterProcessor });
+      registerOption('importcss_file_filter', { processor: filterProcessor });
+      registerOption('importcss_groups', { processor: 'object[]' });
+      registerOption('importcss_append', {
+        processor: 'boolean',
+        default: false
+      });
+    };
+    const shouldMergeClasses = option('importcss_merge_classes');
+    const shouldImportExclusive = option('importcss_exclusive');
+    const getSelectorConverter = option('importcss_selector_converter');
+    const getSelectorFilter = option('importcss_selector_filter');
+    const getCssGroups = option('importcss_groups');
+    const shouldAppend = option('importcss_append');
+    const getFileFilter = option('importcss_file_filter');
+    const getSkin = option('skin');
+    const getSkinUrl = option('skin_url');
+
+    const nativePush = Array.prototype.push;
+    const map = (xs, f) => {
+      const len = xs.length;
+      const r = new Array(len);
+      for (let i = 0; i < len; i++) {
+        const x = xs[i];
+        r[i] = f(x, i);
+      }
+      return r;
+    };
+    const flatten = xs => {
+      const r = [];
+      for (let i = 0, len = xs.length; i < len; ++i) {
+        if (!isArray(xs[i])) {
+          throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        }
+        nativePush.apply(r, xs[i]);
+      }
+      return r;
+    };
+    const bind = (xs, f) => flatten(map(xs, f));
+
+    const generate = () => {
+      const ungroupedOrder = [];
+      const groupOrder = [];
+      const groups = {};
+      const addItemToGroup = (groupTitle, itemInfo) => {
+        if (groups[groupTitle]) {
+          groups[groupTitle].push(itemInfo);
+        } else {
+          groupOrder.push(groupTitle);
+          groups[groupTitle] = [itemInfo];
+        }
+      };
+      const addItem = itemInfo => {
+        ungroupedOrder.push(itemInfo);
+      };
+      const toFormats = () => {
+        const groupItems = bind(groupOrder, g => {
+          const items = groups[g];
+          return items.length === 0 ? [] : [{
+              title: g,
+              items
+            }];
+        });
+        return groupItems.concat(ungroupedOrder);
+      };
+      return {
+        addItemToGroup,
+        addItem,
+        toFormats
+      };
+    };
+
+    const internalEditorStyle = /^\.(?:ephox|tiny-pageembed|mce)(?:[.-]+\w+)+$/;
+    const removeCacheSuffix = url => {
+      const cacheSuffix = global$1.cacheSuffix;
+      if (isString(url)) {
+        url = url.replace('?' + cacheSuffix, '').replace('&' + cacheSuffix, '');
+      }
+      return url;
+    };
+    const isSkinContentCss = (editor, href) => {
+      const skin = getSkin(editor);
+      if (skin) {
+        const skinUrlBase = getSkinUrl(editor);
+        const skinUrl = skinUrlBase ? editor.documentBaseURI.toAbsolute(skinUrlBase) : global$2.baseURL + '/skins/ui/' + skin;
+        const contentSkinUrlPart = global$2.baseURL + '/skins/content/';
+        const suffix = editor.editorManager.suffix;
+        return href === skinUrl + '/content' + (editor.inline ? '.inline' : '') + `${ suffix }.css` || href.indexOf(contentSkinUrlPart) !== -1;
+      }
+      return false;
+    };
+    const compileFilter = filter => {
+      if (isString(filter)) {
+        return value => {
+          return value.indexOf(filter) !== -1;
+        };
+      } else if (filter instanceof RegExp) {
+        return value => {
+          return filter.test(value);
+        };
+      }
+      return filter;
+    };
+    const isCssImportRule = rule => rule.styleSheet;
+    const isCssPageRule = rule => rule.selectorText;
+    const getSelectors = (editor, doc, fileFilter) => {
+      const selectors = [];
+      const contentCSSUrls = {};
+      const append = (styleSheet, imported) => {
+        let href = styleSheet.href;
+        let rules;
+        href = removeCacheSuffix(href);
+        if (!href || fileFilter && !fileFilter(href, imported) || isSkinContentCss(editor, href)) {
+          return;
+        }
+        global.each(styleSheet.imports, styleSheet => {
+          append(styleSheet, true);
+        });
+        try {
+          rules = styleSheet.cssRules || styleSheet.rules;
+        } catch (e) {
+        }
+        global.each(rules, cssRule => {
+          if (isCssImportRule(cssRule) && cssRule.styleSheet) {
+            append(cssRule.styleSheet, true);
+          } else if (isCssPageRule(cssRule)) {
+            global.each(cssRule.selectorText.split(','), selector => {
+              selectors.push(global.trim(selector));
+            });
+          }
+        });
+      };
+      global.each(editor.contentCSS, url => {
+        contentCSSUrls[url] = true;
+      });
+      if (!fileFilter) {
+        fileFilter = (href, imported) => {
+          return imported || contentCSSUrls[href];
+        };
+      }
+      try {
+        global.each(doc.styleSheets, styleSheet => {
+          append(styleSheet);
+        });
+      } catch (e) {
+      }
+      return selectors;
+    };
+    const defaultConvertSelectorToFormat = (editor, selectorText) => {
+      let format = {};
+      const selector = /^(?:([a-z0-9\-_]+))?(\.[a-z0-9_\-\.]+)$/i.exec(selectorText);
+      if (!selector) {
+        return;
+      }
+      const elementName = selector[1];
+      const classes = selector[2].substr(1).split('.').join(' ');
+      const inlineSelectorElements = global.makeMap('a,img');
+      if (selector[1]) {
+        format = { title: selectorText };
+        if (editor.schema.getTextBlockElements()[elementName]) {
+          format.block = elementName;
+        } else if (editor.schema.getBlockElements()[elementName] || inlineSelectorElements[elementName.toLowerCase()]) {
+          format.selector = elementName;
+        } else {
+          format.inline = elementName;
+        }
+      } else if (selector[2]) {
+        format = {
+          inline: 'span',
+          title: selectorText.substr(1),
+          classes
+        };
+      }
+      if (shouldMergeClasses(editor)) {
+        format.classes = classes;
+      } else {
+        format.attributes = { class: classes };
+      }
+      return format;
+    };
+    const getGroupsBySelector = (groups, selector) => {
+      return global.grep(groups, group => {
+        return !group.filter || group.filter(selector);
+      });
+    };
+    const compileUserDefinedGroups = groups => {
+      return global.map(groups, group => {
+        return global.extend({}, group, {
+          original: group,
+          selectors: {},
+          filter: compileFilter(group.filter)
+        });
+      });
+    };
+    const isExclusiveMode = (editor, group) => {
+      return group === null || shouldImportExclusive(editor);
+    };
+    const isUniqueSelector = (editor, selector, group, globallyUniqueSelectors) => {
+      return !(isExclusiveMode(editor, group) ? selector in globallyUniqueSelectors : selector in group.selectors);
+    };
+    const markUniqueSelector = (editor, selector, group, globallyUniqueSelectors) => {
+      if (isExclusiveMode(editor, group)) {
+        globallyUniqueSelectors[selector] = true;
+      } else {
+        group.selectors[selector] = true;
+      }
+    };
+    const convertSelectorToFormat = (editor, plugin, selector, group) => {
+      let selectorConverter;
+      const converter = getSelectorConverter(editor);
+      if (group && group.selector_converter) {
+        selectorConverter = group.selector_converter;
+      } else if (converter) {
+        selectorConverter = converter;
+      } else {
+        selectorConverter = () => {
+          return defaultConvertSelectorToFormat(editor, selector);
+        };
+      }
+      return selectorConverter.call(plugin, selector, group);
+    };
+    const setup = editor => {
+      editor.on('init', () => {
+        const model = generate();
+        const globallyUniqueSelectors = {};
+        const selectorFilter = compileFilter(getSelectorFilter(editor));
+        const groups = compileUserDefinedGroups(getCssGroups(editor));
+        const processSelector = (selector, group) => {
+          if (isUniqueSelector(editor, selector, group, globallyUniqueSelectors)) {
+            markUniqueSelector(editor, selector, group, globallyUniqueSelectors);
+            const format = convertSelectorToFormat(editor, editor.plugins.importcss, selector, group);
+            if (format) {
+              const formatName = format.name || global$3.DOM.uniqueId();
+              editor.formatter.register(formatName, format);
+              return {
+                title: format.title,
+                format: formatName
+              };
+            }
+          }
+          return null;
+        };
+        global.each(getSelectors(editor, editor.getDoc(), compileFilter(getFileFilter(editor))), selector => {
+          if (!internalEditorStyle.test(selector)) {
+            if (!selectorFilter || selectorFilter(selector)) {
+              const selectorGroups = getGroupsBySelector(groups, selector);
+              if (selectorGroups.length > 0) {
+                global.each(selectorGroups, group => {
+                  const menuItem = processSelector(selector, group);
+                  if (menuItem) {
+                    model.addItemToGroup(group.title, menuItem);
+                  }
+                });
+              } else {
+                const menuItem = processSelector(selector, null);
+                if (menuItem) {
+                  model.addItem(menuItem);
+                }
+              }
+            }
+          }
+        });
+        const items = model.toFormats();
+        editor.dispatch('addStyleModifications', {
+          items,
+          replace: !shouldAppend(editor)
+        });
+      });
+    };
+
+    const get = editor => {
+      const convertSelectorToFormat = selectorText => {
+        return defaultConvertSelectorToFormat(editor, selectorText);
+      };
+      return { convertSelectorToFormat };
+    };
+
+    var Plugin = () => {
+      global$4.add('importcss', editor => {
+        register(editor);
+        setup(editor);
+        return get(editor);
+      });
+    };
+
+    Plugin();
+
+})();
+
+/**
+ * TinyMCE version 7.2.1 (2024-07-03)
+ */
+
+(function () {
+    'use strict';
+
+    var global$4 = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
     const getPrototypeOf = Object.getPrototypeOf;
     const hasProto = (v, constructor, predicate) => {
       var _a;
@@ -42594,352 +42940,6 @@ tinymce.IconManager.add('default', {
 (function () {
     'use strict';
 
-    var global$4 = tinymce.util.Tools.resolve('tinymce.PluginManager');
-
-    const hasProto = (v, constructor, predicate) => {
-      var _a;
-      if (predicate(v, constructor.prototype)) {
-        return true;
-      } else {
-        return ((_a = v.constructor) === null || _a === void 0 ? void 0 : _a.name) === constructor.name;
-      }
-    };
-    const typeOf = x => {
-      const t = typeof x;
-      if (x === null) {
-        return 'null';
-      } else if (t === 'object' && Array.isArray(x)) {
-        return 'array';
-      } else if (t === 'object' && hasProto(x, String, (o, proto) => proto.isPrototypeOf(o))) {
-        return 'string';
-      } else {
-        return t;
-      }
-    };
-    const isType = type => value => typeOf(value) === type;
-    const isSimpleType = type => value => typeof value === type;
-    const isString = isType('string');
-    const isObject = isType('object');
-    const isArray = isType('array');
-    const isFunction = isSimpleType('function');
-
-    var global$3 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
-
-    var global$2 = tinymce.util.Tools.resolve('tinymce.EditorManager');
-
-    var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
-
-    var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    const option = name => editor => editor.options.get(name);
-    const register = editor => {
-      const registerOption = editor.options.register;
-      const filterProcessor = value => isString(value) || isFunction(value) || isObject(value);
-      registerOption('importcss_merge_classes', {
-        processor: 'boolean',
-        default: true
-      });
-      registerOption('importcss_exclusive', {
-        processor: 'boolean',
-        default: true
-      });
-      registerOption('importcss_selector_converter', { processor: 'function' });
-      registerOption('importcss_selector_filter', { processor: filterProcessor });
-      registerOption('importcss_file_filter', { processor: filterProcessor });
-      registerOption('importcss_groups', { processor: 'object[]' });
-      registerOption('importcss_append', {
-        processor: 'boolean',
-        default: false
-      });
-    };
-    const shouldMergeClasses = option('importcss_merge_classes');
-    const shouldImportExclusive = option('importcss_exclusive');
-    const getSelectorConverter = option('importcss_selector_converter');
-    const getSelectorFilter = option('importcss_selector_filter');
-    const getCssGroups = option('importcss_groups');
-    const shouldAppend = option('importcss_append');
-    const getFileFilter = option('importcss_file_filter');
-    const getSkin = option('skin');
-    const getSkinUrl = option('skin_url');
-
-    const nativePush = Array.prototype.push;
-    const map = (xs, f) => {
-      const len = xs.length;
-      const r = new Array(len);
-      for (let i = 0; i < len; i++) {
-        const x = xs[i];
-        r[i] = f(x, i);
-      }
-      return r;
-    };
-    const flatten = xs => {
-      const r = [];
-      for (let i = 0, len = xs.length; i < len; ++i) {
-        if (!isArray(xs[i])) {
-          throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
-        }
-        nativePush.apply(r, xs[i]);
-      }
-      return r;
-    };
-    const bind = (xs, f) => flatten(map(xs, f));
-
-    const generate = () => {
-      const ungroupedOrder = [];
-      const groupOrder = [];
-      const groups = {};
-      const addItemToGroup = (groupTitle, itemInfo) => {
-        if (groups[groupTitle]) {
-          groups[groupTitle].push(itemInfo);
-        } else {
-          groupOrder.push(groupTitle);
-          groups[groupTitle] = [itemInfo];
-        }
-      };
-      const addItem = itemInfo => {
-        ungroupedOrder.push(itemInfo);
-      };
-      const toFormats = () => {
-        const groupItems = bind(groupOrder, g => {
-          const items = groups[g];
-          return items.length === 0 ? [] : [{
-              title: g,
-              items
-            }];
-        });
-        return groupItems.concat(ungroupedOrder);
-      };
-      return {
-        addItemToGroup,
-        addItem,
-        toFormats
-      };
-    };
-
-    const internalEditorStyle = /^\.(?:ephox|tiny-pageembed|mce)(?:[.-]+\w+)+$/;
-    const removeCacheSuffix = url => {
-      const cacheSuffix = global$1.cacheSuffix;
-      if (isString(url)) {
-        url = url.replace('?' + cacheSuffix, '').replace('&' + cacheSuffix, '');
-      }
-      return url;
-    };
-    const isSkinContentCss = (editor, href) => {
-      const skin = getSkin(editor);
-      if (skin) {
-        const skinUrlBase = getSkinUrl(editor);
-        const skinUrl = skinUrlBase ? editor.documentBaseURI.toAbsolute(skinUrlBase) : global$2.baseURL + '/skins/ui/' + skin;
-        const contentSkinUrlPart = global$2.baseURL + '/skins/content/';
-        const suffix = editor.editorManager.suffix;
-        return href === skinUrl + '/content' + (editor.inline ? '.inline' : '') + `${ suffix }.css` || href.indexOf(contentSkinUrlPart) !== -1;
-      }
-      return false;
-    };
-    const compileFilter = filter => {
-      if (isString(filter)) {
-        return value => {
-          return value.indexOf(filter) !== -1;
-        };
-      } else if (filter instanceof RegExp) {
-        return value => {
-          return filter.test(value);
-        };
-      }
-      return filter;
-    };
-    const isCssImportRule = rule => rule.styleSheet;
-    const isCssPageRule = rule => rule.selectorText;
-    const getSelectors = (editor, doc, fileFilter) => {
-      const selectors = [];
-      const contentCSSUrls = {};
-      const append = (styleSheet, imported) => {
-        let href = styleSheet.href;
-        let rules;
-        href = removeCacheSuffix(href);
-        if (!href || fileFilter && !fileFilter(href, imported) || isSkinContentCss(editor, href)) {
-          return;
-        }
-        global.each(styleSheet.imports, styleSheet => {
-          append(styleSheet, true);
-        });
-        try {
-          rules = styleSheet.cssRules || styleSheet.rules;
-        } catch (e) {
-        }
-        global.each(rules, cssRule => {
-          if (isCssImportRule(cssRule) && cssRule.styleSheet) {
-            append(cssRule.styleSheet, true);
-          } else if (isCssPageRule(cssRule)) {
-            global.each(cssRule.selectorText.split(','), selector => {
-              selectors.push(global.trim(selector));
-            });
-          }
-        });
-      };
-      global.each(editor.contentCSS, url => {
-        contentCSSUrls[url] = true;
-      });
-      if (!fileFilter) {
-        fileFilter = (href, imported) => {
-          return imported || contentCSSUrls[href];
-        };
-      }
-      try {
-        global.each(doc.styleSheets, styleSheet => {
-          append(styleSheet);
-        });
-      } catch (e) {
-      }
-      return selectors;
-    };
-    const defaultConvertSelectorToFormat = (editor, selectorText) => {
-      let format = {};
-      const selector = /^(?:([a-z0-9\-_]+))?(\.[a-z0-9_\-\.]+)$/i.exec(selectorText);
-      if (!selector) {
-        return;
-      }
-      const elementName = selector[1];
-      const classes = selector[2].substr(1).split('.').join(' ');
-      const inlineSelectorElements = global.makeMap('a,img');
-      if (selector[1]) {
-        format = { title: selectorText };
-        if (editor.schema.getTextBlockElements()[elementName]) {
-          format.block = elementName;
-        } else if (editor.schema.getBlockElements()[elementName] || inlineSelectorElements[elementName.toLowerCase()]) {
-          format.selector = elementName;
-        } else {
-          format.inline = elementName;
-        }
-      } else if (selector[2]) {
-        format = {
-          inline: 'span',
-          title: selectorText.substr(1),
-          classes
-        };
-      }
-      if (shouldMergeClasses(editor)) {
-        format.classes = classes;
-      } else {
-        format.attributes = { class: classes };
-      }
-      return format;
-    };
-    const getGroupsBySelector = (groups, selector) => {
-      return global.grep(groups, group => {
-        return !group.filter || group.filter(selector);
-      });
-    };
-    const compileUserDefinedGroups = groups => {
-      return global.map(groups, group => {
-        return global.extend({}, group, {
-          original: group,
-          selectors: {},
-          filter: compileFilter(group.filter)
-        });
-      });
-    };
-    const isExclusiveMode = (editor, group) => {
-      return group === null || shouldImportExclusive(editor);
-    };
-    const isUniqueSelector = (editor, selector, group, globallyUniqueSelectors) => {
-      return !(isExclusiveMode(editor, group) ? selector in globallyUniqueSelectors : selector in group.selectors);
-    };
-    const markUniqueSelector = (editor, selector, group, globallyUniqueSelectors) => {
-      if (isExclusiveMode(editor, group)) {
-        globallyUniqueSelectors[selector] = true;
-      } else {
-        group.selectors[selector] = true;
-      }
-    };
-    const convertSelectorToFormat = (editor, plugin, selector, group) => {
-      let selectorConverter;
-      const converter = getSelectorConverter(editor);
-      if (group && group.selector_converter) {
-        selectorConverter = group.selector_converter;
-      } else if (converter) {
-        selectorConverter = converter;
-      } else {
-        selectorConverter = () => {
-          return defaultConvertSelectorToFormat(editor, selector);
-        };
-      }
-      return selectorConverter.call(plugin, selector, group);
-    };
-    const setup = editor => {
-      editor.on('init', () => {
-        const model = generate();
-        const globallyUniqueSelectors = {};
-        const selectorFilter = compileFilter(getSelectorFilter(editor));
-        const groups = compileUserDefinedGroups(getCssGroups(editor));
-        const processSelector = (selector, group) => {
-          if (isUniqueSelector(editor, selector, group, globallyUniqueSelectors)) {
-            markUniqueSelector(editor, selector, group, globallyUniqueSelectors);
-            const format = convertSelectorToFormat(editor, editor.plugins.importcss, selector, group);
-            if (format) {
-              const formatName = format.name || global$3.DOM.uniqueId();
-              editor.formatter.register(formatName, format);
-              return {
-                title: format.title,
-                format: formatName
-              };
-            }
-          }
-          return null;
-        };
-        global.each(getSelectors(editor, editor.getDoc(), compileFilter(getFileFilter(editor))), selector => {
-          if (!internalEditorStyle.test(selector)) {
-            if (!selectorFilter || selectorFilter(selector)) {
-              const selectorGroups = getGroupsBySelector(groups, selector);
-              if (selectorGroups.length > 0) {
-                global.each(selectorGroups, group => {
-                  const menuItem = processSelector(selector, group);
-                  if (menuItem) {
-                    model.addItemToGroup(group.title, menuItem);
-                  }
-                });
-              } else {
-                const menuItem = processSelector(selector, null);
-                if (menuItem) {
-                  model.addItem(menuItem);
-                }
-              }
-            }
-          }
-        });
-        const items = model.toFormats();
-        editor.dispatch('addStyleModifications', {
-          items,
-          replace: !shouldAppend(editor)
-        });
-      });
-    };
-
-    const get = editor => {
-      const convertSelectorToFormat = selectorText => {
-        return defaultConvertSelectorToFormat(editor, selectorText);
-      };
-      return { convertSelectorToFormat };
-    };
-
-    var Plugin = () => {
-      global$4.add('importcss', editor => {
-        register(editor);
-        setup(editor);
-        return get(editor);
-      });
-    };
-
-    Plugin();
-
-})();
-
-/**
- * TinyMCE version 7.2.1 (2024-07-03)
- */
-
-(function () {
-    'use strict';
-
     var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
     const option = name => editor => editor.options.get(name);
@@ -44421,6 +44421,130 @@ tinymce.IconManager.add('default', {
         register(editor);
         setup(editor);
         setup$2(editor);
+      });
+    };
+
+    Plugin();
+
+})();
+
+/**
+ * TinyMCE version 7.2.1 (2024-07-03)
+ */
+
+(function () {
+    'use strict';
+
+    var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    const isSimpleType = type => value => typeof value === type;
+    const isBoolean = isSimpleType('boolean');
+    const isNumber = isSimpleType('number');
+
+    const option = name => editor => editor.options.get(name);
+    const register$2 = editor => {
+      const registerOption = editor.options.register;
+      registerOption('nonbreaking_force_tab', {
+        processor: value => {
+          if (isBoolean(value)) {
+            return {
+              value: value ? 3 : 0,
+              valid: true
+            };
+          } else if (isNumber(value)) {
+            return {
+              value,
+              valid: true
+            };
+          } else {
+            return {
+              valid: false,
+              message: 'Must be a boolean or number.'
+            };
+          }
+        },
+        default: false
+      });
+      registerOption('nonbreaking_wrap', {
+        processor: 'boolean',
+        default: true
+      });
+    };
+    const getKeyboardSpaces = option('nonbreaking_force_tab');
+    const wrapNbsps = option('nonbreaking_wrap');
+
+    const stringRepeat = (string, repeats) => {
+      let str = '';
+      for (let index = 0; index < repeats; index++) {
+        str += string;
+      }
+      return str;
+    };
+    const isVisualCharsEnabled = editor => editor.plugins.visualchars ? editor.plugins.visualchars.isEnabled() : false;
+    const insertNbsp = (editor, times) => {
+      const classes = () => isVisualCharsEnabled(editor) ? 'mce-nbsp-wrap mce-nbsp' : 'mce-nbsp-wrap';
+      const nbspSpan = () => `<span class="${ classes() }" contenteditable="false">${ stringRepeat('&nbsp;', times) }</span>`;
+      const shouldWrap = wrapNbsps(editor);
+      const html = shouldWrap || editor.plugins.visualchars ? nbspSpan() : stringRepeat('&nbsp;', times);
+      editor.undoManager.transact(() => editor.insertContent(html));
+    };
+
+    const register$1 = editor => {
+      editor.addCommand('mceNonBreaking', () => {
+        insertNbsp(editor, 1);
+      });
+    };
+
+    var global = tinymce.util.Tools.resolve('tinymce.util.VK');
+
+    const setup = editor => {
+      const spaces = getKeyboardSpaces(editor);
+      if (spaces > 0) {
+        editor.on('keydown', e => {
+          if (e.keyCode === global.TAB && !e.isDefaultPrevented()) {
+            if (e.shiftKey) {
+              return;
+            }
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            insertNbsp(editor, spaces);
+          }
+        });
+      }
+    };
+
+    const onSetupEditable = editor => api => {
+      const nodeChanged = () => {
+        api.setEnabled(editor.selection.isEditable());
+      };
+      editor.on('NodeChange', nodeChanged);
+      nodeChanged();
+      return () => {
+        editor.off('NodeChange', nodeChanged);
+      };
+    };
+    const register = editor => {
+      const onAction = () => editor.execCommand('mceNonBreaking');
+      editor.ui.registry.addButton('nonbreaking', {
+        icon: 'non-breaking',
+        tooltip: 'Nonbreaking space',
+        onAction,
+        onSetup: onSetupEditable(editor)
+      });
+      editor.ui.registry.addMenuItem('nonbreaking', {
+        icon: 'non-breaking',
+        text: 'Nonbreaking space',
+        onAction,
+        onSetup: onSetupEditable(editor)
+      });
+    };
+
+    var Plugin = () => {
+      global$1.add('nonbreaking', editor => {
+        register$2(editor);
+        register$1(editor);
+        register(editor);
+        setup(editor);
       });
     };
 
@@ -47840,130 +47964,6 @@ tinymce.IconManager.add('default', {
 
     var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-    const isSimpleType = type => value => typeof value === type;
-    const isBoolean = isSimpleType('boolean');
-    const isNumber = isSimpleType('number');
-
-    const option = name => editor => editor.options.get(name);
-    const register$2 = editor => {
-      const registerOption = editor.options.register;
-      registerOption('nonbreaking_force_tab', {
-        processor: value => {
-          if (isBoolean(value)) {
-            return {
-              value: value ? 3 : 0,
-              valid: true
-            };
-          } else if (isNumber(value)) {
-            return {
-              value,
-              valid: true
-            };
-          } else {
-            return {
-              valid: false,
-              message: 'Must be a boolean or number.'
-            };
-          }
-        },
-        default: false
-      });
-      registerOption('nonbreaking_wrap', {
-        processor: 'boolean',
-        default: true
-      });
-    };
-    const getKeyboardSpaces = option('nonbreaking_force_tab');
-    const wrapNbsps = option('nonbreaking_wrap');
-
-    const stringRepeat = (string, repeats) => {
-      let str = '';
-      for (let index = 0; index < repeats; index++) {
-        str += string;
-      }
-      return str;
-    };
-    const isVisualCharsEnabled = editor => editor.plugins.visualchars ? editor.plugins.visualchars.isEnabled() : false;
-    const insertNbsp = (editor, times) => {
-      const classes = () => isVisualCharsEnabled(editor) ? 'mce-nbsp-wrap mce-nbsp' : 'mce-nbsp-wrap';
-      const nbspSpan = () => `<span class="${ classes() }" contenteditable="false">${ stringRepeat('&nbsp;', times) }</span>`;
-      const shouldWrap = wrapNbsps(editor);
-      const html = shouldWrap || editor.plugins.visualchars ? nbspSpan() : stringRepeat('&nbsp;', times);
-      editor.undoManager.transact(() => editor.insertContent(html));
-    };
-
-    const register$1 = editor => {
-      editor.addCommand('mceNonBreaking', () => {
-        insertNbsp(editor, 1);
-      });
-    };
-
-    var global = tinymce.util.Tools.resolve('tinymce.util.VK');
-
-    const setup = editor => {
-      const spaces = getKeyboardSpaces(editor);
-      if (spaces > 0) {
-        editor.on('keydown', e => {
-          if (e.keyCode === global.TAB && !e.isDefaultPrevented()) {
-            if (e.shiftKey) {
-              return;
-            }
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            insertNbsp(editor, spaces);
-          }
-        });
-      }
-    };
-
-    const onSetupEditable = editor => api => {
-      const nodeChanged = () => {
-        api.setEnabled(editor.selection.isEditable());
-      };
-      editor.on('NodeChange', nodeChanged);
-      nodeChanged();
-      return () => {
-        editor.off('NodeChange', nodeChanged);
-      };
-    };
-    const register = editor => {
-      const onAction = () => editor.execCommand('mceNonBreaking');
-      editor.ui.registry.addButton('nonbreaking', {
-        icon: 'non-breaking',
-        tooltip: 'Nonbreaking space',
-        onAction,
-        onSetup: onSetupEditable(editor)
-      });
-      editor.ui.registry.addMenuItem('nonbreaking', {
-        icon: 'non-breaking',
-        text: 'Nonbreaking space',
-        onAction,
-        onSetup: onSetupEditable(editor)
-      });
-    };
-
-    var Plugin = () => {
-      global$1.add('nonbreaking', editor => {
-        register$2(editor);
-        register$1(editor);
-        register(editor);
-        setup(editor);
-      });
-    };
-
-    Plugin();
-
-})();
-
-/**
- * TinyMCE version 7.2.1 (2024-07-03)
- */
-
-(function () {
-    'use strict';
-
-    var global$1 = tinymce.util.Tools.resolve('tinymce.PluginManager');
-
     var global = tinymce.util.Tools.resolve('tinymce.Env');
 
     const option = name => editor => editor.options.get(name);
@@ -48066,104 +48066,6 @@ tinymce.IconManager.add('default', {
         register(editor);
         setup$1(editor);
         setup(editor);
-      });
-    };
-
-    Plugin();
-
-})();
-
-/**
- * TinyMCE version 7.2.1 (2024-07-03)
- */
-
-(function () {
-    'use strict';
-
-    var global$2 = tinymce.util.Tools.resolve('tinymce.PluginManager');
-
-    var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
-
-    var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
-
-    const option = name => editor => editor.options.get(name);
-    const getContentStyle = option('content_style');
-    const shouldUseContentCssCors = option('content_css_cors');
-    const getBodyClass = option('body_class');
-    const getBodyId = option('body_id');
-
-    const getPreviewHtml = editor => {
-      var _a;
-      let headHtml = '';
-      const encode = editor.dom.encode;
-      const contentStyle = (_a = getContentStyle(editor)) !== null && _a !== void 0 ? _a : '';
-      headHtml += '<base href="' + encode(editor.documentBaseURI.getURI()) + '">';
-      const cors = shouldUseContentCssCors(editor) ? ' crossorigin="anonymous"' : '';
-      global.each(editor.contentCSS, url => {
-        headHtml += '<link type="text/css" rel="stylesheet" href="' + encode(editor.documentBaseURI.toAbsolute(url)) + '"' + cors + '>';
-      });
-      if (contentStyle) {
-        headHtml += '<style type="text/css">' + contentStyle + '</style>';
-      }
-      const bodyId = getBodyId(editor);
-      const bodyClass = getBodyClass(editor);
-      const isMetaKeyPressed = global$1.os.isMacOS() || global$1.os.isiOS() ? 'e.metaKey' : 'e.ctrlKey && !e.altKey';
-      const preventClicksOnLinksScript = '<script>' + 'document.addEventListener && document.addEventListener("click", function(e) {' + 'for (var elm = e.target; elm; elm = elm.parentNode) {' + 'if (elm.nodeName === "A" && !(' + isMetaKeyPressed + ')) {' + 'e.preventDefault();' + '}' + '}' + '}, false);' + '</script> ';
-      const directionality = editor.getBody().dir;
-      const dirAttr = directionality ? ' dir="' + encode(directionality) + '"' : '';
-      const previewHtml = '<!DOCTYPE html>' + '<html>' + '<head>' + headHtml + '</head>' + '<body id="' + encode(bodyId) + '" class="mce-content-body ' + encode(bodyClass) + '"' + dirAttr + '>' + editor.getContent() + preventClicksOnLinksScript + '</body>' + '</html>';
-      return previewHtml;
-    };
-
-    const open = editor => {
-      const content = getPreviewHtml(editor);
-      const dataApi = editor.windowManager.open({
-        title: 'Preview',
-        size: 'large',
-        body: {
-          type: 'panel',
-          items: [{
-              name: 'preview',
-              type: 'iframe',
-              sandboxed: true,
-              transparent: false
-            }]
-        },
-        buttons: [{
-            type: 'cancel',
-            name: 'close',
-            text: 'Close',
-            primary: true
-          }],
-        initialData: { preview: content }
-      });
-      dataApi.focus('close');
-    };
-
-    const register$1 = editor => {
-      editor.addCommand('mcePreview', () => {
-        open(editor);
-      });
-    };
-
-    const register = editor => {
-      const onAction = () => editor.execCommand('mcePreview');
-      editor.ui.registry.addButton('preview', {
-        icon: 'preview',
-        tooltip: 'Preview',
-        onAction
-      });
-      editor.ui.registry.addMenuItem('preview', {
-        icon: 'preview',
-        text: 'Preview',
-        onAction
-      });
-    };
-
-    var Plugin = () => {
-      global$2.add('preview', editor => {
-        register$1(editor);
-        register(editor);
       });
     };
 
@@ -48628,110 +48530,88 @@ tinymce.IconManager.add('default', {
 
     var global$2 = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-    const isSimpleType = type => value => typeof value === type;
-    const isFunction = isSimpleType('function');
-
-    var global$1 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+    var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
 
     var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
 
     const option = name => editor => editor.options.get(name);
-    const register$2 = editor => {
-      const registerOption = editor.options.register;
-      registerOption('save_enablewhendirty', {
-        processor: 'boolean',
-        default: true
-      });
-      registerOption('save_onsavecallback', { processor: 'function' });
-      registerOption('save_oncancelcallback', { processor: 'function' });
-    };
-    const enableWhenDirty = option('save_enablewhendirty');
-    const getOnSaveCallback = option('save_onsavecallback');
-    const getOnCancelCallback = option('save_oncancelcallback');
+    const getContentStyle = option('content_style');
+    const shouldUseContentCssCors = option('content_css_cors');
+    const getBodyClass = option('body_class');
+    const getBodyId = option('body_id');
 
-    const displayErrorMessage = (editor, message) => {
-      editor.notificationManager.open({
-        text: message,
-        type: 'error'
+    const getPreviewHtml = editor => {
+      var _a;
+      let headHtml = '';
+      const encode = editor.dom.encode;
+      const contentStyle = (_a = getContentStyle(editor)) !== null && _a !== void 0 ? _a : '';
+      headHtml += '<base href="' + encode(editor.documentBaseURI.getURI()) + '">';
+      const cors = shouldUseContentCssCors(editor) ? ' crossorigin="anonymous"' : '';
+      global.each(editor.contentCSS, url => {
+        headHtml += '<link type="text/css" rel="stylesheet" href="' + encode(editor.documentBaseURI.toAbsolute(url)) + '"' + cors + '>';
       });
+      if (contentStyle) {
+        headHtml += '<style type="text/css">' + contentStyle + '</style>';
+      }
+      const bodyId = getBodyId(editor);
+      const bodyClass = getBodyClass(editor);
+      const isMetaKeyPressed = global$1.os.isMacOS() || global$1.os.isiOS() ? 'e.metaKey' : 'e.ctrlKey && !e.altKey';
+      const preventClicksOnLinksScript = '<script>' + 'document.addEventListener && document.addEventListener("click", function(e) {' + 'for (var elm = e.target; elm; elm = elm.parentNode) {' + 'if (elm.nodeName === "A" && !(' + isMetaKeyPressed + ')) {' + 'e.preventDefault();' + '}' + '}' + '}, false);' + '</script> ';
+      const directionality = editor.getBody().dir;
+      const dirAttr = directionality ? ' dir="' + encode(directionality) + '"' : '';
+      const previewHtml = '<!DOCTYPE html>' + '<html>' + '<head>' + headHtml + '</head>' + '<body id="' + encode(bodyId) + '" class="mce-content-body ' + encode(bodyClass) + '"' + dirAttr + '>' + editor.getContent() + preventClicksOnLinksScript + '</body>' + '</html>';
+      return previewHtml;
     };
-    const save = editor => {
-      const formObj = global$1.DOM.getParent(editor.id, 'form');
-      if (enableWhenDirty(editor) && !editor.isDirty()) {
-        return;
-      }
-      editor.save();
-      const onSaveCallback = getOnSaveCallback(editor);
-      if (isFunction(onSaveCallback)) {
-        onSaveCallback.call(editor, editor);
-        editor.nodeChanged();
-        return;
-      }
-      if (formObj) {
-        editor.setDirty(false);
-        if (!formObj.onsubmit || formObj.onsubmit()) {
-          if (typeof formObj.submit === 'function') {
-            formObj.submit();
-          } else {
-            displayErrorMessage(editor, 'Error: Form submit field collision.');
-          }
-        }
-        editor.nodeChanged();
-      } else {
-        displayErrorMessage(editor, 'Error: No form element found.');
-      }
-    };
-    const cancel = editor => {
-      const h = global.trim(editor.startContent);
-      const onCancelCallback = getOnCancelCallback(editor);
-      if (isFunction(onCancelCallback)) {
-        onCancelCallback.call(editor, editor);
-        return;
-      }
-      editor.resetContent(h);
+
+    const open = editor => {
+      const content = getPreviewHtml(editor);
+      const dataApi = editor.windowManager.open({
+        title: 'Preview',
+        size: 'large',
+        body: {
+          type: 'panel',
+          items: [{
+              name: 'preview',
+              type: 'iframe',
+              sandboxed: true,
+              transparent: false
+            }]
+        },
+        buttons: [{
+            type: 'cancel',
+            name: 'close',
+            text: 'Close',
+            primary: true
+          }],
+        initialData: { preview: content }
+      });
+      dataApi.focus('close');
     };
 
     const register$1 = editor => {
-      editor.addCommand('mceSave', () => {
-        save(editor);
-      });
-      editor.addCommand('mceCancel', () => {
-        cancel(editor);
+      editor.addCommand('mcePreview', () => {
+        open(editor);
       });
     };
 
-    const stateToggle = editor => api => {
-      const handler = () => {
-        api.setEnabled(!enableWhenDirty(editor) || editor.isDirty());
-      };
-      handler();
-      editor.on('NodeChange dirty', handler);
-      return () => editor.off('NodeChange dirty', handler);
-    };
     const register = editor => {
-      editor.ui.registry.addButton('save', {
-        icon: 'save',
-        tooltip: 'Save',
-        enabled: false,
-        onAction: () => editor.execCommand('mceSave'),
-        onSetup: stateToggle(editor),
-        shortcut: 'Meta+S'
+      const onAction = () => editor.execCommand('mcePreview');
+      editor.ui.registry.addButton('preview', {
+        icon: 'preview',
+        tooltip: 'Preview',
+        onAction
       });
-      editor.ui.registry.addButton('cancel', {
-        icon: 'cancel',
-        tooltip: 'Cancel',
-        enabled: false,
-        onAction: () => editor.execCommand('mceCancel'),
-        onSetup: stateToggle(editor)
+      editor.ui.registry.addMenuItem('preview', {
+        icon: 'preview',
+        text: 'Preview',
+        onAction
       });
-      editor.addShortcut('Meta+S', '', 'mceSave');
     };
 
     var Plugin = () => {
-      global$2.add('save', editor => {
-        register$2(editor);
-        register(editor);
+      global$2.add('preview', editor => {
         register$1(editor);
+        register(editor);
       });
     };
 
@@ -49831,6 +49711,126 @@ tinymce.IconManager.add('default', {
         register$1(editor, currentSearchState);
         register(editor, currentSearchState);
         return get(editor, currentSearchState);
+      });
+    };
+
+    Plugin();
+
+})();
+
+/**
+ * TinyMCE version 7.2.1 (2024-07-03)
+ */
+
+(function () {
+    'use strict';
+
+    var global$2 = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    const isSimpleType = type => value => typeof value === type;
+    const isFunction = isSimpleType('function');
+
+    var global$1 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+
+    var global = tinymce.util.Tools.resolve('tinymce.util.Tools');
+
+    const option = name => editor => editor.options.get(name);
+    const register$2 = editor => {
+      const registerOption = editor.options.register;
+      registerOption('save_enablewhendirty', {
+        processor: 'boolean',
+        default: true
+      });
+      registerOption('save_onsavecallback', { processor: 'function' });
+      registerOption('save_oncancelcallback', { processor: 'function' });
+    };
+    const enableWhenDirty = option('save_enablewhendirty');
+    const getOnSaveCallback = option('save_onsavecallback');
+    const getOnCancelCallback = option('save_oncancelcallback');
+
+    const displayErrorMessage = (editor, message) => {
+      editor.notificationManager.open({
+        text: message,
+        type: 'error'
+      });
+    };
+    const save = editor => {
+      const formObj = global$1.DOM.getParent(editor.id, 'form');
+      if (enableWhenDirty(editor) && !editor.isDirty()) {
+        return;
+      }
+      editor.save();
+      const onSaveCallback = getOnSaveCallback(editor);
+      if (isFunction(onSaveCallback)) {
+        onSaveCallback.call(editor, editor);
+        editor.nodeChanged();
+        return;
+      }
+      if (formObj) {
+        editor.setDirty(false);
+        if (!formObj.onsubmit || formObj.onsubmit()) {
+          if (typeof formObj.submit === 'function') {
+            formObj.submit();
+          } else {
+            displayErrorMessage(editor, 'Error: Form submit field collision.');
+          }
+        }
+        editor.nodeChanged();
+      } else {
+        displayErrorMessage(editor, 'Error: No form element found.');
+      }
+    };
+    const cancel = editor => {
+      const h = global.trim(editor.startContent);
+      const onCancelCallback = getOnCancelCallback(editor);
+      if (isFunction(onCancelCallback)) {
+        onCancelCallback.call(editor, editor);
+        return;
+      }
+      editor.resetContent(h);
+    };
+
+    const register$1 = editor => {
+      editor.addCommand('mceSave', () => {
+        save(editor);
+      });
+      editor.addCommand('mceCancel', () => {
+        cancel(editor);
+      });
+    };
+
+    const stateToggle = editor => api => {
+      const handler = () => {
+        api.setEnabled(!enableWhenDirty(editor) || editor.isDirty());
+      };
+      handler();
+      editor.on('NodeChange dirty', handler);
+      return () => editor.off('NodeChange dirty', handler);
+    };
+    const register = editor => {
+      editor.ui.registry.addButton('save', {
+        icon: 'save',
+        tooltip: 'Save',
+        enabled: false,
+        onAction: () => editor.execCommand('mceSave'),
+        onSetup: stateToggle(editor),
+        shortcut: 'Meta+S'
+      });
+      editor.ui.registry.addButton('cancel', {
+        icon: 'cancel',
+        tooltip: 'Cancel',
+        enabled: false,
+        onAction: () => editor.execCommand('mceCancel'),
+        onSetup: stateToggle(editor)
+      });
+      editor.addShortcut('Meta+S', '', 'mceSave');
+    };
+
+    var Plugin = () => {
+      global$2.add('save', editor => {
+        register$2(editor);
+        register(editor);
+        register$1(editor);
       });
     };
 
@@ -53324,105 +53324,6 @@ tinymce.IconManager.add('default', {
 
     var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-    const fireVisualBlocks = (editor, state) => {
-      editor.dispatch('VisualBlocks', { state });
-    };
-
-    const toggleVisualBlocks = (editor, pluginUrl, enabledState) => {
-      const dom = editor.dom;
-      dom.toggleClass(editor.getBody(), 'mce-visualblocks');
-      enabledState.set(!enabledState.get());
-      fireVisualBlocks(editor, enabledState.get());
-    };
-
-    const register$2 = (editor, pluginUrl, enabledState) => {
-      editor.addCommand('mceVisualBlocks', () => {
-        toggleVisualBlocks(editor, pluginUrl, enabledState);
-      });
-    };
-
-    const option = name => editor => editor.options.get(name);
-    const register$1 = editor => {
-      const registerOption = editor.options.register;
-      registerOption('visualblocks_default_state', {
-        processor: 'boolean',
-        default: false
-      });
-    };
-    const isEnabledByDefault = option('visualblocks_default_state');
-
-    const setup = (editor, pluginUrl, enabledState) => {
-      editor.on('PreviewFormats AfterPreviewFormats', e => {
-        if (enabledState.get()) {
-          editor.dom.toggleClass(editor.getBody(), 'mce-visualblocks', e.type === 'afterpreviewformats');
-        }
-      });
-      editor.on('init', () => {
-        if (isEnabledByDefault(editor)) {
-          toggleVisualBlocks(editor, pluginUrl, enabledState);
-        }
-      });
-    };
-
-    const toggleActiveState = (editor, enabledState) => api => {
-      api.setActive(enabledState.get());
-      const editorEventCallback = e => api.setActive(e.state);
-      editor.on('VisualBlocks', editorEventCallback);
-      return () => editor.off('VisualBlocks', editorEventCallback);
-    };
-    const register = (editor, enabledState) => {
-      const onAction = () => editor.execCommand('mceVisualBlocks');
-      editor.ui.registry.addToggleButton('visualblocks', {
-        icon: 'visualblocks',
-        tooltip: 'Show blocks',
-        onAction,
-        onSetup: toggleActiveState(editor, enabledState)
-      });
-      editor.ui.registry.addToggleMenuItem('visualblocks', {
-        text: 'Show blocks',
-        icon: 'visualblocks',
-        onAction,
-        onSetup: toggleActiveState(editor, enabledState)
-      });
-    };
-
-    var Plugin = () => {
-      global.add('visualblocks', (editor, pluginUrl) => {
-        register$1(editor);
-        const enabledState = Cell(false);
-        register$2(editor, pluginUrl, enabledState);
-        register(editor, enabledState);
-        setup(editor, pluginUrl, enabledState);
-      });
-    };
-
-    Plugin();
-
-})();
-
-/**
- * TinyMCE version 7.2.1 (2024-07-03)
- */
-
-(function () {
-    'use strict';
-
-    const Cell = initial => {
-      let value = initial;
-      const get = () => {
-        return value;
-      };
-      const set = v => {
-        value = v;
-      };
-      return {
-        get,
-        set
-      };
-    };
-
-    var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
-
     const get$2 = toggleState => {
       const isEnabled = () => {
         return toggleState.get();
@@ -53954,6 +53855,105 @@ tinymce.IconManager.add('default', {
         setup(editor, toggleState);
         setup$1(editor, toggleState);
         return get$2(toggleState);
+      });
+    };
+
+    Plugin();
+
+})();
+
+/**
+ * TinyMCE version 7.2.1 (2024-07-03)
+ */
+
+(function () {
+    'use strict';
+
+    const Cell = initial => {
+      let value = initial;
+      const get = () => {
+        return value;
+      };
+      const set = v => {
+        value = v;
+      };
+      return {
+        get,
+        set
+      };
+    };
+
+    var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
+
+    const fireVisualBlocks = (editor, state) => {
+      editor.dispatch('VisualBlocks', { state });
+    };
+
+    const toggleVisualBlocks = (editor, pluginUrl, enabledState) => {
+      const dom = editor.dom;
+      dom.toggleClass(editor.getBody(), 'mce-visualblocks');
+      enabledState.set(!enabledState.get());
+      fireVisualBlocks(editor, enabledState.get());
+    };
+
+    const register$2 = (editor, pluginUrl, enabledState) => {
+      editor.addCommand('mceVisualBlocks', () => {
+        toggleVisualBlocks(editor, pluginUrl, enabledState);
+      });
+    };
+
+    const option = name => editor => editor.options.get(name);
+    const register$1 = editor => {
+      const registerOption = editor.options.register;
+      registerOption('visualblocks_default_state', {
+        processor: 'boolean',
+        default: false
+      });
+    };
+    const isEnabledByDefault = option('visualblocks_default_state');
+
+    const setup = (editor, pluginUrl, enabledState) => {
+      editor.on('PreviewFormats AfterPreviewFormats', e => {
+        if (enabledState.get()) {
+          editor.dom.toggleClass(editor.getBody(), 'mce-visualblocks', e.type === 'afterpreviewformats');
+        }
+      });
+      editor.on('init', () => {
+        if (isEnabledByDefault(editor)) {
+          toggleVisualBlocks(editor, pluginUrl, enabledState);
+        }
+      });
+    };
+
+    const toggleActiveState = (editor, enabledState) => api => {
+      api.setActive(enabledState.get());
+      const editorEventCallback = e => api.setActive(e.state);
+      editor.on('VisualBlocks', editorEventCallback);
+      return () => editor.off('VisualBlocks', editorEventCallback);
+    };
+    const register = (editor, enabledState) => {
+      const onAction = () => editor.execCommand('mceVisualBlocks');
+      editor.ui.registry.addToggleButton('visualblocks', {
+        icon: 'visualblocks',
+        tooltip: 'Show blocks',
+        onAction,
+        onSetup: toggleActiveState(editor, enabledState)
+      });
+      editor.ui.registry.addToggleMenuItem('visualblocks', {
+        text: 'Show blocks',
+        icon: 'visualblocks',
+        onAction,
+        onSetup: toggleActiveState(editor, enabledState)
+      });
+    };
+
+    var Plugin = () => {
+      global.add('visualblocks', (editor, pluginUrl) => {
+        register$1(editor);
+        const enabledState = Cell(false);
+        register$2(editor, pluginUrl, enabledState);
+        register(editor, enabledState);
+        setup(editor, pluginUrl, enabledState);
       });
     };
 
