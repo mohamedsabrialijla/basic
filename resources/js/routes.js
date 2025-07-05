@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard/pages/Dashboard.vue';
 import DashboardVendor from './components/Dashboard/pages/DashboardVendor.vue';
 import Pricing from './components/Dashboard/pages/buyer/Pricing.vue';
 import PricingSheet from './components/Dashboard/pages/buyer/PricingSheet.vue';
+import PDFHtml from './components/Dashboard/pages/buyer/PDFHtml.vue';
 
 import Users from './components/Dashboard/pages/UserManagement/Users.vue';
 import Roles from './components/Dashboard/pages/UserManagement/Roles.vue';
@@ -31,6 +32,12 @@ import Steps from './components/Dashboard/pages/MasterData/Steps.vue';
 import RFP from './components/Dashboard/pages/MasterData/RFP.vue';
 import StepTemplate from './components/Dashboard/pages/MasterData/StepTemplate.vue';
 
+
+
+// Review Team
+
+import IndexReview from './components/Dashboard/pages/Review/Index.vue';
+import ReviewStep from './components/Dashboard/pages/Review/ReviewStep.vue';
 
 
 
@@ -73,6 +80,12 @@ const routes = [
     { 
         path: '/:locale/dashboard/buyer/pricing-sheet', 
         component: PricingSheet, 
+        meta: { requiresAuth: true } 
+    },
+
+    { 
+        path: '/:locale/dashboard/buyer/pdf-html', 
+        component: PDFHtml, 
         meta: { requiresAuth: true } 
     },
     
@@ -193,6 +206,23 @@ const routes = [
         component: StepTemplate, 
         meta: { requiresAuth: true, breadcrumb: 'Steps Management' } 
     },
+
+
+
+
+    { 
+        path: '/:locale/dashboard/review/rfp', 
+        component: IndexReview, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/review/rfp-step', 
+        component: ReviewStep, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
 
 
 

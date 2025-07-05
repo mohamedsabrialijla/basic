@@ -40,6 +40,12 @@ class RFPStep extends Model
     }
 
 
+     public function type_event()
+    {
+        return $this->belongsTo(ItemsCategories::class,'type_event_id');
+    }
+
+
    
 
 

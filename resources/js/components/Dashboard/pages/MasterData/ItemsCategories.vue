@@ -623,15 +623,10 @@ export default {
                 if(response.data){
                   let data = response.data.items
                   let translations = response.data.items.translations
-                  this.formData.users = data.users
                   this.resetItem()
 
                   this.formData = data;
-                   translations.forEach((element) => { 
-                              this.formData['name_'+element.locale] = element.name; 
-                              this.formData['description_'+element.locale] = element.description; 
-                        });
-
+                  
                    this.formEntries = data.features.map((feature, index) => {
                       return {
                         title: feature.title,

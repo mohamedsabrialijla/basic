@@ -66,9 +66,9 @@
                   <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table_users .form-check-input" value="1" v-model="selectAll" @change="toggleAll" />
                 </div>
               </th>
-              <th class="min-w-125px">Code</th>
+              <th class="min-w-125px">ID Number</th>
               <th class="min-w-125px">Name</th>
-              <th class="min-w-125px">Status</th>
+              <!-- <th class="min-w-125px">Status</th> -->
               <th class="min-w-125px">Joined Date</th>
               <th class="text-center min-w-100px">Actions</th>
             </tr>
@@ -85,7 +85,7 @@
            
               <td class="align-items-center" style="margin-top: 15px;">
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.code}}</a>
+                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.ID_rfp}}</a>
                 </div>
               </td>
 
@@ -101,10 +101,10 @@
                 </div>
                 <!--begin::User details-->
               </td>
-              <td>
+              <!-- <td>
                 <div v-if="item.status=='active'" class="badge badge-light-success fw-bold">{{item.status}}</div>
                 <div v-else class="badge badge-light-danger fw-bold">{{item.status}}</div>
-              </td>
+              </td> -->
               <td>{{item.created_at}}</td>
              
 

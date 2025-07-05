@@ -32,17 +32,24 @@ import gantt from 'dhtmlx-gantt';
 export default {
   name: 'GanttStyled',
   setup() {
-    const selectedId = ref(null);
+    const selectedId = ref(null); 
 
-   function loadTasks() {
-      axios.get('/Gantt/gantt')
-        .then(res => {
-          gantt.clearAll(); // ضروري لإزالة المهام السابقة
-          gantt.parse({ data: res.data.items || [] }); // إعادة رسم المهام
-        })
-        .catch(() => {
-          alert("فشل في تحميل المهام");
-        });
+    function loadTasks() {
+       let object = JSON.parse(localStorage.getItem('object_rfp'));
+       let section_id = localStorage.getItem('section_id');
+      axios.get('/Gantt/gantt', {
+        params: {
+          rfp_id: object.id,            
+          section_id: section_id  
+        }
+      })
+      .then(res => {
+        gantt.clearAll(); 
+        gantt.parse({ data: res.data.items || [] }); 
+      })
+      .catch(() => {
+        alert("فشل في تحميل المهام");
+      });
     }
 
 
@@ -51,7 +58,7 @@ export default {
       gantt.config.show_grid = true;
       gantt.config.readonly = false;
 
-    gantt.config.columns = [
+      gantt.config.columns = [
         { name: "text", label: "Description", tree: true, width: 200 },
         {
           name: "reference", label: "Reference", width: 100, template: function (task) {
@@ -157,6 +164,7 @@ export default {
           task.total_price = (parseFloat(task.quantity) || 0) * (parseFloat(task.unit_price) || 0);
 
           gantt.updateTask(id);
+          let object = JSON.parse(localStorage.getItem('object_rfp'));
 
           // إرسال request
           axios.put(`/Gantt/gantt/${id}`, {
@@ -166,7 +174,8 @@ export default {
             uom: task.uom,
             quantity: task.quantity,
             unit_price: task.unit_price,
-            total_price: task.total_price
+            total_price: task.total_price,
+            rfp_id: object.id
           }).then(() => {
             console.log("Updated");
           }).catch((error) => {
@@ -213,7 +222,8 @@ export default {
               uom: task.uom,
               quantity: task.quantity,
               unit_price: task.unit_price,
-              total_price: task.total_price
+              total_price: task.total_price,
+              rfp_id: object.id,
             }).catch(() => {
               alert("فشل في حفظ التعديلات تلقائيًا.");
             });
@@ -222,6 +232,8 @@ export default {
 
 
     });
+    
+    let object = JSON.parse(localStorage.getItem('object_rfp'));
 
     const addGroup = () => {
       const task = {
@@ -232,6 +244,7 @@ export default {
         uom: 1,
         unit_price: 0,
         total_price: 0,
+        rfp_id: object.id,
       };
       gantt.addTask(task);
     };
@@ -246,6 +259,7 @@ export default {
         uom: 1,
         unit_price: 0,
         total_price: 0,
+        rfp_id: object.id,
       };
       gantt.addTask(task);
     };

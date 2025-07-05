@@ -9,10 +9,10 @@ use App\Http\Controllers\Controller;
 
 class GanttTaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
 
-        $items = GanttTask::all();
+        $items = GanttTask::where('rfp_id',$request->rfp_id)->get();
 
         $message = 'Return Data successfully';
         return mainResponse(true, $message , $items, 200, 'items',''); 

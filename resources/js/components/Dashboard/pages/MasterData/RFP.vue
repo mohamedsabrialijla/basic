@@ -177,6 +177,7 @@
                   <option value="text">Text</option>
                   <option value="PricingSheet">PricingSheet</option>
                   <option value="TechnicalSheet">TechnicalSheet</option>
+                  <option value="PDFContract">PDF Contract </option>
                 </select>
               </div>
 

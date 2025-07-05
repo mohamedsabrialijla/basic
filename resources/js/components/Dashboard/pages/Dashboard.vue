@@ -8,6 +8,7 @@
 import DashboardAdmin from './DashboardAdmin.vue';
 import DashboardVendor from './DashboardVendor.vue';
 import DashboardBuyer from './DashboardBuyer.vue';
+import DashboardReview from './DashboardReview.vue';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -34,6 +35,8 @@ export default {
 
     currentDashboardComponent() {
       switch (this.userType) {
+      case 'review':
+          return 'DashboardReview';
         case 'vendor':
           return 'DashboardVendor';
         case 'buyer':

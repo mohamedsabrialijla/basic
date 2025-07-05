@@ -56,9 +56,11 @@ import HeaderDashboard from './HeaderDashboard.vue';
 import FooterDashboard from './FooterDashboard.vue';
 import Breadcrumb from './Breadcrumb.vue';
 import Menu from './Menu.vue';
+import MenuReview from './MenuReview.vue';
 import MenuVendor from './MenuVendor.vue';
 import MenuBuyer from './MenuBuyer.vue';
 
+import DashboardReview from '../pages/DashboardReview.vue';
 import DashboardVendor from '../pages/DashboardVendor.vue';
 import DashboardBuyer from '../pages/DashboardBuyer.vue';
 import DashboardAdmin from '../pages/Dashboard.vue';
@@ -72,8 +74,10 @@ export default {
     FooterDashboard,
     Breadcrumb,
     Menu,
+    MenuReview,
     MenuVendor,
     MenuBuyer,
+    DashboardReview,
     DashboardVendor,
     DashboardBuyer,
     DashboardAdmin
@@ -97,12 +101,14 @@ export default {
 
       if (this.userType === 'vendor') return 'MenuVendor';
       if (this.userType === 'buyer') return 'MenuBuyer';
+      if (this.userType === 'review') return 'MenuReview';
       return 'Menu';
     },
 
     contentComponent() {
       if (this.userType === 'vendor') return 'DashboardVendor';
       if (this.userType === 'buyer') return 'DashboardBuyer';
+      if (this.userType === 'review') return 'DashboardReview';
       return 'Dashboard';
     }
   },

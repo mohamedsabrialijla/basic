@@ -15,10 +15,10 @@ class CategoryFeature extends Model
         return date('Y-m-d H:i', strtotime($value));
     }
 
-    // public function type()
-    // {
-    //     return $this->belongsTo(ItemsTypes::class,'type_id');
-    // }
+    public function title()
+    {
+        return $this->belongsTo(CategoryTitle::class,'title_id');
+    }
 
 
    

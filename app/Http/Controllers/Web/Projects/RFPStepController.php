@@ -37,7 +37,7 @@ class RFPStepController extends Controller
         return array('jpg','png','jpeg','gif','bmp');
     }
 
-   
+    
 
 
     public function create(Request $request)
@@ -53,7 +53,7 @@ class RFPStepController extends Controller
                   // "contract_id" => 'required',
                   "name" => 'required',
                   "description" => 'required',
-                  "type_event" => 'required',
+                  "type_event_id" => 'required',
                   "business_unite" => 'required',
                   "estimated_budget" => 'required',
               ];
@@ -68,20 +68,22 @@ class RFPStepController extends Controller
           
                 $item = New RFPStep;
                
-               $item->ID_rfp = $request->ID_rfp;
+                $item->ID_rfp = $request->ID_rfp;
                 $item->category_id = $request->category_id;
                 $item->contract_id = $request->contract_id;
                 $item->name = $request->name;
                 $item->description = $request->description;
                 $item->business_unite = $request->business_unite;
-                $item->type_event = $request->type_event;
+                $item->type_event_id = $request->type_event_id;
                 $item->estimated_budget = $request->estimated_budget;
                 $item->created_by = $id;
                 $item->number_contractor = $request->number_contractor;
+                $item->techinical_passing_score = $request->techinical_passing_score;
                 
 
                 $item->commercial_commite = json_encode($request->commercial_commite);
                 $item->review_team = json_encode($request->review_team);
+                $item->soi_team = json_encode($request->soi_team);
                 $item->technical_commite = json_encode($request->technical_commite);
                 $item->vendors = json_encode($request->vendors);
                 $item->currency = $request->currency;
@@ -90,12 +92,13 @@ class RFPStepController extends Controller
                 $item->location = $request->location;
                 
 
-                $item->check_1 = $request->check_1;
-                $item->check_2 = $request->check_2;
-                $item->check_3 = $request->check_3;
-                $item->check_4 = $request->check_4;
-                $item->check_5 = $request->check_5;
-                $item->check_6 = $request->check_6;
+                $item->check_1 = $request->has('check_1') && $request->check_1 == true ? 1 : 0;
+                $item->check_2 = $request->has('check_2') && $request->check_2 == true ? 1 : 0;
+                $item->check_3 = $request->has('check_3') && $request->check_3 == true ? 1 : 0;
+                $item->check_4 = $request->has('check_4') && $request->check_4 == true ? 1 : 0;
+                $item->check_5 = $request->has('check_5') && $request->check_5 == true ? 1 : 0;
+                $item->check_6 = $request->has('check_6') && $request->check_6 == true ? 1 : 0;
+            
 
                 $item->save();
 
@@ -132,7 +135,7 @@ class RFPStepController extends Controller
     public function edit(Request $request)
     {
 
-      // dd($request->all());
+        // dd($request->all());
 
         $id = auth('sanctum')->id();
 
@@ -142,7 +145,7 @@ class RFPStepController extends Controller
                   // "contract_id" => 'required',
                   "name" => 'required',
                   "description" => 'required',
-                  "type_event" => 'required',
+                  "type_event_id" => 'required',
                   "business_unite" => 'required',
                   "estimated_budget" => 'required',
               ];
@@ -163,14 +166,16 @@ class RFPStepController extends Controller
                 $item->name = $request->name;
                 $item->description = $request->description;
                 $item->business_unite = $request->business_unite;
-                $item->type_event = $request->type_event;
+                $item->type_event_id = $request->type_event_id;
                 $item->estimated_budget = $request->estimated_budget;
                 $item->created_by = $id;
                 $item->number_contractor = $request->number_contractor;
+                $item->techinical_passing_score = $request->techinical_passing_score;
                 
 
                 $item->commercial_commite = json_encode($request->commercial_commite);
                 $item->review_team = json_encode($request->review_team);
+                $item->soi_team = json_encode($request->soi_team);
                 $item->technical_commite = json_encode($request->technical_commite);
                 $item->vendors = json_encode($request->vendors);
                 $item->currency = $request->currency;
@@ -179,13 +184,17 @@ class RFPStepController extends Controller
                 $item->location = $request->location;
                 
 
-                $item->check_1 = $request->check_1;
-                $item->check_2 = $request->check_2;
-                $item->check_3 = $request->check_3;
-                $item->check_4 = $request->check_4;
-                $item->check_5 = $request->check_5;
-                $item->check_6 = $request->check_6;
+                $item->check_1 = $request->has('check_1') && $request->check_1 == true ? 1 : 0;
+                $item->check_2 = $request->has('check_2') && $request->check_2 == true ? 1 : 0;
+                $item->check_3 = $request->has('check_3') && $request->check_3 == true ? 1 : 0;
+                $item->check_4 = $request->has('check_4') && $request->check_4 == true ? 1 : 0;
+                $item->check_5 = $request->has('check_5') && $request->check_5 == true ? 1 : 0;
+                $item->check_6 = $request->has('check_6') && $request->check_6 == true ? 1 : 0;
+
                
+                $item->review_team_deadline = $request->review_team_deadline ? $request->review_team_deadline : null ;
+                $item->soi_days_deadline = $request->soi_days_deadline ? $request->soi_days_deadline : null ;
+                $item->draft = $request->draft  ? $request->draft: 0 ;
                
 
                 $item->save();
@@ -235,6 +244,8 @@ class RFPStepController extends Controller
             }
 
 
+            
+
            
 
 
@@ -243,6 +254,25 @@ class RFPStepController extends Controller
             } else {
                 $items = $items->orderBy('id','DESC')->get();
             }
+
+
+            if($request->has('review') && !empty($request->review)) {
+                
+                $items = $items->filter(function ($item) use ($id) {
+                    $reviewTeam = json_decode($item->review_team, true);
+                    if (!is_array($reviewTeam)) return false;
+
+                    foreach ($reviewTeam as $member) {
+                        if (isset($member['id']) && $member['id'] == $id) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                })->values(); 
+
+            }
+
 
             $message = "success return";
 
@@ -253,7 +283,7 @@ class RFPStepController extends Controller
 
     public function getById(Request $request)
     {
-        $items = RFPStep::with('sections','category','contract')->where('id',$request->ID)->first();
+        $items = RFPStep::with('sections','category','contract','type_event')->where('id',$request->ID)->first();
         $message ="success return";
         return mainResponse(true, $message , $items, 200, 'items',''); 
     }
@@ -321,6 +351,16 @@ class RFPStepController extends Controller
        
         }
 
+    }
+
+
+
+
+    public function getAllItemsWordFile(Request $request)
+    {
+            $items = RFPWord::where('rfp_id',$request->rfp_id)->get();
+            $message = "success return";
+            return mainResponse(true, $message, $items, 200, 'items', '');
     }
 
     

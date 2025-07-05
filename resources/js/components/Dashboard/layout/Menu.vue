@@ -139,6 +139,19 @@
                                         </div>
 
 
+
+                                        <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <router-link :to="`/${locale}/dashboard/master_data/category/event_type`" class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Event Type</span>
+                                            </router-link>
+                                            <!--end:Menu link-->
+                                        </div>
+
+
                                         <div class="menu-item">
                                             <!--begin:Menu link-->
                                             <router-link :to="`/${locale}/dashboard/master_data/category/contract`" class="menu-link">

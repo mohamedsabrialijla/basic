@@ -238,6 +238,7 @@ Route::group([
             Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\Projects\RFPStepController::class,'delete']);
             Route::Delete('deleteAllItem', [App\Http\Controllers\Web\Projects\RFPStepController::class,'deleteAllItem']);
             Route::post('editItemStep', [App\Http\Controllers\Web\Projects\RFPStepController::class,'editStep']);
+            Route::get('getAllItemsWordFile', [App\Http\Controllers\Web\Projects\RFPStepController::class,'getAllItemsWordFile']);
 
         });
 
@@ -269,8 +270,30 @@ Route::group([
 
 
 
+
+        Route::group(['prefix' => 'ItemsTechnicals'], function () {
+
+            Route::get('Withdrow', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'withdrow']);
+            Route::get('getAllItems', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'getAll']);
+            Route::get('getById', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'create']);
+            Route::post('editItem', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'edit']);
+            Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'delete']);
+            Route::Delete('deleteAllItem', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'deleteAllItem']);
+        
+        });
+
+
+
        
-       
+       Route::group(['prefix' => 'ReviewApprove'], function () {
+
+            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\ReviewApproveController::class,'getAll']);
+            Route::get('getById', [App\Http\Controllers\Web\Projects\ReviewApproveController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\Projects\ReviewApproveController::class,'create']);
+            Route::post('editItem', [App\Http\Controllers\Web\Projects\ReviewApproveController::class,'edit']);
+
+        });
 
 
 
