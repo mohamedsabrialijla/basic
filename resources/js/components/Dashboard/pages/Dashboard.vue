@@ -34,9 +34,11 @@ export default {
     // },
 
     currentDashboardComponent() {
+
       switch (this.userType) {
       case 'review':
-          return 'DashboardReview';
+          // return 'DashboardReview';
+          return 'DashboardVendor';
         case 'vendor':
           return 'DashboardVendor';
         case 'buyer':

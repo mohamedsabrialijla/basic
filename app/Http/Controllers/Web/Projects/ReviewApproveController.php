@@ -71,32 +71,40 @@ class ReviewApproveController extends Controller
                     $item = New Approve();
                 }
 
+
+                if($request->type == 'comment'){
+                    $status="Decline";
+                    $item->comment = $request->comment;   
+                }else{
+                    $status="Completed";
+                    $item->comment = ''; 
+                }  
+                
                 $item->rfp_id = $request->rfp_id; 
                 $item->type = 'reviewTeam';
                 $item->user_id = $id;
                 $item->deadline = $rfp->review_team_deadline;
-                $item->status = 'Completed';
+                $item->status = $status;
                 $item->department_id = $user->department;
-                $item->comment = $request->comment;                
 
                 $item->save();
 
+                    $createdAt = Carbon::parse($item->date_approved);
+                    $deadline = Carbon::parse($item->deadline);
+                    $overdue = 0 ;
 
-                $createdAt = Carbon::parse($item->created_at);
-                $deadline = Carbon::parse($item->deadline);
-                $overdue = 0 ;
+                    $daysDifference = $createdAt->diffInDays($deadline, false);
 
-                $daysDifference = $createdAt->diffInDays($deadline, false);
+                    if($daysDifference < 0){
+                        $overdue = 1 ;
+                        // $status = 'Overdue'
+                    }
 
-                if($daysDifference < 0){
-                    $overdue = 1 ;
-                    // $status = 'Overdue'
-                }
-
-                $item->kpi = $daysDifference;
-                $item->overdue = $overdue;
-                $item->date_approved = Carbon::now();
-                $item->save();
+                    $item->kpi = $daysDifference;
+                    $item->overdue = $overdue;
+                    $item->date_approved = Carbon::now();
+                    $item->save();
+                
 
 
 

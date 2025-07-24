@@ -22,31 +22,7 @@
         <!--begin::Card toolbar-->
         <div class="card-toolbar">
           <!--begin::Toolbar-->
-          <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base" v-if="selectedItems.length === 0">
-          
-            <!--end::Menu 1-->
-            <!--end::Filter-->
-            <!--begin::Export-->
-            <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_export_items">
-            <i class="ki-duotone ki-exit-up fs-2">
-              <span class="path1"></span>
-              <span class="path2"></span>
-            </i>Export</button>
-            <!--end::Export-->
-            <!--begin::Add user-->
-            <button @click="openRFPSteper()" type="button" class="btn btn-primary" >
-            <i class="ki-duotone ki-plus fs-2"></i>Add New</button>
-            <!--end::Add user-->
-          </div>
-          <!--end::Toolbar-->
-          <!--begin::Group actions-->
-          <div class="d-flex justify-content-end align-items-center " v-if="selectedItems.length != 0" >
-            <div class="fw-bold me-5">
-            <span class="me-2" >{{ selectedItems.length }}</span>Selected</div>
-            <button type="button" class="btn btn-danger"  @click="deleteSelected">Delete Selected</button>
-          </div>
-          <!--end::Group actions-->
-          
+        
          
         </div>
         <!--end::Card toolbar-->
@@ -63,12 +39,12 @@
             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
               <th class="w-10px pe-2">
                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
-                  <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table_users .form-check-input" value="1" v-model="selectAll" @change="toggleAll" />
+                  #
                 </div>
               </th>
               <th class="min-w-125px">ID Number</th>
               <th class="min-w-125px">Name</th>
-              <th class="min-w-125px">Status</th>
+              <!-- <th class="min-w-125px">Status</th> -->
               <th class="min-w-125px">Joined Date</th>
               <th class="text-center min-w-100px">Actions</th>
             </tr>
@@ -76,9 +52,7 @@
           <tbody class="text-gray-600 fw-semibold">
             <tr v-for="(item, index) in items" :key="item.id">
               <td >
-                <div class="form-check form-check-sm form-check-custom form-check-solid">
-                  <input v-model="selectedItems" :value="item.id" class="form-check-input" type="checkbox"  />
-                </div>
+                {{index+1}}
               </td>
 
 
@@ -101,36 +75,24 @@
                 </div>
                 <!--begin::User details-->
               </td>
-               
-              <td>
-                  <div v-if="item.draft== 0 " class="badge badge-light-danger fw-bold">Saved</div>
-                  <div v-if="item.draft== 1 " class="badge badge-light-primary fw-bold">Draft</div>
-                  <div v-else-if="item.draft== 2" class="badge badge-light-success fw-bold">Sent To Review Team</div>
-              </td>
-
+              <!-- <td>
+                <div v-if="item.status=='active'" class="badge badge-light-success fw-bold">{{item.status}}</div>
+                <div v-else class="badge badge-light-danger fw-bold">{{item.status}}</div>
+              </td> -->
               <td>{{item.created_at}}</td>
              
 
               <td class="text-end">
                  <div class="d-flex flex-center rounded p-4 h-80px mb-1 overlay">
                       <div class="overlay-wrapper text-gray-600">
-                          <i @click="openRFPSteperForEdit(item)" class="ki-duotone ki-notepad-edit fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                          <i @click="openRFPSteperForEdit(item)" class="ki-duotone ki-eye fs-2x"><span class="path1"></span><span class="path2"></span> <span class="path3"></span></i>
                         </div>
-
 
 
                       
                         
 
 
-                        <div class="overlay-wrapper text-gray-600">
-                          <i @click="deleteItem(item.id)" class="ki-duotone ki-trash-square fs-2x">
-                           <span class="path1"></span>
-                           <span class="path2"></span>
-                           <span class="path3"></span>
-                           <span class="path4"></span>
-                          </i>
-                        </div>
                             
                   </div>
               </td>
@@ -207,9 +169,7 @@ export default {
 
             
             ItemID: null,
-            URL:'RFPStep/createItem',
 
-            routeSegment: this.object,
         };
     },
 
@@ -217,21 +177,6 @@ export default {
     mounted() {
        
         this.fetchItems(this.currentPage);
-
-
-      //   this.quill = new Quill('#kt_docs_quill_basic', {
-      //     modules: {
-      //         toolbar: [
-      //             [{ header: [1, 2, false] }],
-      //             ['bold', 'italic', 'underline'],
-      //             [{ color: [] }, { background: [] }], // ✅ أدوات الألوان
-      //             ['image', 'code-block']
-      //         ]
-      //     },
-      //     placeholder: 'Type your text here...',
-      //     theme: 'snow'
-      // });
-
         
     },
 
@@ -248,31 +193,17 @@ export default {
 
 
 
-        openRFPSteper(){
-
-          localStorage.setItem('RFPItem', ''); 
-
-          this.$router.push({ path: `/${this.locale}/dashboard/master_data/projects/rfp-step` });
-        },
-
-
-
-
-
-        openRFPSteperForEdit(RFPItem){
-          localStorage.setItem('RFPItem', JSON.stringify(RFPItem)); 
-          this.$router.push({ path: `/${this.locale}/dashboard/master_data/projects/rfp-step` });
-        },
-
-
         
 
 
 
-       
+        openRFPSteperForEdit(RFPItem){
+          localStorage.setItem('RFPReview', JSON.stringify(RFPItem)); 
+          this.$router.push({ path: `/${this.locale}/dashboard/soi/rfp-step` });
+        },
 
 
-      
+        
         
 
         swalFunction(type , text){
@@ -289,7 +220,7 @@ export default {
 
 
         searchItems() {
-          this.fetchItems(this.searchQuery); // استدعاء الدالة مع الكلمة المفتاحية
+          this.fetchItems(this.searchQuery); 
         },
 
 
@@ -298,15 +229,16 @@ export default {
           this.isLoading = true;
             await axios.get('RFPStep/getAllItems', {
                 params: {
-                  search: this.searchQuery,  // تمرير قيمة البحث
-                  pagination: 1,
+                  search: this.searchQuery,  
+                  pagination: 0,
                   page:page,
+                  soi:1,
                 }
               })
                 .then(response => {
-                    this.items = response.data.items.data;
+                    this.items = response.data.items;
                     this.isLoading = false;
-                    this.totalItems = response.data.items.total
+                    // this.totalItems = response.data.items.total
                     this.languages = this.$store.state.languages ;
                 })
                 .catch(error => {
@@ -332,70 +264,7 @@ export default {
       
 
 
-        deleteItem(id) {
-          swal.fire({
-            text: "Are you sure you want to delete this item?",
-            icon: "warning",
-            buttonsStyling: false,
-            showDenyButton: true,
-            confirmButtonText: "Yes",
-            denyButtonText: 'No',
-            customClass: {
-              confirmButton: "btn btn-primary",
-              denyButton: "btn btn-light-danger"
-            }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // إذا تم تأكيد الحذف
-              axios.delete(`RFPStep/deleteItem/${id}`)
-                .then(() => {
-                  // this.items = this.items.filter(i => i.id !== item.id);
-                  // this.ItemID = ''
-                  this.swalFunction('success','The item has been deleted successfully.')
-                  this.fetchItems()
-                })
-                .catch(error => {
-                  swal.fire({
-                    text: 'Error deleting the item. Please try again.', 
-                    icon: 'error',
-                    confirmButtonText: "Ok",
-                    buttonsStyling: false,
-                    customClass: {
-                      confirmButton: "btn btn-light-primary"
-                    }
-                  });
-                });
-            } else if (result.isDenied) {
-              // إذا تم رفض الحذف
-              swal.fire({
-                text: 'The deletion has been canceled.', 
-                icon: 'info',
-                confirmButtonText: "Ok",
-                buttonsStyling: false,
-                customClass: {
-                  confirmButton: "btn btn-light-primary"
-                }
-              });
-            }
-          });
-        },
-
-       toggleAll() {
-          if (this.selectAll) {
-            this.selectedItems = this.items.map(item => item.id);
-          } else {
-            this.selectedItems = [];
-          }
-
-        },
       
-        deleteSelected() {
-          this.selectedItems.forEach(id => {
-            this.deleteItem(id);
-          });
-          this.selectedItems = [];
-          this.selectAll = false;
-        },
       
      
   },

@@ -4,59 +4,15 @@
       
 
   
-
-<div class="documents-list">
-  <div
-    v-for="section in sections"
-    :key="section.id"
-    class="document-item mb-4 p-3 border rounded bg-light">
-    <!-- Text Section -->
-    <div v-if="section.type === 'text'" v-html="section.description">
-      
-    </div>
-
-
-    <!-- Sheet Pricing Section -->
-    <div v-else-if="section.type === 'PricingSheet'"> 
-       <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Reference</th>
-            <th>duration</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-            <th>Total Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in itemsFlatTree" :key="item.id">
-            <td>{{ index }}</td>
-            <td :style="{ paddingLeft: item.level * 20 + 'px' }">{{ item.text }}</td>
-            <td>{{ item.reference }}</td>
-            <td>{{ item.duration }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.unit_price }}</td>
-            <td>{{ item.total_price }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-
-    <!-- Technical Section -->
-    <div v-else-if="section.type === 'TechnicalSheet'"> 
-        
-        <TechnicalView></TechnicalView>
-
-    </div>
-
-  </div>
-</div>
-
-
+    <div class="documents-list">
+    <div v-for="section in sections" :key="section.id" class="document-item mb-4 p-3 border rounded bg-light">
      
+      
+      <div  v-html="section.description"></div>
+    </div>
+  </div>
+
+    
 
         
     </div>
@@ -78,7 +34,6 @@
 
 import axios from 'axios';
 import { mapState } from 'vuex';
-import TechnicalView from '../buyer/TechnicalView.vue';
 
  
 import { nextTick } from 'vue';
@@ -86,7 +41,7 @@ import { nextTick } from 'vue';
  
 export default {
   components: {
-    TechnicalView
+    
   },
     data() {
         return {
@@ -100,8 +55,6 @@ export default {
           
 
             sections:[],
-            itemsTree: [],
-            itemsFlatTree: [],
 
         };
     },
@@ -112,7 +65,6 @@ export default {
 
    mounted() {
         this.fetchItemsSections()
-        this.fetchItemsTree()
 
     }, 
 
@@ -139,57 +91,13 @@ export default {
             }
         });
     },
-
-
-
-
-
-    
-
-    async fetchItemsTree() {
-      this.isLoading = true;
-
-      let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
-
-      try {
-        const response = await axios.get('/Gantt/gantt', {
-          params: { rfp_id: rfp_id.id }
-        });
-
-        this.itemsTree = response.data.items;
-
-        this.itemsFlatTree = this.buildTree(this.itemsTree, 0, 0);
-
-      } catch (error) {
-        Swal.fire({
-          text: error.message || "Unexpected error",
-          icon: "error",
-          buttonsStyling: false,
-          confirmButtonText: "Ok, got it!",
-          customClass: {
-            confirmButton: "btn btn-primary"
-          }
-        });
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    buildTree(items, parentId = 0, level = 0) {
-      let tree = [];
-      items
-        .filter(item => item.parent === parentId)
-        .forEach(item => {
-          tree.push({ ...item, level });
-          tree = tree.concat(this.buildTree(items, item.id, level + 1));
-        });
-      return tree;
-    },
-
-
-
-    
  
+
+    
+
+
+    
+
 
 
      async fetchItemsSections(page,query = '') {

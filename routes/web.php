@@ -225,7 +225,7 @@ Route::group([
         
         });
 
-
+ 
 
 
         Route::group(['prefix' => 'RFPStep'], function () {
@@ -286,12 +286,50 @@ Route::group([
 
 
        
-       Route::group(['prefix' => 'ReviewApprove'], function () {
+        Route::group(['prefix' => 'ReviewApprove'], function () {
 
             Route::get('getAllItems', [App\Http\Controllers\Web\Projects\ReviewApproveController::class,'getAll']);
             Route::get('getById', [App\Http\Controllers\Web\Projects\ReviewApproveController::class,'getById']);
             Route::post('createItem', [App\Http\Controllers\Web\Projects\ReviewApproveController::class,'create']);
             Route::post('editItem', [App\Http\Controllers\Web\Projects\ReviewApproveController::class,'edit']);
+
+        });
+
+
+
+        Route::group(['prefix' => 'SOIApprove'], function () {
+
+            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\SOIApproveController::class,'getAll']);
+            Route::get('getById', [App\Http\Controllers\Web\Projects\SOIApproveController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\Projects\SOIApproveController::class,'create']);
+            Route::post('editItem', [App\Http\Controllers\Web\Projects\SOIApproveController::class,'edit']);
+
+        });
+
+
+
+        Route::group(['prefix' => 'VendorApprove'], function () {
+
+            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\VendorApproveController::class,'getAll']);
+            Route::get('getById', [App\Http\Controllers\Web\Projects\VendorApproveController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\Projects\VendorApproveController::class,'create']);
+            Route::post('createItemDocument', [App\Http\Controllers\Web\Projects\VendorApproveController::class,'createItemDocument']);
+
+        });
+
+
+
+        Route::group(['prefix' => 'BuyerApprove'], function () {
+
+            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'getAll']);
+            Route::get('getById', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'create']);
+            Route::post('createItemDate', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'createItemDate']);
+            Route::get('excelResponse', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'excelResponse']);
+            Route::get('getAllItemsResponseVendor', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'getAllItemsResponseVendor']);
+            Route::get('getAllItemsStaticitics', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'getAllItemsStaticitics']);
+            
+            Route::post('Store', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'Store']);
 
         });
 

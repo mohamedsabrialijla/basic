@@ -11,6 +11,7 @@ import PricingSheet from './components/Dashboard/pages/buyer/PricingSheet.vue';
 import PDFHtml from './components/Dashboard/pages/buyer/PDFHtml.vue';
 
 import Users from './components/Dashboard/pages/UserManagement/Users.vue';
+import Vendors from './components/Dashboard/pages/UserManagement/Vendors.vue';
 import Roles from './components/Dashboard/pages/UserManagement/Roles.vue';
 
 // HR Begin
@@ -38,6 +39,29 @@ import StepTemplate from './components/Dashboard/pages/MasterData/StepTemplate.v
 
 import IndexReview from './components/Dashboard/pages/Review/Index.vue';
 import ReviewStep from './components/Dashboard/pages/Review/ReviewStep.vue';
+
+
+
+// SOI Team
+
+import IndexSOI from './components/Dashboard/pages/SOI/Index.vue';
+import SOIStep from './components/Dashboard/pages/SOI/SOIStep.vue';
+
+
+
+
+// Vendor Team
+
+import IndexSVendor from './components/Dashboard/pages/Vendor/Index.vue';
+import VendorStep from './components/Dashboard/pages/Vendor/VendorStep.vue';
+
+
+
+
+// Buyer Team
+
+import VendorsResponseIndex from './components/Dashboard/pages/buyer/VendorsResponseIndex.vue';
+import VendorsResponseRfp from './components/Dashboard/pages/buyer/VendorsResponseRfp.vue';
 
 
 
@@ -93,6 +117,12 @@ const routes = [
         path: '/:locale/dashboard/user_management/users', 
         component: Users, 
         meta: { requiresAuth: true , breadcrumb: 'Users Management' } 
+    },
+
+    { 
+        path: '/:locale/dashboard/user_management/vendors', 
+        component: Vendors, 
+        meta: { requiresAuth: true , breadcrumb: 'Vendors Management' } 
     },
 
 
@@ -220,6 +250,51 @@ const routes = [
     { 
         path: '/:locale/dashboard/review/rfp-step', 
         component: ReviewStep, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+
+    { 
+        path: '/:locale/dashboard/soi/rfp', 
+        component: IndexSOI, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/soi/rfp-step', 
+        component: SOIStep, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+
+
+    { 
+        path: '/:locale/dashboard/vendor/rfp', 
+        component: IndexSVendor, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/vendor/rfp-step', 
+        component: VendorStep, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/buyer/vendors-response-index', 
+        component: VendorsResponseIndex, 
+        meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/buyer/vendors-response-rfp', 
+        component: VendorsResponseRfp, 
         meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
     },
 

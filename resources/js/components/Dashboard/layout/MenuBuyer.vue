@@ -32,49 +32,83 @@
             
 
 
-                                  <!--begin:Menu item-->
-                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                            <!--begin:Menu link-->
-                            <span class="menu-link">
-                                <span class="menu-icon">
-                                    <i class="ki-duotone ki-abstract-28 fs-2">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                    </i>
-                                </span>
-                                <router-link :to="`/${locale}/dashboard/master_data/projects/rfp`" class="menu-link">
-                                            
-                                            <span class="menu-title">RFP File</span>
-                                        </router-link>
-                            </span>
-                            <!--end:Menu link-->
-                            <!--begin:Menu sub-->
-                           
-                            <!--end:Menu sub-->
-                        </div>
+                                <!--begin:Menu item-->
+                                    <!-- <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                        <span class="menu-link">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-abstract-28 fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </span>
+                                            <router-link :to="`/${locale}/dashboard/master_data/projects/rfp`" class="menu-link">
+                                                        
+                                                        <span class="menu-title">RFP File</span>
+                                                    </router-link>
+                                        </span>
+                                    </div> -->
                         
 
 
 
-                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                            <!--begin:Menu link-->
-                            <span class="menu-link">
-                                <span class="menu-icon">
-                                    <i class="ki-duotone ki-abstract-28 fs-2">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                    </i>
-                                </span>
-                                <router-link :to="`/${locale}/dashboard/buyer/pricing`" class="menu-link">
-                                           
-                                            <span class="menu-title">Pricing </span>
-                                        </router-link>
-                            </span>
-                            <!--end:Menu link-->
-                            <!--begin:Menu sub-->
-                           
-                            <!--end:Menu sub-->
-                        </div>
+                                <!-- <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                    <span class="menu-link">
+                                        <span class="menu-icon">
+                                            <i class="ki-duotone ki-abstract-28 fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </span>
+                                        <router-link :to="`/${locale}/dashboard/buyer/pricing`" class="menu-link">
+                                                   
+                                                    <span class="menu-title">Pricing </span>
+                                                </router-link>
+                                    </span>
+                            
+                                </div> -->
+
+
+
+
+
+
+
+                                <!--begin:Menu item-->
+                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                        <span class="menu-link">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-abstract-28 fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </span>
+                                            <router-link :to="`/${locale}/dashboard/master_data/projects/rfp-index`" class="menu-link">
+                                                        
+                                                        <span class="menu-title">RFP File</span>
+                                                    </router-link>
+                                        </span>
+                                    </div> 
+ 
+
+
+                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                        <span class="menu-link">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-abstract-28 fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </span>
+                                            <router-link :to="`/${locale}/dashboard/buyer/vendors-response-index`" class="menu-link">
+                                                        
+                                                        <span class="menu-title">Vendors Response</span>
+                                                    </router-link>
+                                        </span>
+                                    </div> 
+
+
+
+                                  
                         
 
          

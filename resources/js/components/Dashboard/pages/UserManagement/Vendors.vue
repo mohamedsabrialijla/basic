@@ -14,7 +14,7 @@
               <span class="path1"></span>
               <span class="path2"></span>
             </i>
-            <input v-model="searchQuery" @input="searchItems" type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search ..." />
+            <input v-model="searchQuery" @input="searchItems" type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search user" />
           </div>
           <!--end::Search-->
         </div>
@@ -23,45 +23,7 @@
         <div class="card-toolbar">
           <!--begin::Toolbar-->
           <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base" v-if="selectedItems.length === 0">
-            <!-- <button type="button" class="btn btn-light-primary me-3" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-            <i class="ki-duotone ki-filter fs-2">
-              <span class="path1"></span>
-              <span class="path2"></span>
-            </i>Filter</button> -->
-            <!-- <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true">
-              <div class="px-7 py-5">
-                <div class="fs-5 text-gray-900 fw-bold">Filter Options</div>
-              </div>
-             
-              <div class="separator border-gray-200"></div>
-              
-              <div class="px-7 py-5" data-kt-user-table-filter="form">
-                <div class="mb-10">
-                  <label class="form-label fs-6 fw-semibold">Role:</label>
-                  <select class="form-select form-select-solid fw-bold" data-kt-select2="true" data-placeholder="Select option" data-allow-clear="true" data-kt-user-table-filter="role" data-hide-search="true">
-                    <option></option>
-                    <option value="Administrator">Administrator</option>
-                    <option value="Analyst">Analyst</option>
-                    <option value="Developer">Developer</option>
-                    <option value="Support">Support</option>
-                    <option value="Trial">Trial</option>
-                  </select>
-                </div>
-                
-                <div class="mb-10">
-                  <label class="form-label fs-6 fw-semibold">Two Step Verification:</label>
-                  <select class="form-select form-select-solid fw-bold" data-kt-select2="true" data-placeholder="Select option" data-allow-clear="true" data-kt-user-table-filter="two-step" data-hide-search="true">
-                    <option></option>
-                    <option value="Enabled">Enabled</option>
-                  </select>
-                </div>
-                
-                <div class="d-flex justify-content-end">
-                  <button type="reset" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6" data-kt-menu-dismiss="true" data-kt-user-table-filter="reset">Reset</button>
-                  <button type="submit" class="btn btn-primary fw-semibold px-6" data-kt-menu-dismiss="true" data-kt-user-table-filter="filter">Apply</button>
-                </div>
-              </div>
-            </div> -->
+          
             <!--end::Menu 1-->
             <!--end::Filter-->
             <!--begin::Export-->
@@ -73,7 +35,7 @@
             <!--end::Export-->
             <!--begin::Add user-->
             <button @click="getModalCreate()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_item">
-            <i class="ki-duotone ki-plus fs-2"></i>Add New</button>
+            <i class="ki-duotone ki-plus fs-2"></i>Add User</button>
             <!--end::Add user-->
           </div>
           <!--end::Toolbar-->
@@ -104,39 +66,37 @@
                   <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table_users .form-check-input" value="1" v-model="selectAll" @change="toggleAll" />
                 </div>
               </th>
-              <th class="min-w-125px">Logo</th>
-              <th class="min-w-125px">Employee</th>
-              <th class="min-w-125px">Position</th>
+              <th class="min-w-125px">User</th>
               <th class="min-w-125px">Status</th>
               <th class="min-w-125px">Joined Date</th>
               <th class="text-center min-w-100px">Actions</th>
             </tr>
           </thead>
           <tbody class="text-gray-600 fw-semibold">
-            <tr v-if="items.length > 0 " v-for="(item, index) in items" :key="item.id">
+            <tr v-for="(item, index) in items" :key="item.id">
               <td >
                 <div class="form-check form-check-sm form-check-custom form-check-solid">
                   <input v-model="selectedItems" :value="item.id" class="form-check-input" type="checkbox"  />
                 </div>
               </td>
-
-              <td>
-                 <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
+              <td class="d-flex align-items-center" style="margin-top: 15px;">
+                <!--begin:: Avatar -->
+                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
                   <a href="#">
                     <div class="symbol-label">
-                      <img :src="item.logo" :alt="item.name" class="w-100" />
+                      <img :src="item.logo" alt="item.name" class="w-100" />
                     </div>
                   </a>
                 </div> 
-              </td>
-              <td class="d-flex align-items-center">
+                <!--end::Avatar-->
+                <!--begin::User details-->
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1" style="margin-top:27px;">{{item.full_name}}</a>
-                  <span>{{item.code}}</span>
+                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.name}}</a>
+                  <span>{{item.email}}</span>
                 </div>
                 <!--begin::User details-->
               </td>
-              <td>{{item.position.name}}</td>
+              <td v-if="item.role_name">{{item.role_name.display_name}}</td>
               <td>
                 <div v-if="item.status=='active'" class="badge badge-light-success fw-bold">{{item.status}}</div>
                 <div v-else class="badge badge-light-danger fw-bold">{{item.status}}</div>
@@ -148,6 +108,10 @@
                  <div class="d-flex flex-center rounded p-4 h-80px mb-1 overlay">
                       <div class="overlay-wrapper text-gray-600">
                           <i @click="getModalEdit(item)" class="ki-duotone ki-notepad-edit fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+
+                        <div class="overlay-wrapper text-gray-600">
+                          <i @click="getModalEditPassword(item)" class="ki-duotone ki-user-edit fs-2x"><span class="path1"></span><span class="path2"></span></i>
                         </div>
 
 
@@ -162,11 +126,6 @@
                             
                   </div>
               </td>
-            </tr>
-
-            <tr v-else class="d-flex align-items-center">
-                  Empty 
-
             </tr>
        
           </tbody>
@@ -229,7 +188,6 @@
 
                   <div class="image-input-wrapper w-125px h-125px" :style="{'background-image': formData.logo ? `url(${formData.logo})` : 'url(/assets/avatar.svg)'}"></div>
 
-
                 
                   <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
                     <i class="ki-duotone ki-pencil fs-7">
@@ -254,31 +212,18 @@
                 </div>
                 <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
               </div>
-
-
-
+             
               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Code</label>
-                <input type="text" name="code"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Employee Code" value="" v-model="formData.code" required />
+                <label class="required fw-semibold fs-6 mb-2">Full Name</label>
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Full name" value="" v-model="formData.name" required />
               </div>
              
               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">First Name</label>
-                <input type="text" name="first_name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="First name" value="" v-model="formData.first_name" required />
+                <label class="required fw-semibold fs-6 mb-2">Email</label>
+                <input type="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="example@domain.com" value="" v-model="formData.email" required />
               </div>
 
-              <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Middle Name</label>
-                <input type="text" name="first_name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Middle name" value="" v-model="formData.middle_name" required />
-              </div>
-
-
-              <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Last Name</label>
-                <input type="text" name="first_name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Last name" value="" v-model="formData.last_name" required />
-              </div>
-             
-             
+            
 
               <div class="fv-row mb-7">
                 <label class="required fw-semibold fs-6 mb-2">Mobile</label>
@@ -286,23 +231,42 @@
               </div>
 
 
+
               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Idintification Number</label>
-                <input type="text" name="id_number" v-model="formData.id_number" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Idintification Number" maxlength="12" value="" required />
+                <label class="required fw-semibold fs-6 mb-2">services</label>
+                <input type="text" name="position" v-model="formData.position" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="EX:here you are what is work  ..." maxlength="100" value="" required />
               </div>
+
+
+              <!-- <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Level</label>
+                 <select class="form-control" v-model="formData.level">
+                    <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
+                 </select>
+              </div> -->
+
+ 
+
+             <!--  <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Department</label>
+                <multiselect class="" v-model="formData.department" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="itemsDepartments" :multiple="false" :taggable="false" :options-limit="20" :allow-empty="false" ></multiselect>
+
+              </div> -->
+
+              <div class="fv-row mb-7" v-if="!ItemID">
+                <label class="required fw-semibold fs-6 mb-2">Password</label>
+                <input type="password" name="password" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Your password" v-model="formData.password" value="" required />
+              </div>
+
+
+
+              <div class="fv-row mb-7" v-if="!ItemID">
+                <label class="required fw-semibold fs-6 mb-2">confirm password</label>
+                <input type="password" v-model="formData.confirm_password" name="confirm_password" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Your confirm password"  value="" required />
+              </div>
+
 
           
-
-
-
-
-               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Position</label>
-                <multiselect class="" v-model="formData.position" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="itemsPosition" :multiple="false" :taggable="false" :options-limit="10" :allow-empty="false" ></multiselect>
-
-              </div>
-
-
             </div>
             <div class="text-center pt-10">
               <button type="submit" class="btn btn-primary" @click.prevent="addEditItem" :disabled="isLoading">
@@ -312,8 +276,80 @@
               </span>
             </button>
 
+              <button style="margin: 7px;" type="submit" class="btn btn-secondary" @click.prevent="closeModal">
+              <span  class="indicator-label">Canacel</span>
+              
+            </button>
+            </div>
+          </form>
+        </div>
 
-            <button style="margin: 7px;" type="submit" class="btn btn-secondary" @click.prevent="closeModal">
+
+      </div>
+    </div>
+  </div>
+<!--begin::Modal - Add task-->
+
+
+
+<!--begin::Modal - Add task-->
+  <div class="modal fade" id="kt_modal_add_item_password" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+      <!--begin::Modal content-->
+      <div class="modal-content">
+        <!--begin::Modal header-->
+        <div class="modal-header" id="kt_modal_add_user_header">
+          <!--begin::Modal title-->
+          <h2 class="fw-bold">Edit password</h2>
+          <!--end::Modal title-->
+          <!--begin::Close-->
+          <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close" @click="closeModalPassword">
+            <i class="ki-duotone ki-cross fs-1">
+              <span class="path1"></span>
+              <span class="path2"></span>
+            </i>
+          </div>
+          <!--end::Close-->
+        </div>
+
+
+        <div class="modal-body px-5 my-7">
+          <form id="kt_modal_add_user_form_password" class="form" action="#">
+            <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
+
+
+
+             
+
+
+              <div class="fv-row mb-7" >
+                <label class="required fw-semibold fs-6 mb-2">Password</label>
+                <input type="password" name="password" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Your password" v-model="formData.password" value="" required />
+              </div>
+
+
+              <div class="fv-row mb-7" >
+                <label class="required fw-semibold fs-6 mb-2">confirm password</label>
+                <input type="password" v-model="formData.confirm_password" name="confirm_password" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Your confirm password"  value="" required />
+              </div>
+
+
+          
+
+
+
+
+            </div>
+            <div class="text-center pt-10">
+              <button type="submit" class="btn btn-primary" @click.prevent="addEditItemPassword" :disabled="isLoading">
+              <span  class="indicator-label">Submit</span>
+              <span  class="indicator-progress">Please wait...
+                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+              </span>
+            </button>
+
+             <button style="margin: 7px;" type="submit" class="btn btn-secondary" @click.prevent="closeModalPassword">
               <span  class="indicator-label">Canacel</span>
               
             </button>
@@ -329,13 +365,17 @@
 <!--begin::Modal - Add task-->
 
 
+
+
+
              
 </template>
-
+ 
 <script>
 import axios from 'axios';
 import Pagination from '../../layout/pagination.vue';
 import Multiselect from 'vue-multiselect'
+
 
 export default {
   components: {
@@ -350,23 +390,31 @@ export default {
             searchQuery: '', // الكلمة المفتاحية للبحث
             isLoading: false, // حالة التحميل
             items: [], 
-            itemsPosition: [], 
+            itemsCategories:[], 
+            itemsDepartments:[],
             searchQuery: '',
             formData: {
-                code: '',
-                first_name: '',
-                middle_name: '',
-                last_name: '',
-                position_id: '',
-                id_number: '',
+                user_type:'vendor',
+                name: '',
+                email: '',
+                position: '',
+                level: '1',
+                password: '',
+                services: '',
+                documents: '',
                 logo: '',
                 logo_preview  :'./../assets/media/avatars/300-1.jpg',
             },
 
-           
+            formDataPassword: {
+                password: '',
+                confirm_password: '',
+               
+            },
+
 
             ItemID: null, // المستخدم الذي يتم تعديله
-            URL:'Employees/createItem',
+            URL:'Users/createItem',
         };
     },
 
@@ -383,19 +431,17 @@ export default {
     methods: {
 
        onFileChange(e) {
-        this.logo = e.target.files[0];
-            const file = e.target.files[0];
-            if (file) {
-                this.formData.logo = URL.createObjectURL(file);
-            }
+          // حفظ الملف المختار
+          this.logo = e.target.files[0];
+          this.logo_preview = URL.createObjectURL(this.logo);
         },
 
 
 
-
         getModalCreate(){
-            this.fetchItemsPosition();
             this.resetItem();
+            // this.fetchItemsCategories()
+            this.fetchItemsDepartments()
             $('#kt_modal_add_item').modal('show');
             this.titleModal = 'اضافة جديد '
         },
@@ -403,20 +449,26 @@ export default {
 
         getModalEdit(item){
             this.ItemID = item.id
-            this.fetchItemsPosition();
             this.resetItem();
+            this.fetchItemsDepartments()
             $('#kt_modal_add_item').modal('show');
-            this.titleModal = 'تعديل البيانات'
-            this.URL = 'Employees/editItem'
+            this.titleModal = 'Edit Item'
+            this.URL = 'Users/editItem'
             this.getItemById() 
         },
 
 
-      
+        getModalEditPassword(item){
+            this.ItemID = item.id
+            this.resetItemPassword();
+            $('#kt_modal_add_item_password').modal('show');
+            this.titleModal = 'تعديل الباسوورد'
+            this.getItemById() 
+        },
 
         closeModal(){
             $('#kt_modal_add_item').modal('hide');
-            this.URL = 'Employees/createItem'
+            this.URL = 'Users/createItem'
             this.ItemID = null
             // this.resetMark();
         },
@@ -428,12 +480,12 @@ export default {
         },
 
         resetItem(){
-          this.URL = 'Employees/createItem'
-          this.formData.code=''
+          this.URL = 'Users/createItem'
           this.formData.mobile=''
           this.formData.email=''
           this.formData.name=''
-          this.formData.position_id=''
+          this.formData.position=''
+          this.formData.level= '1' ,
           this.formData.logo=''
           this.logo_preview ='./../assets/companies/img/store-logo.jpg'
 
@@ -444,9 +496,43 @@ export default {
          resetItemPassword(){
           this.formData.password=''
           this.formData.confirm_password=''
-          
-
         },
+ 
+
+
+        async fetchItemsCategories() {
+            const typeList = ['category'];
+            axios.get('/ItemsCategories/getAllItems?pagination=0', {
+                params: {
+                    pagination: 0,
+                    type: 'documents'
+                } 
+            })
+            .then(response => {
+                this.itemsCategories = response.data.items;
+                console.log(this.itemsCategories)
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        },
+ 
+
+        async fetchItemsDepartments() {
+            axios.get('/Departments/getAllItems?pagination=0', {
+                params: {
+                    pagination: 0,
+                } 
+            })
+            .then(response => {
+                this.itemsDepartments = response.data.items;
+                
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        },
+
 
 
 
@@ -466,17 +552,17 @@ export default {
         searchItems() {
           this.fetchItems(this.searchQuery); // استدعاء الدالة مع الكلمة المفتاحية
         },
+ 
 
-
-        // جلب جميع المستخدمين
         async fetchItems(page,query = '') {
           this.currentPage = page;
           this.isLoading = true;
-            await axios.get('Employees/getAllItems', {
+            await axios.get('Users/getAllItems', {
                 params: {
                   search: this.searchQuery,  // تمرير قيمة البحث
                   pagination: 1,
                   page:page,
+                  user_type:'vendor',
                 }
               })
                 .then(response => {
@@ -496,26 +582,19 @@ export default {
             });
 
                    this.isLoading = false;
-                }); 
-        },
-
-
-        async fetchItemsPosition() {
-            axios.get('/Positions/getAllItems?pagination=0')
-                .then(response => {
-                    this.itemsPosition = response.data.items;
-                })
-                .catch(error => {
-                    this.swalFunction('error','Error Happens')
                 });
         },
 
+
        
 
+        // تحديث واختيار الدور
+        selectRole(roleId) {
+          this.formData.role_id = roleId;
+        },
 
-        // إضافة مستخدم جديد
+ 
         addEditItem() {
-
           
           this.isLoading = true;
 
@@ -524,15 +603,31 @@ export default {
                       'content-type': 'multipart/form-data'
                   }
               }
- 
+
             let form = new FormData();
-              form.append('code', this.formData.code);
-              form.append('first_name', this.formData.first_name);
-              form.append('middle_name', this.formData.middle_name);
-              form.append('last_name', this.formData.last_name);
+              form.append('name', this.formData.name);
               form.append('mobile', this.formData.mobile);
-              form.append('id_number', this.formData.id_number);
-              form.append('position_id', this.formData.position.id);
+              form.append('email', this.formData.email);
+              form.append('user_type', this.formData.user_type);
+              if(this.ItemID == null){
+                form.append('password', this.formData.password);
+                form.append('confirm_password', this.formData.confirm_password);
+              }
+              form.append('position', this.formData.position);
+              form.append('level', this.formData.level);
+
+
+              if(this.formData.department){
+
+                form.append('department', this.formData.department.id)
+              }
+              
+
+              // this.formData.documents.forEach(doc => {
+              //   form.append('documents[]', doc.id);
+              // });
+
+
 
               if (this.logo) {
                 form.append('logo', this.logo);
@@ -541,9 +636,8 @@ export default {
             if(this.ItemID != ''){
                form.append('Item_id', this.ItemID);
             }
-
              
-          axios.post(this.URL,form,config).then((response)=>{
+           axios.post(this.URL,form,config).then((response)=>{
                  this.isLoading = false;
                 if(response.data.items){
                    swal.fire({
@@ -556,18 +650,15 @@ export default {
                     this.fetchItems()           
 
                 }else{
-                  this.isLoading = false;
                     swal.fire({
                     text: response.data.message,
                     icon: 'error',
                     timer: false,
                     button: true
                     });
-
                 }             
             
           }).catch(error => {
-            this.isLoading = false;
                     swal.fire({
                     text: error,
                     icon: 'error',
@@ -580,33 +671,72 @@ export default {
         },
 
 
-        
-        async getItemById(){
+        addEditItemPassword() {
 
-            axios.get('Employees/getById', { params: { ID: this.ItemID } }).then(response => {
-                if(response.data){
-                  let data = response.data.items
-                   this.formData = data;
+          
+          this.isLoading = true;
+
+          const config = {
+                  headers: {
+                      'content-type': 'multipart/form-data'
+                  }
+              }
+
+
+            let form = new FormData();
+           
+                form.append('password', this.formData.password);
+                form.append('confirm_password', this.formData.confirm_password);
+                form.append('Item_id', this.ItemID);
+             
+          axios.post('Users/EditItemPassword',form,config).then((response)=>{
+                 this.isLoading = false;
+                if(response.data.items){
+                   swal.fire({
+                    text: "تم حفظ التغييرات بنجاح",
+                    icon: "success",
+                    timer: 2000,
+                    button: false
+                    }); 
+                    this.closeModalPassword()
+                    this.fetchItems()           
 
                 }else{
-                    Swal.fire({
-                        text: "Error happens",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn btn-primary"
-                        }
-                    });
-                }
-            }).catch((error)=>{
-
-                    swal({
-                    text: 'Error happens',
+                    swal.fire({
+                    text: response.data.message,
                     icon: 'error',
                     timer: false,
                     button: true
-                    });         
+                    });
+                }             
+            
+          }).catch(error => {
+                    swal.fire({
+                    text: error,
+                    icon: 'error',
+                    timer: false,
+                    button: true
+                    });
+                });
+
+          
+        },
+
+
+        async getItemById(){
+
+            axios.get('Users/getById', { params: { ID: this.ItemID } }).then(response => {
+                if(response.data){
+                  let data = response.data.items
+                   this.formData = data;
+                   this.formData.documents = data.document
+
+                }else{
+                    this.swalFunction('info', 'Error Happens')
+                }
+            }).catch((error)=>{
+
+                  this.swalFunction('info', 'Error Happens')       
             });
         },
 
@@ -629,10 +759,12 @@ export default {
         }).then((result) => {
           if (result.isConfirmed) {
             // إذا تم تأكيد الحذف
-            axios.delete(`Employees/deleteItem/${id}`)
+            axios.delete(`Users/deleteItem/${id}`)
               .then(() => {
-                this.fetchItems()
-                
+                // إزالة العنصر من القائمة بعد الحذف
+                this.items = this.items.filter(i => i.id !== item.id);
+                this.ItemID = ''
+                // إظهار رسالة النجاح
                 swal.fire({
                   text: 'The item has been deleted successfully.', 
                   icon: 'success',
@@ -690,7 +822,6 @@ export default {
 
 
      
-
         
 
         
@@ -728,8 +859,9 @@ export default {
     }
 
 
-  .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image.svg'); } [data-bs-theme="dark"] .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image-dark.svg'); }
 
 
+     .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image.svg'); } [data-bs-theme="dark"] .image-input-placeholder { background-image: url('assets/media/svg/files/blank-image-dark.svg'); }
 
 </style>
+

@@ -1,6 +1,3 @@
-
-
-
 <template>
   <div class="card">
     <div class="row" style="margin-top:60px;">
@@ -11,18 +8,18 @@
         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
           <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-              <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">RFP Dashboard</h1>
-              <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
-                <li class="breadcrumb-item text-muted">
-                  <a href="index.html" class="text-muted text-hover-primary">RFP</a>
-                </li>
-                <li class="breadcrumb-item">
-                  <span class="bullet bg-gray-500 w-5px h-2px"></span>
-                </li>
-                
-                <li class="breadcrumb-item text-muted">{{ breadcrumbLabel }}</li>
+              <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Vendor SOI Response</h1>
+              <!-- <span v-if="formData.status=='Completed'"  :class="getStatusClass('Completed')" class="btn btn-sm ">
+                Completed
+              </span>
 
-              </ul>
+              <span v-else  class="btn btn-sm btn-light-warning">
+                Decline
+              </span> -->
+
+
+
+              
             </div>
             <div class="d-flex align-items-center gap-2 gap-lg-3">
               
@@ -30,21 +27,22 @@
                 @click="openList()">Cancel</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-primary" @click="Approve2('approve')">Approve</a>
+              <a href="#" class="btn btn-sm fw-bold btn-primary" @click="Approve('approve')">Confirm </a>
               
  
             
               
-              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep == 1" @click="getModalCreate()">Return To Comment</a>
+              <a href="#" class="btn btn-sm fw-bold btn-primary"  @click="getModalCreate()">Decline</a>
             </div>
           </div>
-        </div> 
+        </div>
 
         <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 53%;margin: auto;">
 
-          <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
-                :key="index"  @click="setStep(index)">
-            <!--begin::Symbol-->
+          <!-- <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
+                :key="index" 
+                
+                @click="setStep(index)">
             <div class="symbol symbol-30px symbol-circle me-3">
               <span class="symbol-label bg-light-primary" >
                   
@@ -53,28 +51,21 @@
 
               </span>
             </div>
-            <!--end::Symbol-->
-            <!--begin::Info-->
             <div class="m-0">
               <span class="fw-semibold text-gray-500 d-block fs-8" style="cursor:pointer;"> {{ step }}</span>
             </div>
-            <!--end::Info-->
-          </div>
+          </div> -->
         </div>
       </div>
 
 
        
           
-      <!-- Step 1: Kanban Board -->
-      <div v-if="currentStep === 0" class="col-12">
-         Step One
-      </div>
-
+ 
 
 
       <!-- Step 2 -->
-      <div v-if="currentStep === 1" class="col-12">
+      <div class="col-12">
         
 
         <div class="modal-body px-5 my-7" >
@@ -91,25 +82,26 @@
                   
                   <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px" style="height: 500px;">
 
-                      <WordFile></WordFile>
+                       <VendorsResponseExcel></VendorsResponseExcel> 
 
                     </div>
         
                 </div>
 
 
+			 <div class="fv-row col-md-3" >
+                <label class="required fw-semibold fs-6 mb-2">Date Deadlin</label>
+                <input type="date" name="date"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Employee Code" value="" :disabled="disabel!=1" v-model="formDate.deadline" @input="addDeadline" required />
+              </div>
 
-
-
-                  <table class="table">
-                    <thead class="thead-light" style="background: #e5dcdc;font-weight: bold;">
+                <table class="table">
+                    <thead class="thead-light" style="background: rgb(245 238 238);font-weight: bold;">
                       <tr>
                         <th scope="col">ReviewBy</th>
                         <th scope="col">Department</th>
                         <th scope="col">Deadline</th>
-                        <th scope="col">Action On Decline/Approve</th>
-                        <th scope="col" >Status &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  KPI</th>
-                        <th scope="col">Comment </th>
+                        <th scope="col">Approved On</th>
+                        <th scope="col" >Status </th> 
                       </tr>
                     </thead>
                     <tbody>
@@ -117,28 +109,37 @@
                         <td v-if="item.user">{{item.user.name}}</td>
                         <td v-if="item.department">{{item.department.name}}</td>
                         <td>{{item.dead}}</td>
-                        <td :class="getDateClass(item.overdue)">{{item.approv}}</td>
-                        <td> 
+                        <td>{{item.date_approved}}</td>
+                        <td style="width: 410px;display: flex">
+                        	<span :class="getStatusClass(item.status)" class="btn btn-sm">
+	                            {{ item.status }}
+	                          </span>&nbsp;&nbsp;&nbsp;&nbsp;
 
-                          <span :class="getStatusClass(item.status)" class="btn btn-sm">
-                            {{ item.status }}
-                          </span>
-                          &nbsp;&nbsp;&nbsp;&nbsp;
-                          <span :class="getKPIClass(item.kpi)" style="height: calc(1.5em + 0.55rem + 2px); margin-top:6px;" class="btn btn-icon me-2 mb-2">
-                            {{ item.kpi }}
-                          </span>
+	                          <div class="form-check form-switch form-check-custom form-check-success form-check-solid" >
+	                              <input v-model="item.answer" @change="ApproveForUser(item.id)" class="form-check-input " type="checkbox" value=""  id="kt_flexSwitchCustomDefault_1_1" style="cursor:pointer;"   :checked="item.criteria?.approve === 'true'">
+
+	                             
+	                          </div>
+
 
                         </td>
-                        <td>{{item.comment}}</td>
+
+                     
                       </tr>
                       
                     </tbody>
-                  </table>
+                 </table>
+
+
 
 
 
               </div>
             </div>
+
+
+
+
         </div>
            
       </div>
@@ -147,19 +148,11 @@
         
       </div>
 
-      <!-- Step 3 -->
-      <div v-if="currentStep === 2" class="col-12">
-
-        step three
-
-      </div>
-
-
 
     </div>
 
 
-
+ 
 
 
 
@@ -174,7 +167,7 @@
         <!--begin::Modal header-->
         <div class="modal-header" id="kt_modal_add_user_header">
           <!--begin::Modal title-->
-          <h2 class="fw-bold">Send Comment</h2>
+          <h2 class="fw-bold">Decline Justifications</h2>
           <!--end::Modal title-->
           <!--begin::Close-->
           <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close" @click="closeModal">
@@ -192,23 +185,19 @@
             <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
 
 
-
-           
-            
+          
 
               <div class="fv-row mb-7" >
-                <label class="required fw-semibold fs-6 mb-2">Comment</label>
-                <textarea rows="6" id="messageContent" maxlength="250"
-                   v-model="formData.comment" value=""
-                    placeholdr="Comment" class="form-control " >     
+                <label class="required fw-semibold fs-6 mb-2">Explain More Details :</label>
+                <textarea v-if="formData" rows="4" id="messageContent" maxlength="250"
+                   v-model="formData.comment_buyer" value=""
+                    placeholdr="Write Here..." class="form-control " >     
                 </textarea>
               </div>
 
-
-
             </div>
             <div class="text-center pt-10">
-              <button type="submit" class="btn btn-primary" @click.prevent="Approve('comment')" :disabled="isLoading">
+              <button type="submit" class="btn btn-primary" @click.prevent="Approve('comment_buyer')" :disabled="isLoading">
               <span  class="indicator-label">Submit</span>
               <span  class="indicator-progress">Please wait...
                 <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -266,73 +255,56 @@
 
 
 import axios from 'axios';
-import Pagination from '../../layout/pagination.vue';
 import { mapState } from 'vuex';
-import Multiselect from 'vue-multiselect'
-import Quill from 'quill';
-import QuillBetterTable from 'quill-better-table';
-import 'quill/dist/quill.snow.css';
-import 'quill-better-table/dist/quill-better-table.css';
-import WordFile from '../Review/WordFile.vue';
+import VendorsResponseExcel from '../buyer/VendorsResponseExcel.vue';
 
- Quill.register({
-  'modules/better-table': QuillBetterTable
-}, true);
+
 
 import { nextTick } from 'vue';
-
+ 
  
 export default {
   components: {
-    Pagination,Multiselect,WordFile
+    VendorsResponseExcel
   },
     data() {
         return {
             languages:{},
-            totalItems: 0, 
-            currentPage: 1,
-            selectedItems: [], 
-            selectAll: false, 
-            searchQuery: '', 
-            isLoading: false, 
-            items: [], 
-            itemsCategories: [],
-            ItemsContracts: [],
-            sections :[],
-            ItemsUsers:[],
-            ItemsVendors:[],
-            ItemsTypeEvents:[],
+            
 
-            searchQuery: '',
             formData: {
-                type:'',
+                reason_id: null,
+                comment_buyer: null,
+                rfp_id:null,
             },
 
-            currentStep: 1,
-            steps: ["Information RFP", "RFP Sheet", "RFP"],
+            formDate: {
+                deadline: null,
+                rfp_id:null,
+                user_id:null,
+            },
+            disabel:null,
 
-            logo:'',
-            quill: null,
-            click:false,
+           
 
+
+           
 
             
-            ItemID: null,
-            URL:'ReviewApprove/createItem',
+            URL:'BuyerApprove/createItem', 
 
-            formSection:{},
-
+            
         };
     },
 
 
-
+ 
  
 
    mounted() {
 
-        this.fetchItems()
-        this.fetchItems()
+   		this.fetchItems();
+        
     }, 
 
     computed: {
@@ -340,13 +312,13 @@ export default {
               return this.$route.params.locale;
           },
 
-
+ 
            breadcrumbLabel() {
             switch (this.currentStep) {
               case 0:
                 return 'Event';
               case 1:
-                return 'Review Approval';
+                return 'Vendor SOI Response';
               case 2:
                 return 'Publish';
               case 3:
@@ -377,6 +349,9 @@ export default {
     },
  
 
+   
+ 
+
      getStatusClass(status) {
             switch (status) {
               case 'Completed':
@@ -385,9 +360,6 @@ export default {
                 return 'btn-light-warning';
 
               case 'Overdue':
-                return 'btn-light-danger';
-
-              case 'Decline':
                 return 'btn-light-danger';
               
               default:
@@ -425,6 +397,11 @@ export default {
 
         getModalCreate(){
             $('#kt_modal_add_item').modal('show');
+            this.formData = {
+            reason_id: this.formData.reason_id,
+            comment_buyer: null,
+          };
+
 
         },
         
@@ -435,30 +412,26 @@ export default {
         },
 
   
-  
+   
 
-      Approve(type){
+      Approve(status=null){
 
         this.isLoading = true;  
-        let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
-        if(this.ItemID && this.ItemID != ''){
-           this.URL = 'ReviewApprove/editItem'
-        }
+        let rfp_id = JSON.parse(localStorage.getItem('RFPVendor'));
+          if(status == 'approve'){
+            this.formData.status = 'Completed';
+          } 
 
-          this.formData.type = type
-        
-
-        this.formData.rfp_id = rfp_id.id 
-        axios.post(this.URL,this.formData).then((response)=>{
+          this.formData.rfp_id = rfp_id?.id ?? null;
+        axios.post(this.URL,{ ...this.formData }).then((response)=>{
                this.isLoading = false;
               if(response.data.code==200){ 
-                 this.formData.type=''
-                 if(this.formData.comment){
-                  $('#kt_modal_add_item').modal('hide');
+                 
+                 if(this.formData.comment_buyer){
+                    $('#kt_modal_add_item').modal('hide');
                  }
                  // this.approves = response.data.items
                  this.fetchItems()
-                 this.swalFunction('success', 'Approved successfully')
 
               }else{
                   this.swalFunction('info', response.data.message)
@@ -472,105 +445,69 @@ export default {
       },
 
 
-      Approve2(type){
+      addDeadline(status=null){
 
         this.isLoading = true;  
-        let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
-        if(this.ItemID && this.ItemID != ''){
-           this.URL = 'ReviewApprove/editItem'
-        }
+        let rfp_id = JSON.parse(localStorage.getItem('RFPVendor'));
+          this.formDate.rfp_id = rfp_id?.id ?? null;
+          this.formDate.type = 'buyerTeam';
+        axios.post('BuyerApprove/createItemDate',{ ...this.formDate }).then((response)=>{
+               this.isLoading = false;
+              if(response.data.code==200){ 
+                 
+                 if(this.formData.comment_buyer){
+                    $('#kt_modal_add_item').modal('hide');
+                 }
+                 // this.approves = response.data.items
+                 this.fetchItems()
 
-          this.formData.type = type
-        
-
-        this.formData.rfp_id = rfp_id.id 
-
-
-        swal.fire({
-            text: "Are you sure ?",
-            icon: "warning",
-            buttonsStyling: false,
-            showDenyButton: true,
-            confirmButtonText: "Yes",
-            denyButtonText: 'No',
-            customClass: {
-              confirmButton: "btn btn-primary",
-              denyButton: "btn btn-light-danger"
-            }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // إذا تم تأكيد الحذف
-              axios.post(this.URL,this.formData)
-                .then(() => {
-                     this.formData.type=''
-                     this.fetchItems()
-                     this.swalFunction('success', 'Approved successfully')
- 
-                })
-                .catch(error => {
-                  swal.fire({
-                    text: 'Error Approve the item. Please try again.', 
-                    icon: 'error',
-                    confirmButtonText: "Ok",
-                    buttonsStyling: false,
-                    customClass: {
-                      confirmButton: "btn btn-light-primary"
-                    }
-                  });
-                });
-            } else if (result.isDenied) {
-              // إذا تم رفض الحذف
-              swal.fire({
-                text: 'The Approved has been canceled.', 
-                icon: 'info',
-                confirmButtonText: "Ok",
-                buttonsStyling: false,
-                customClass: {
-                  confirmButton: "btn btn-light-primary"
-                }
+              }else{
+                  this.swalFunction('info', response.data.message)
+              }             
+          
+        }).catch(error => {
+                this.isLoading = false;
+                this.swalFunction('error','Error Happens')
               });
-            }
-          });
 
-        },
-
-
-
-
-
-
-
+      },
 
 
 
 
  
-     
-
-
-
-
-      async fetchItems() {
+   
+ 
+       async fetchItems() { 
           this.isLoading = true;
-           let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
-            await axios.get('ReviewApprove/getAllItems', {
+           let rfp_id = JSON.parse(localStorage.getItem('RFPBuyer'));
+            await axios.get('BuyerApprove/getAllItems', {
                 params: {
-                  type:'reviewTeam',
+                  type:'buyerTeam',
                   rfp_id:rfp_id.id,
                 }
               })
                 .then(response => {
                     this.items = response.data.items;
                     this.isLoading = false;
+                    this.formData = this.items
+                    if(this.formData.length > 0){
+                    	this.formDate.deadline = this.formData[0].deadline
+                    	this.disabel = this.formData.disabel ;             	
+                    }
+                    // console.log(this.formData)
+
                 })
                 .catch(error => {
                    this.swalFunction('error','Error Happens')
                    this.isLoading = false;
 
-                });
+                }); 
+     
+       },
 
-              
-        },
+
+     
 
     
 

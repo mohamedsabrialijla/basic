@@ -67,6 +67,7 @@
                 </div>
               </th>
               <th class="min-w-125px">Name</th>
+              <th class="min-w-125px">Type</th>
               <th class="min-w-125px">Status</th>
               <th class="min-w-125px">Joined Date</th>
               <th class="text-center min-w-100px">Actions</th>
@@ -92,6 +93,7 @@
                 </div>
                 <!--begin::User details-->
               </td>
+              <td>{{item.type_cretiria}}</td>
               <td>
                 <div v-if="item.status=='active'" class="badge badge-light-success fw-bold">{{item.status}}</div>
                 <div v-else class="badge badge-light-danger fw-bold">{{item.status}}</div>
@@ -150,7 +152,7 @@
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content shadow-none">
             <div class="modal-header">
-                <h5 class="modal-title">Modal title</h5>
+                <h5 class="modal-title">Add Edit Data</h5>
 
                 <!--begin::Close-->
                 <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
@@ -180,6 +182,15 @@
                 <multiselect class="" v-model="formData.users" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="itemsUsers" :multiple="true" :taggable="false" :options-limit="20" :allow-empty="false" ></multiselect>
 
               </div>
+
+
+              <div class="fv-row mb-7" v-if="routeSegment == 'criteria'">
+                <label class="required fw-semibold fs-6 mb-2"> Type </label>
+              <select class="form-control" v-model="formData.type_cretiria">
+                <option value="yesORno">Yes/NO</option>
+                <option value="attachment">Attachment</option>
+              </select>
+            </div>
 
 
 
@@ -348,7 +359,7 @@ export default {
    props: ['category'],
   components: {
     Pagination,Multiselect
-  },
+  }, 
     data() {
         return {
             languages:{},
@@ -363,6 +374,7 @@ export default {
             formData: {
                 type_id:'',
                 code: '',
+                type_cretiria:'',
             },
 
             itemsUsers:[],
@@ -626,6 +638,8 @@ export default {
                   this.resetItem()
 
                   this.formData = data;
+
+                  this.formData.name_en = data.name
                   
                    this.formEntries = data.features.map((feature, index) => {
                       return {

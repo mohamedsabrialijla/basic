@@ -41,7 +41,6 @@ class ItemsCategoriesController extends Controller
     {
        
 
-
         $id = auth('sanctum')->id();
 
         $validator = Validator::make($request->all(), [
@@ -68,6 +67,7 @@ class ItemsCategoriesController extends Controller
                 $item->created_by = $id;
                 $item->slug = Str::slug($request->name_en);
                 $item->order = $request->order;
+                $item->type_cretiria = $request->type_cretiria;
                 if($request->users){
                     $item->users = json_encode($request->users);
                 }
@@ -160,6 +160,7 @@ class ItemsCategoriesController extends Controller
                 $item->created_by = $id;
                 $item->order = $request->order;
                 $item->slug = Str::slug($request->name_en);
+                $item->type_cretiria = $request->type_cretiria;
                 
              
                 foreach ($this->locales as $locale) {

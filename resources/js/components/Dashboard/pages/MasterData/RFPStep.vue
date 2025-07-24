@@ -31,7 +31,7 @@
 
               <a href="#" class="btn btn-sm fw-bold btn-primary" disabled="currentStep === steps.length - 1" v-if="currentStep == 0 " @click="nextStep">Next</a>
               
-              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep == 1" @click="addEditItem()">Send To RFP Review Team</a>
+              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep == 1" @click="addEditItem(2)">Send To RFP Review Team</a>
             </div>
           </div>
         </div>
@@ -227,7 +227,7 @@
                   <div class="fv-row col-md-4">
                       <div class="form-check form-check-custom form-check-success form-check-solid" style="gap: 25px; color: rgb(255, 255, 255);"> 
 
-                          <input class="form-check-input" type="checkbox" v-model="formData.check_1" checked="" value=""><label class="form-check-label" for=""> Final RFP / Scope of Work Document </label>
+                          <input class="form-check-input" type="checkbox" v-model="formData.check_1"  value=""><label class="form-check-label" for=""> Final RFP / Scope of Work Document </label>
                       </div>
                   </div>
 
@@ -236,7 +236,7 @@
                   <div class="fv-row col-md-4">
                       <div class="form-check form-check-custom form-check-success form-check-solid" style="gap: 25px; color: rgb(255, 255, 255);"> 
 
-                          <input class="form-check-input" type="checkbox" v-model="formData.check_2" checked="" value=""><label class="form-check-label" for=""> BOQ/Deliverables (Pricings Sheet) </label>
+                          <input class="form-check-input" type="checkbox" v-model="formData.check_2"  value=""><label class="form-check-label" for=""> BOQ/Deliverables (Pricings Sheet) </label>
                       </div>
                   </div>
 
@@ -245,7 +245,7 @@
                   <div class="fv-row col-md-4">
                       <div class="form-check form-check-custom form-check-success form-check-solid" style="gap: 25px; color: rgb(255, 255, 255);"> 
 
-                          <input class="form-check-input" type="checkbox" v-model="formData.check_3" checked="" value=""><label class="form-check-label" for=""> Technical Criteras in RFP</label>
+                          <input class="form-check-input" type="checkbox" v-model="formData.check_3"  value=""><label class="form-check-label" for=""> Technical Criteras in RFP</label>
                       </div>
                   </div>
 
@@ -261,7 +261,7 @@
                   <div class="fv-row col-md-4">
                       <div class="form-check form-check-custom form-check-success form-check-solid " style="gap: 25px; color: rgb(255, 255, 255);"> 
 
-                          <input class="form-check-input" type="checkbox" v-model="formData.check_4" checked="" value=""><label class="form-check-label" for=""> Appendix to the RFP (Drawings/Datasheet Etc.) </label>
+                          <input class="form-check-input" type="checkbox" v-model="formData.check_4"  value=""><label class="form-check-label" for=""> Appendix to the RFP (Drawings/Datasheet Etc.) </label>
                       </div>
                   </div>
 
@@ -270,7 +270,7 @@
                   <div class="fv-row col-md-4">
                       <div class="form-check form-check-custom form-check-success form-check-solid" style="gap: 25px; color: rgb(255, 255, 255);"> 
 
-                          <input class="form-check-input" type="checkbox" v-model="formData.check_5" checked="" value=""><label class="form-check-label" for=""> DACO General Cotract with T&C </label>
+                          <input class="form-check-input" type="checkbox" v-model="formData.check_5"  value=""><label class="form-check-label" for=""> DACO General Cotract with T&C </label>
                       </div>
                   </div>
 
@@ -413,7 +413,7 @@
 
 
 
-                  <div class="modal-body px-5 my-7" v-if="formSection.type == 'sheetPricing'">
+                  <div class="modal-body px-5 my-7" v-if="formSection.type == 'PricingSheet'">
                   
                     <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
 
@@ -602,7 +602,7 @@ export default {
         this.fetchItemsCategories()
         // this.fetchItemsSections()
         this.getItemById()
-        this.fetchItemsVendors()
+        // this.fetchItemsVendors()
         this.fetchItemsUsers()
 
 
@@ -745,7 +745,7 @@ export default {
       addEditItem(Draft=0){
 
 
-
+ 
 
         this.isLoading = true;  
         this.formData.draft = Draft;
@@ -783,6 +783,13 @@ export default {
                   }
 
                  // this.KcEditor()
+
+                  let message = 'Saved Draft Successfully';
+                  if(Draft == 2){
+                      message = 'Sent To Review Team Successfully';
+                      this.swalFunction('info', message)
+                  }
+
 
               }else{
                   swal.fire({
@@ -1016,7 +1023,11 @@ export default {
           })
             .then(response => {
                 this.ItemsUsers = response.data.items;
-                this.isLoading = false;
+                this.ItemsVendors = this.ItemsUsers.filter(item => item.user_type && item.user_type === "vendor");
+                // this.ItemsVendors = this.items.filter(item => item.type && item.type.name === "vendors");
+                console.log(this.ItemsVendors)
+
+                this.isLoading = false;  
             })
             .catch(error => {
                Swal.fire({

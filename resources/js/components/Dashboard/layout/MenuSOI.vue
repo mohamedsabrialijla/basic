@@ -30,21 +30,55 @@
            
                
             
- 
 
-                        <div data-kt-menu-trigger="click" class="menu-item ">
-                            <router-link :to="`/${locale}/dashboard/vendor/rfp`" class="menu-link">
+
+                                  <!--begin:Menu item-->
+                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                            <!--begin:Menu link-->
+                            <span class="menu-link">
                                 <span class="menu-icon">
                                     <i class="ki-duotone ki-abstract-28 fs-2">
                                         <span class="path1"></span>
                                         <span class="path2"></span>
                                     </i>
                                 </span>
-                                <span class="menu-title">RFP</span>
-                            </router-link>
+                                <span class="menu-title">Steps Management</span>
+                                <span class="menu-arrow"></span>
+                            </span>
+                            <!--end:Menu link-->
+                            <!--begin:Menu sub-->
+                            <div class="menu-sub menu-sub-accordion">
+                                <!--begin:Menu item-->
+                                <div data-kt-menu-trigger="click" class="menu-item menu-accordion mb-1">
+                                    <!--begin:Menu link-->
+                                    <div class="menu-item">
+                                        <!--begin:Menu link-->
+
+ 
+                                        <router-link :to="`/${locale}/dashboard/soi/rfp`" class="menu-link">
+                                            <span class="menu-bullet">
+                                                <span class="bullet bullet-dot"></span>
+                                            </span>
+                                            <span class="menu-title">RFP</span>
+                                        </router-link>
+
+
+                                       
+                                    </div>
+
+
+                            
+
+                                </div>
+                                <!--end:Menu item-->
+                              
+                            </div>
+                            <!--end:Menu sub-->
                         </div>
                         
 
+         
+                  
                    
                   
 
@@ -65,7 +99,7 @@
 
 <script>
     export default {
-       name : 'Menu',
+       name : 'MenuReview',
 
        computed: {
     locale() {

@@ -35,6 +35,7 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
+        // dd($request->all());
         $id = auth()->id();
         $user = User::query()->findOrFail($id);
 
@@ -42,7 +43,7 @@ class UserController extends Controller
             'name' => 'required',
             'email'=>'required|email|unique:users',
             'mobile'=>'required|numeric|min:8|unique:users',
-            'department' => 'required' ,
+            // 'department' => 'required' ,
             'password' => 'required|min:6',
             'confirm_password' => 'required|min:6|same:password',
             'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
@@ -66,6 +67,9 @@ class UserController extends Controller
                 $item->department = $request->department;
                 // $item->documents = json_encode($request->documents);
                 $item->created_by = $id;
+                $item->user_type = $request->user_type;
+                $item->services = $request->services;
+
                
                 if($request->hasFile('logo') && $request->file("logo")!='')
                 {
@@ -110,7 +114,7 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'mobile' => 'required|numeric|min:8|unique:users,mobile,' . $user->id,
-            'department' => 'required',
+            // 'department' => 'required',
             //'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -129,6 +133,8 @@ class UserController extends Controller
                 $item->department = $request->department;
                 // $item->documents = json_encode($request->documents);
                 $item->created_by = $id;
+                $item->user_type = $request->user_type;
+                $item->services = $request->services;
                
                 if($request->hasFile('logo') && $request->file("logo")!='')
                 {
@@ -195,15 +201,11 @@ class UserController extends Controller
 
     public function getAll(Request $request)
         {
-            // الحصول على ID المستخدم الحالي
             $id = auth('sanctum')->id();
 
-            // استعلام الأساسي لجلب المستخدمين من نفس الشركة
-            $items = User::with('department')->where('company_id', company_auth_id());
+            $items = User::with('department');
 
-            // التحقق من وجود كلمة البحث في الطلب
             if($request->has('search') && !empty($request->search)) {
-                // البحث في الحقول المطلوبة (الاسم، الإيميل، الموبايل)
                 $items->where(function($query) use ($request) {
                     $query->where('name', 'like', '%' . $request->search . '%')
                           ->orWhere('email', 'like', '%' . $request->search . '%')
@@ -211,17 +213,19 @@ class UserController extends Controller
                 });
             }
 
-            // التحقق من وجود صفحة في الطلب (pagination)
+
+            if($request->has('user_type') && $request->get('user_type') != '') {
+                $items->where('user_type', $request->user_type);
+                
+            }
+
             if(isset($request->pagination) && $request->pagination == 1) {
                 $items = $items->orderBy('id','DESC')->paginate(10); 
             } else {
                 $items = $items->orderBy('id','DESC')->get();
             }
 
-            // رسالة النجاح
             $message = "success return";
-
-            // إعادة النتيجة مع الرد العام
             return mainResponse(true, $message, $items, 200, 'items', '');
         }
 

@@ -65,6 +65,20 @@
                                             <!--end:Menu link-->
                                         </div>
                                         <!--end:Menu item-->
+ 
+                                        <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <router-link :to="`/${locale}/dashboard/user_management/vendors`" class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Vendors List</span>
+                                            </router-link>
+                                            <!--end:Menu link-->
+                                        </div>
+
+
+
                                         <!--begin:Menu item-->
                                         <div class="menu-item">
                                             <!--begin:Menu link-->
@@ -113,13 +127,23 @@
                                         </div>
                                         <!--end:Menu item-->
                                         <!--begin:Menu item-->
-                                        <div class="menu-item">
-                                            <!--begin:Menu link-->
+                                        <!-- <div class="menu-item">
                                             <router-link :to="`/${locale}/dashboard/master_data/category/vendors`" class="menu-link">
                                                 <span class="menu-bullet">
                                                     <span class="bullet bullet-dot"></span>
                                                 </span>
                                                 <span class="menu-title">Vendors List</span>
+                                            </router-link>
+                                        </div> -->
+
+
+                                        <div class="menu-item">
+                                            <!--begin:Menu link-->
+                                            <router-link :to="`/${locale}/dashboard/master_data/category/reasons`" class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Reasons List</span>
                                             </router-link>
                                             <!--end:Menu link-->
                                         </div>

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class ItemsCategories extends Model
 {
     use SoftDeletes, Translatable;
+    protected $with = ['criteria'];
     protected $appends = ['users'];
     protected $fillable = ['code', 'order_by'];
     protected $hidden = [  'pivot', 'updated_at', 'deleted_at'];
@@ -34,15 +35,20 @@ class ItemsCategories extends Model
 
     public function getUsersAttribute() {
        
-             $raw = $this->attributes['users'] ?? '[]';
-            $ids = array_map('intval', json_decode($raw, true));
-
-            return User::whereIn('id', $ids)->get();
+        $raw = $this->attributes['users'] ?? '[]';
+        $ids = array_map('intval', json_decode($raw, true));
+        return User::whereIn('id', $ids)->get();
         
     }
 
     public function features() {
         return $this->hasMany(CategoryTitle::class, 'items_category_id');
+    }
+
+
+    public function criteria() {
+        $id = auth('sanctum')->id();
+        return $this->hasOne(Document::class, 'criteria_id')->where('user_id',$id);
     }
     
    

@@ -33,7 +33,7 @@ export default {
   name: 'GanttStyled',
   setup() {
     const selectedId = ref(null); 
-
+ 
     function loadTasks() {
        let object = JSON.parse(localStorage.getItem('object_rfp'));
        let section_id = localStorage.getItem('section_id');

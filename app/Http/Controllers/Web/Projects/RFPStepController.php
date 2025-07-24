@@ -18,8 +18,7 @@ use App\Models\RFPWord;
 use Carbon\Carbon;
 
 
-
- 
+  
 class RFPStepController extends Controller
 {
   
@@ -136,7 +135,7 @@ class RFPStepController extends Controller
     {
 
         // dd($request->all());
-
+       
         $id = auth('sanctum')->id();
 
          $rules = [
@@ -246,14 +245,14 @@ class RFPStepController extends Controller
 
             
 
-           
+            
 
 
             if(isset($request->pagination) && $request->pagination == 1) {
-                $items = $items->orderBy('id','DESC')->paginate(10); 
+                $items = $items->orderBy('order','Asc')->paginate(10); 
             } else {
-                $items = $items->orderBy('id','DESC')->get();
-            }
+                $items = $items->orderBy('order','Asc')->get();
+            }            
 
 
             if($request->has('review') && !empty($request->review)) {
@@ -272,6 +271,68 @@ class RFPStepController extends Controller
                 })->values(); 
 
             }
+
+      
+
+
+        if ($request->has('buyer') && !empty($request->buyer)) {
+            $items = $items->filter(function ($item) use ($id) {
+                $soiTeam = json_decode($item->soi_team, true);
+                if (!is_array($soiTeam) || empty($soiTeam)) return false;
+
+                // شرط أساسي: المستخدم موجود في الفريق
+                // $userInTeam = collect($soiTeam)->pluck('id')->contains($id);
+                // if (!$userInTeam) return false;
+
+                // شرط جديد: كل vendorTeam عاملين approval
+                $anyReviewPending = \App\Models\Approve::where('rfp_id', $item->id)
+                    ->where('type', 'vendorTeam')
+                    ->whereNull('date_approved')
+                    ->exists();
+
+                if ($anyReviewPending) return false;
+
+                // جلب أول شخص لم يوافق بعد (soiTeam)
+                $firstPendingApprove = \App\Models\Approve::where('rfp_id', $item->id)
+                    ->where('type', 'BuyerTeam')
+                    ->whereNull('date_approved')
+                    ->orderBy('id', 'ASC')
+                    ->first();
+
+                if ($firstPendingApprove) {
+                    return $firstPendingApprove->user_id == $id;
+                } else {
+                    // لا يوجد موافقات بعد → فقط أول واحد في الفريق يظهر له
+                    $firstTeamMemberId = $soiTeam[0]['id'] ?? null;
+                    return $firstTeamMemberId == $id;
+                }
+            })->values();
+        }
+
+
+        if ($request->has('vendor') && !empty($request->vendor)) {
+            $items = $items->filter(function ($item) use ($id) {
+                $vendors = json_decode($item->vendors, true);
+                if (!is_array($vendors) || empty($vendors)) return false;
+
+                // شرط أساسي: المستخدم موجود في الفريق
+                $userInTeam = collect($vendors)->pluck('id')->contains($id);
+                if (!$userInTeam) return false;
+
+                // شرط جديد: كل reviewTeam عاملين approval
+                $anyReviewPending = \App\Models\Approve::where('rfp_id', $item->id)
+                    ->where('type', 'reviewTeam')
+                    ->whereNull('date_approved')
+                    ->exists();
+
+                if ($anyReviewPending) return false;
+
+                return true;
+
+            })->values();
+        }
+
+
 
 
             $message = "success return";

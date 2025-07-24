@@ -92,6 +92,9 @@
                   <a href="#" class="text-gray-800 text-hover-primary mb-1 text-uppercase">{{item.type}}</a>
                 </div>
               </td>
+
+
+             
               
               <td>{{item.created_at}}</td>
              

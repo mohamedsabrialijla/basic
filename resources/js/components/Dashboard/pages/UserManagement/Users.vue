@@ -97,7 +97,7 @@
                 </div>
                 <!--begin::User details-->
               </td>
-              <td>{{item.role_name.display_name}}</td>
+              <td v-if="item.role_name">{{item.role_name.display_name}}</td>
               <td>
                 <div v-if="item.status=='active'" class="badge badge-light-success fw-bold">{{item.status}}</div>
                 <div v-else class="badge badge-light-danger fw-bold">{{item.status}}</div>

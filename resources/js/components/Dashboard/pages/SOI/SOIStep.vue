@@ -11,16 +11,16 @@
         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
           <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-              <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">RFP Dashboard</h1>
+              <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Vendor SOI Response</h1>
               <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                 <li class="breadcrumb-item text-muted">
-                  <a href="index.html" class="text-muted text-hover-primary">RFP</a>
+                  <!-- <a href="index.html" class="text-muted text-hover-primary">RFP</a> -->
                 </li>
                 <li class="breadcrumb-item">
                   <span class="bullet bg-gray-500 w-5px h-2px"></span>
                 </li>
                 
-                <li class="breadcrumb-item text-muted">{{ breadcrumbLabel }}</li>
+                <!-- <li class="breadcrumb-item text-muted">{{ breadcrumbLabel }}</li> -->
 
               </ul>
             </div>
@@ -30,21 +30,22 @@
                 @click="openList()">Cancel</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-primary" @click="Approve2('approve')">Approve</a>
+              <a href="#" class="btn btn-sm fw-bold btn-primary" @click="Approve('approve')">Confirm </a>
               
  
             
               
-              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep == 1" @click="getModalCreate()">Return To Comment</a>
+              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep == 1" @click="getModalCreate()">Decline</a>
             </div>
           </div>
-        </div> 
+        </div>
 
         <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 53%;margin: auto;">
 
-          <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
-                :key="index"  @click="setStep(index)">
-            <!--begin::Symbol-->
+          <!-- <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
+                :key="index" 
+                
+                @click="setStep(index)">
             <div class="symbol symbol-30px symbol-circle me-3">
               <span class="symbol-label bg-light-primary" >
                   
@@ -53,13 +54,10 @@
 
               </span>
             </div>
-            <!--end::Symbol-->
-            <!--begin::Info-->
             <div class="m-0">
               <span class="fw-semibold text-gray-500 d-block fs-8" style="cursor:pointer;"> {{ step }}</span>
             </div>
-            <!--end::Info-->
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -107,7 +105,7 @@
                         <th scope="col">ReviewBy</th>
                         <th scope="col">Department</th>
                         <th scope="col">Deadline</th>
-                        <th scope="col">Action On Decline/Approve</th>
+                        <th scope="col">Approved On</th>
                         <th scope="col" >Status &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  KPI</th>
                         <th scope="col">Comment </th>
                       </tr>
@@ -116,8 +114,8 @@
                       <tr v-for="(item,index) in items" :key="item.id">
                         <td v-if="item.user">{{item.user.name}}</td>
                         <td v-if="item.department">{{item.department.name}}</td>
-                        <td>{{item.dead}}</td>
-                        <td :class="getDateClass(item.overdue)">{{item.approv}}</td>
+                        <td>{{item.created}}</td>
+                        <td :class="getDateClass(item.overdue)">{{item.date_approved}}</td>
                         <td> 
 
                           <span :class="getStatusClass(item.status)" class="btn btn-sm">
@@ -305,7 +303,7 @@ export default {
 
             searchQuery: '',
             formData: {
-                type:'',
+                
             },
 
             currentStep: 1,
@@ -318,7 +316,7 @@ export default {
 
             
             ItemID: null,
-            URL:'ReviewApprove/createItem',
+            URL:'SOIApprove/createItem',
 
             formSection:{},
 
@@ -331,7 +329,6 @@ export default {
 
    mounted() {
 
-        this.fetchItems()
         this.fetchItems()
     }, 
 
@@ -346,7 +343,7 @@ export default {
               case 0:
                 return 'Event';
               case 1:
-                return 'Review Approval';
+                return 'Vendor SOI Response';
               case 2:
                 return 'Publish';
               case 3:
@@ -385,9 +382,6 @@ export default {
                 return 'btn-light-warning';
 
               case 'Overdue':
-                return 'btn-light-danger';
-
-              case 'Decline':
                 return 'btn-light-danger';
               
               default:
@@ -435,30 +429,26 @@ export default {
         },
 
   
-  
+   
 
-      Approve(type){
+      Approve(){
 
         this.isLoading = true;  
-        let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
+        let rfp_id = JSON.parse(localStorage.getItem('RFPSOI'));
         if(this.ItemID && this.ItemID != ''){
-           this.URL = 'ReviewApprove/editItem'
+           this.URL = 'SOIApprove/editItem'
         }
-
-          this.formData.type = type
-        
 
         this.formData.rfp_id = rfp_id.id 
         axios.post(this.URL,this.formData).then((response)=>{
                this.isLoading = false;
               if(response.data.code==200){ 
-                 this.formData.type=''
+                 
                  if(this.formData.comment){
                   $('#kt_modal_add_item').modal('hide');
                  }
                  // this.approves = response.data.items
                  this.fetchItems()
-                 this.swalFunction('success', 'Approved successfully')
 
               }else{
                   this.swalFunction('info', response.data.message)
@@ -472,90 +462,14 @@ export default {
       },
 
 
-      Approve2(type){
-
-        this.isLoading = true;  
-        let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
-        if(this.ItemID && this.ItemID != ''){
-           this.URL = 'ReviewApprove/editItem'
-        }
-
-          this.formData.type = type
-        
-
-        this.formData.rfp_id = rfp_id.id 
-
-
-        swal.fire({
-            text: "Are you sure ?",
-            icon: "warning",
-            buttonsStyling: false,
-            showDenyButton: true,
-            confirmButtonText: "Yes",
-            denyButtonText: 'No',
-            customClass: {
-              confirmButton: "btn btn-primary",
-              denyButton: "btn btn-light-danger"
-            }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // إذا تم تأكيد الحذف
-              axios.post(this.URL,this.formData)
-                .then(() => {
-                     this.formData.type=''
-                     this.fetchItems()
-                     this.swalFunction('success', 'Approved successfully')
- 
-                })
-                .catch(error => {
-                  swal.fire({
-                    text: 'Error Approve the item. Please try again.', 
-                    icon: 'error',
-                    confirmButtonText: "Ok",
-                    buttonsStyling: false,
-                    customClass: {
-                      confirmButton: "btn btn-light-primary"
-                    }
-                  });
-                });
-            } else if (result.isDenied) {
-              // إذا تم رفض الحذف
-              swal.fire({
-                text: 'The Approved has been canceled.', 
-                icon: 'info',
-                confirmButtonText: "Ok",
-                buttonsStyling: false,
-                customClass: {
-                  confirmButton: "btn btn-light-primary"
-                }
-              });
-            }
-          });
-
-        },
-
-
-
-
-
-
-
-
-
-
-
- 
-     
-
-
 
 
       async fetchItems() {
           this.isLoading = true;
-           let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
-            await axios.get('ReviewApprove/getAllItems', {
+           let rfp_id = JSON.parse(localStorage.getItem('RFPSOI'));
+            await axios.get('SOIApprove/getAllItems', {
                 params: {
-                  type:'reviewTeam',
+                  type:'soiTeam',
                   rfp_id:rfp_id.id,
                 }
               })
@@ -567,7 +481,7 @@ export default {
                    this.swalFunction('error','Error Happens')
                    this.isLoading = false;
 
-                });
+                }); 
 
               
         },
