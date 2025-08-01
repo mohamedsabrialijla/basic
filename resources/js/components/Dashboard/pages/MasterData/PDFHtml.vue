@@ -8188,7 +8188,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
         },
@@ -8223,7 +8223,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -8322,7 +8322,7 @@ export default {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-primary"
+                            confirmButton: "btn btn-info"
                         }
                     });
                 }
@@ -8350,7 +8350,7 @@ export default {
             confirmButtonText: "Yes",
             denyButtonText: 'No',
             customClass: {
-              confirmButton: "btn btn-primary",
+              confirmButton: "btn btn-info",
               denyButton: "btn btn-light-danger"
             }
           }).then((result) => {
@@ -8370,7 +8370,7 @@ export default {
                     confirmButtonText: "Ok",
                     buttonsStyling: false,
                     customClass: {
-                      confirmButton: "btn btn-light-primary"
+                      confirmButton: "btn btn-light-info"
                     }
                   });
                 });
@@ -8382,7 +8382,7 @@ export default {
                 confirmButtonText: "Ok",
                 buttonsStyling: false,
                 customClass: {
-                  confirmButton: "btn btn-light-primary"
+                  confirmButton: "btn btn-light-info"
                 }
               });
             }

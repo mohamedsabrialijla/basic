@@ -27,12 +27,12 @@
                 @click="openList()">Cancel</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-primary" @click="Approve('approve')">Confirm </a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" @click="Approve('approve')">Confirm </a>
               
  
             
               
-              <a href="#" class="btn btn-sm fw-bold btn-primary"  @click="getModalCreate()">Decline</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info"  @click="getModalCreate()">Decline</a>
             </div>
           </div>
         </div>
@@ -44,7 +44,7 @@
                 
                 @click="setStep(index)">
             <div class="symbol symbol-30px symbol-circle me-3">
-              <span class="symbol-label bg-light-primary" >
+              <span class="symbol-label bg-light-info" >
                   
                   <i class="ki-duotone ki-black-right fs-2 text-gray-500" v-if="currentStep === index"></i>
                   <l v-else>{{index+1}}</l>
@@ -89,13 +89,13 @@
                 </div>
 
 
-			 <div class="fv-row col-md-3" >
-                <label class="required fw-semibold fs-6 mb-2">Date Deadlin</label>
-                <input type="date" name="date"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Employee Code" value="" :disabled="disabel!=1" v-model="formDate.deadline" @input="addDeadline" required />
+			        <div class="fv-row col-md-3" >
+                <label class="required fw-semibold fs-6 mb-2">Add SOI Response Deadline</label>
+                <input type="date" name="date"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Date Here" value="" :disabled="disabel==1" v-model="formDate.deadline" @input="addDeadline" required />
               </div>
 
-                <table class="table">
-                    <thead class="thead-light" style="background: rgb(245 238 238);font-weight: bold;">
+                <table class="table" >
+                    <thead class="thead-light" style="background: #f4f4f4;font-weight: bold;">
                       <tr>
                         <th scope="col">ReviewBy</th>
                         <th scope="col">Department</th>
@@ -110,17 +110,30 @@
                         <td v-if="item.department">{{item.department.name}}</td>
                         <td>{{item.dead}}</td>
                         <td>{{item.date_approved}}</td>
-                        <td style="width: 410px;display: flex">
+                        <!-- <td style="width: 410px;display: flex">
                         	<span :class="getStatusClass(item.status)" class="btn btn-sm">
 	                            {{ item.status }}
 	                          </span>&nbsp;&nbsp;&nbsp;&nbsp;
 
 	                          <div class="form-check form-switch form-check-custom form-check-success form-check-solid" >
 	                              <input v-model="item.answer" @change="ApproveForUser(item.id)" class="form-check-input " type="checkbox" value=""  id="kt_flexSwitchCustomDefault_1_1" style="cursor:pointer;"   :checked="item.criteria?.approve === 'true'">
-
+ 
 	                             
 	                          </div>
 
+
+                        </td> -->
+
+
+                         <td> 
+
+                          <span :class="getStatusClass(item.status)" class="btn btn-sm">
+                            {{ item.status }}
+                          </span>
+                          &nbsp;&nbsp;&nbsp;&nbsp;
+                          <span :class="getKPIClass(item.kpi)" style="height: calc(1.5em + 0.55rem + 2px); margin-top:6px;" class="btn btn-icon me-2 mb-2">
+                            {{ item.kpi }}
+                          </span>
 
                         </td>
 
@@ -170,7 +183,7 @@
           <h2 class="fw-bold">Decline Justifications</h2>
           <!--end::Modal title-->
           <!--begin::Close-->
-          <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close" @click="closeModal">
+          <div class="btn btn-icon btn-sm btn-active-icon-info" data-kt-users-modal-action="close" @click="closeModal">
             <i class="ki-duotone ki-cross fs-1">
               <span class="path1"></span>
               <span class="path2"></span>
@@ -197,7 +210,7 @@
 
             </div>
             <div class="text-center pt-10">
-              <button type="submit" class="btn btn-primary" @click.prevent="Approve('comment_buyer')" :disabled="isLoading">
+              <button type="submit" class="btn btn-info" @click.prevent="Approve('comment_buyer')" :disabled="isLoading">
               <span  class="indicator-label">Submit</span>
               <span  class="indicator-progress">Please wait...
                 <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -343,7 +356,7 @@ export default {
             buttonsStyling: false,
             confirmButtonText: "Ok, got it!",
             customClass: {
-                confirmButton: "btn btn-primary"
+                confirmButton: "btn btn-info"
             }
         });
     },
@@ -487,15 +500,14 @@ export default {
                   rfp_id:rfp_id.id,
                 }
               })
-                .then(response => {
+                .then(response => { 
                     this.items = response.data.items;
                     this.isLoading = false;
                     this.formData = this.items
                     if(this.formData.length > 0){
                     	this.formDate.deadline = this.formData[0].deadline
-                    	this.disabel = this.formData.disabel ;             	
+                    	this.disabel = response.data.message ;             	
                     }
-                    // console.log(this.formData)
 
                 })
                 .catch(error => {

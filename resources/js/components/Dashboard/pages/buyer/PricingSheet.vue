@@ -2,11 +2,11 @@
   <div>
     <!-- الأزرار -->
     <div class="d-flex gap-2 mb-4">
-      <button @click="addGroup" class="btn btn-sm btn-success">
+      <button @click="addGroup" class="btn btn-sm btn-info">
         <i class="bi bi-folder-plus"></i> Add Scope
       </button>
 
-      <button @click="addChild" :disabled="!selectedId" class="btn btn-sm btn-primary">
+      <button @click="addChild" :disabled="!selectedId" class="btn btn-sm btn-info">
         <i class="bi bi-plus-square"></i> Add Child
       </button>
 
@@ -96,6 +96,9 @@ export default {
         return true;
       });
 
+
+
+
       gantt.attachEvent("onAfterTaskAdd", async (tempId, task) => {
         try {
           const response = await axios.post('/Gantt/gantt', task);
@@ -147,87 +150,106 @@ export default {
         });
       });
 
+gantt.attachEvent("onLightbox", function (id) {
+  setTimeout(() => {
+    const textarea = document.querySelector(".gantt_cal_ltext textarea");
+    if (textarea) {
+      textarea.classList.add("gantt-description-field");
+    }
+  }, 0); // تأخير بسيط ليتأكد أن العنصر موجود في DOM
+});
 
-      document.addEventListener("change", function (e) {
-        if (e.target.classList.contains("gantt-input")) {
-          const id = e.target.dataset.id;
-          const field = e.target.dataset.field;
-          const value = e.target.value;
+ 
 
-          const task = gantt.getTask(id);
-          if (!task) return;
+  document.addEventListener("input", function (e) {
+    const textarea = e.target;
 
-          // تعديل القيمة
-          task[field] = (field === "quantity" || field === "unit_price") ? parseFloat(value) || 0 : value;
+    if (!textarea.classList.contains("gantt-description-field")) return;
 
-          // تحديث total_price تلقائيًا
-          task.total_price = (parseFloat(task.quantity) || 0) * (parseFloat(task.unit_price) || 0);
+    const taskId = gantt.getSelectedId(); // أو استخدم selectedId.value إذا مخزنه بـ Vue
+    if (!taskId) return;
 
-          gantt.updateTask(id);
-          let object = JSON.parse(localStorage.getItem('object_rfp'));
+    const task = gantt.getTask(taskId);
+    if (!task) return;
 
-          // إرسال request
-          axios.put(`/Gantt/gantt/${id}`, {
-            text: task.text,
-            parent: task.parent,
-            reference: task.reference,
-            uom: task.uom,
-            quantity: task.quantity,
-            unit_price: task.unit_price,
-            total_price: task.total_price,
-            rfp_id: object.id
-          }).then(() => {
-            console.log("Updated");
-          }).catch((error) => {
-            console.error("خطأ في الإرسال:", error);
-          });
-        }
+    task.text = textarea.value;
+    gantt.updateTask(taskId);
+
+    const object = JSON.parse(localStorage.getItem("object_rfp"));
+
+    axios
+      .put(`/Gantt/gantt/${taskId}`, {
+        text: task.text,
+        parent: task.parent,
+        reference: task.reference,
+        uom: task.uom,
+        quantity: task.quantity,
+        unit_price: task.unit_price,
+        total_price: task.total_price,
+        rfp_id: object.id,
+      })
+      .then(() => {
+        console.log("تم التحديث");
+      })
+      .catch((err) => {
+        console.error("فشل الإرسال:", err);
       });
+  }, true);
 
 
-      document.querySelector('#gantt_here').addEventListener('change', (e) => {
-            const input = e.target;
-            const taskNode = input.closest("div[task_id]");
-            if (!taskNode) return;
 
-            const taskId = taskNode.getAttribute("task_id");
-            const task = gantt.getTask(taskId);
 
-            const column = input.closest("td[column_id]");
-            if (!column) return;
+   document.querySelector('#gantt_here').addEventListener('change', (e) => {
+  const input = e.target;
+  
+  // نأخذ القيم من data attributes
+  const taskId = input.dataset.id;
+  const field = input.dataset.field;
+  const value = input.value;
 
-            const columnId = column.getAttribute("column_id");
-            const value = input.value;
+  if (!taskId || !field) return;
 
-            if (columnId === "reference") {
-              task.reference = value;
-            } else if (columnId === "quantity") {
-              task.quantity = parseFloat(value) || 0;
-            } else if (columnId === "uom") {
-              task.uom = value;
-            } else if (columnId === "unit_price") {
-              task.unit_price = parseFloat(value) || 0;
-            }
+  const task = gantt.getTask(taskId);
+  if (!task) return;
 
-            // حساب تلقائي لـ total_price
-            task.total_price = (task.quantity || 0) * (task.unit_price || 0);
+  // تحديث القيم حسب الحقل
+  if (field === "reference") {
+    task.reference = value;
+  } else if (field === "quantity") {
+    task.quantity = parseFloat(value) || 0;
+  } else if (field === "uom") {
+    task.uom = value;
+  } else if (field === "unit_price") {
+    task.unit_price = parseFloat(value) || 0;
+  }
 
-            gantt.updateTask(taskId);
+  // تحديث السعر الإجمالي تلقائيًا
+  task.total_price = (parseFloat(task.quantity) || 0) * (parseFloat(task.unit_price) || 0);
 
-            // إرسال البيانات للسيرفر
-            axios.put(`/Gantt/gantt/${taskId}`, {
-              text: task.text,
-              parent: task.parent,
-              reference: task.reference,
-              uom: task.uom,
-              quantity: task.quantity,
-              unit_price: task.unit_price,
-              total_price: task.total_price,
-              rfp_id: object.id,
-            }).catch(() => {
-              alert("فشل في حفظ التعديلات تلقائيًا.");
-            });
-          });
+  gantt.updateTask(taskId);
+
+  const object = JSON.parse(localStorage.getItem("object_rfp"));
+  if (!object) {
+    console.warn("لم يتم العثور على object_rfp في localStorage");
+    return;
+  }
+
+  // إرسال التحديث للسيرفر
+  axios.put(`/Gantt/gantt/${taskId}`, {
+    text: task.text,
+    parent: task.parent,
+    reference: task.reference,
+    uom: task.uom,
+    quantity: task.quantity,
+    unit_price: task.unit_price,
+    total_price: task.total_price,
+    rfp_id: object.id,
+  }).then(() => {
+    console.log("تم الحفظ بنجاح");
+  }).catch(() => {
+    alert("فشل في حفظ التعديلات تلقائيًا.");
+  });
+});
 
 
 
@@ -314,5 +336,20 @@ export default {
 <style>
 .gantt_grid_data .gantt_cell {
   padding: 0 !important;
+}
+.gantt_cal_lsection{
+  display: none;
+}
+
+.gantt_section_duration{
+  display: none;
+}
+
+.gantt_delete_btn_set{
+  display: none !important;
+}
+
+.gantt_cal_larea{
+  margin-top: 15px;
 }
 </style>

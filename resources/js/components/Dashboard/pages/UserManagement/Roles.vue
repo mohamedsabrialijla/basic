@@ -23,7 +23,7 @@
         <div class="card-toolbar">
           <!--begin::Toolbar-->
           <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base" v-if="selectedItems.length === 0">
-            <!-- <button type="button" class="btn btn-light-primary me-3" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+            <!-- <button type="button" class="btn btn-light-info me-3" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
             <i class="ki-duotone ki-filter fs-2">
               <span class="path1"></span>
               <span class="path2"></span>
@@ -57,22 +57,22 @@
                 </div>
                 
                 <div class="d-flex justify-content-end">
-                  <button type="reset" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6" data-kt-menu-dismiss="true" data-kt-user-table-filter="reset">Reset</button>
-                  <button type="submit" class="btn btn-primary fw-semibold px-6" data-kt-menu-dismiss="true" data-kt-user-table-filter="filter">Apply</button>
+                  <button type="reset" class="btn btn-light btn-active-light-info fw-semibold me-2 px-6" data-kt-menu-dismiss="true" data-kt-user-table-filter="reset">Reset</button>
+                  <button type="submit" class="btn btn-info fw-semibold px-6" data-kt-menu-dismiss="true" data-kt-user-table-filter="filter">Apply</button>
                 </div>
               </div>
             </div> -->
             <!--end::Menu 1-->
             <!--end::Filter-->
             <!--begin::Export-->
-            <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_export_items">
+            <button type="button" class="btn btn-light-info me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_export_items">
             <i class="ki-duotone ki-exit-up fs-2">
               <span class="path1"></span>
               <span class="path2"></span>
             </i>Export</button>
             <!--end::Export-->
             <!--begin::Add user-->
-            <button @click="getModalCreate()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_item">
+            <button @click="getModalCreate()" type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#kt_modal_add_item">
             <i class="ki-duotone ki-plus fs-2"></i>Add User</button>
             <!--end::Add user-->
           </div>
@@ -178,7 +178,7 @@
           <h2 class="fw-bold">Add User</h2>
           <!--end::Modal title-->
           <!--begin::Close-->
-          <div class="btn btn-icon btn-sm btn-active-icon-primary"  @click="closeModal">
+          <div class="btn btn-icon btn-sm btn-active-icon-info"  @click="closeModal">
             <i class="ki-duotone ki-cross fs-1">
               <span class="path1"></span>
               <span class="path2"></span>
@@ -282,7 +282,7 @@
               <!--end::Scroll-->
               <!--begin::Actions-->
               <div class="text-center pt-10">
-                <button type="submit" class="btn btn-primary" @click.prevent="addEditItem" :disabled="isLoading">
+                <button type="submit" class="btn btn-info" @click.prevent="addEditItem" :disabled="isLoading">
                 <span  class="indicator-label">Submit</span>
                 <span  class="indicator-progress">Please wait...
                   <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -412,7 +412,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
         },
@@ -446,7 +446,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -567,7 +567,7 @@ export default {
           confirmButtonText: "Yes",
           denyButtonText: 'No',
           customClass: {
-            confirmButton: "btn btn-primary",
+            confirmButton: "btn btn-info",
             denyButton: "btn btn-light-danger"
           }
         }).then((result) => {
@@ -585,7 +585,7 @@ export default {
                   confirmButtonText: "Ok",
                   buttonsStyling: false,
                   customClass: {
-                    confirmButton: "btn btn-light-primary"
+                    confirmButton: "btn btn-light-info"
                   }
                 });
               })
@@ -598,7 +598,7 @@ export default {
                   confirmButtonText: "Ok",
                   buttonsStyling: false,
                   customClass: {
-                    confirmButton: "btn btn-light-primary"
+                    confirmButton: "btn btn-light-info"
                   }
                 });
               });
@@ -610,7 +610,7 @@ export default {
               confirmButtonText: "Ok",
               buttonsStyling: false,
               customClass: {
-                confirmButton: "btn btn-light-primary"
+                confirmButton: "btn btn-light-info"
               }
             });
           }

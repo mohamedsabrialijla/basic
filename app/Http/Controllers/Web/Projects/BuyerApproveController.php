@@ -202,8 +202,14 @@ class BuyerApproveController extends Controller
             ->orderBy('id','ASC')
             ->get();
 
+        $disable= 1 ;
+        
+        if(isset($items[0]['user_id']) && $items[0]['user_id'] == $id){
+            $disable = 0 ;
+        }   
+
         $message = "success return";
-        return mainResponse(true, $message, $items, 200, 'items', '');
+        return mainResponse(true, $disable, $items, 200, 'items', '');
     }
 
 
@@ -281,6 +287,9 @@ class BuyerApproveController extends Controller
             ->orderBy('id','ASC')
             ->get();
 
+
+
+
         $message = "success return";
         return mainResponse(true, $message, $items, 200, 'items', '');
     }
@@ -321,10 +330,38 @@ class BuyerApproveController extends Controller
 
     }
 
-
+ 
     public function getAllItemsStaticitics(Request $request){
 
         // dd($request->all());
+
+        $id = auth('sanctum')->id();
+        $criteria_count  = DB::table('items_categories')->where('type_id',2)->count();
+
+        $vendors = DB::table('response_vendors')
+            ->select('vendor_id', DB::raw('COUNT(*) as total_yes'))
+            ->where('rfp_id', $request->rfp_id)
+            ->where('response', 'YES') 
+            ->groupBy('vendor_id')
+            ->having('total_yes', '=', $criteria_count)
+            ->pluck('vendor_id')
+            ->toArray();
+
+
+        $fullyApprovedCount = count($vendors);
+
+        $allVendors = DB::table('response_vendors')
+            ->select('vendor_id')
+            ->where('rfp_id', $request->rfp_id)
+            ->groupBy('vendor_id')
+            ->pluck('vendor_id')
+            ->toArray();
+
+        $notFullyApprovedCount = count(array_diff($allVendors, $vendors));
+
+
+
+
 
         $vendors = DB::table('r_f_p_steps')->where([
             'id' => $request->rfp_id,
@@ -340,23 +377,13 @@ class BuyerApproveController extends Controller
         ->whereNotNull('date_approved') 
         ->count();
 
-
-        $passed = DB::table('approves')
-         ->where('rfp_id', $request->rfp_id)
-         ->where('type', $request->type)
-         ->where('status','Completed') 
-         ->count();
+        $passed = $fullyApprovedCount;
 
 
-         $fail = DB::table('approves')
-          ->where('rfp_id', $request->rfp_id)
-          ->where('type', $request->type)
-          ->where('status','Ready')
-          // ->whereNotNull('date_approved') 
-          ->count();
+        $fail = $notFullyApprovedCount;
 
 
-          $decline = DB::table('approves')
+        $decline = DB::table('approves')
            ->where('rfp_id', $request->rfp_id)
            ->where('type', $request->type)
            ->where('status','Decline')
@@ -368,10 +395,27 @@ class BuyerApproveController extends Controller
 
 
 
+
+
+
          $items = ['rashed'=>$rashed , 'response'=>$response , 'passed'=>$passed , 'fail'=>$fail , 'decline'=>$decline, 'invited'=>$invited];
          $message = 'success return Data';
 
-         return mainResponse(true, $message, $items, 200, 'items', '');
+
+         $items22 = Approve::where('rfp_id', $request->rfp_id)
+            ->where('type', 'BuyerTeam')
+            ->orderBy('id','ASC')
+            ->get();
+
+        $disable= 1 ;
+
+        // dd($items22[0]['user_id']);
+        
+        if(isset($items22[0]['user_id']) && $items22[0]['user_id'] == $id){
+            $disable = 0 ;
+        }   
+
+         return mainResponse(true, $disable, $items, 200, 'items', '');
 
 
       

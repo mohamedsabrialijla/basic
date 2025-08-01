@@ -27,14 +27,14 @@
             <!--end::Menu 1-->
             <!--end::Filter-->
             <!--begin::Export-->
-            <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_export_users">
+            <button type="button" class="btn btn-light-info me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_export_users">
             <i class="ki-duotone ki-exit-up fs-2">
               <span class="path1"></span>
               <span class="path2"></span>
             </i>Export</button>
             <!--end::Export-->
             <!--begin::Add user-->
-            <button @click="getModalCreate()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_item">
+            <button @click="getModalCreate()" type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#kt_modal_add_item">
             <i class="ki-duotone ki-plus fs-2"></i>Add User</button>
             <!--end::Add user-->
           </div>
@@ -92,7 +92,7 @@
                 <!--end::Avatar-->
                 <!--begin::User details-->
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.name}}</a>
+                  <a href="#" class="text-gray-800 text-hover-info mb-1">{{item.name}}</a>
                   <span>{{item.email}}</span>
                 </div>
                 <!--begin::User details-->
@@ -164,7 +164,7 @@
           <h2 class="fw-bold">Add User</h2>
           <!--end::Modal title-->
           <!--begin::Close-->
-          <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close" @click="closeModal">
+          <div class="btn btn-icon btn-sm btn-active-icon-info" data-kt-users-modal-action="close" @click="closeModal">
             <i class="ki-duotone ki-cross fs-1">
               <span class="path1"></span>
               <span class="path2"></span>
@@ -190,7 +190,7 @@
                   <div class="image-input-wrapper w-125px h-125px" :style="{'background-image': formData.logo ? `url(${formData.logo})` : 'url(/assets/avatar.svg)'}"></div>
 
                 
-                  <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
+                  <label class="btn btn-icon btn-circle btn-active-color-info w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
                     <i class="ki-duotone ki-pencil fs-7">
                       <span class="path1"></span>
                       <span class="path2"></span>
@@ -198,13 +198,13 @@
                     <input type="file" name="avatar" @change="onFileChange" accept=".png, .jpg, .jpeg" />
                     <input type="hidden" name="avatar_remove" />
                   </label>
-                  <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel avatar">
+                  <span class="btn btn-icon btn-circle btn-active-color-info w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel avatar">
                     <i class="ki-duotone ki-cross fs-2">
                       <span class="path1"></span>
                       <span class="path2"></span>
                     </i>
                   </span>
-                  <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove avatar">
+                  <span class="btn btn-icon btn-circle btn-active-color-info w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove avatar">
                     <i class="ki-duotone ki-cross fs-2">
                       <span class="path1"></span>
                       <span class="path2"></span>
@@ -270,7 +270,7 @@
           
             </div>
             <div class="text-center pt-10">
-              <button type="submit" class="btn btn-primary" @click.prevent="addEditItem" :disabled="isLoading">
+              <button type="submit" class="btn btn-info" @click.prevent="addEditItem" :disabled="isLoading">
               <span  class="indicator-label">Submit</span>
               <span  class="indicator-progress">Please wait...
                 <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -305,7 +305,7 @@
           <h2 class="fw-bold">Edit password</h2>
           <!--end::Modal title-->
           <!--begin::Close-->
-          <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close" @click="closeModalPassword">
+          <div class="btn btn-icon btn-sm btn-active-icon-info" data-kt-users-modal-action="close" @click="closeModalPassword">
             <i class="ki-duotone ki-cross fs-1">
               <span class="path1"></span>
               <span class="path2"></span>
@@ -343,7 +343,7 @@
 
             </div>
             <div class="text-center pt-10">
-              <button type="submit" class="btn btn-primary" @click.prevent="addEditItemPassword" :disabled="isLoading">
+              <button type="submit" class="btn btn-info" @click.prevent="addEditItemPassword" :disabled="isLoading">
               <span  class="indicator-label">Submit</span>
               <span  class="indicator-progress">Please wait...
                 <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -542,7 +542,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
         },
@@ -575,7 +575,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -750,7 +750,7 @@ export default {
           confirmButtonText: "Yes",
           denyButtonText: 'No',
           customClass: {
-            confirmButton: "btn btn-primary",
+            confirmButton: "btn btn-info",
             denyButton: "btn btn-light-danger"
           }
         }).then((result) => {
@@ -768,7 +768,7 @@ export default {
                   confirmButtonText: "Ok",
                   buttonsStyling: false,
                   customClass: {
-                    confirmButton: "btn btn-light-primary"
+                    confirmButton: "btn btn-light-info"
                   }
                 });
               })
@@ -781,7 +781,7 @@ export default {
                   confirmButtonText: "Ok",
                   buttonsStyling: false,
                   customClass: {
-                    confirmButton: "btn btn-light-primary"
+                    confirmButton: "btn btn-light-info"
                   }
                 });
               });
@@ -793,7 +793,7 @@ export default {
               confirmButtonText: "Ok",
               buttonsStyling: false,
               customClass: {
-                confirmButton: "btn btn-light-primary"
+                confirmButton: "btn btn-light-info"
               }
             });
           }

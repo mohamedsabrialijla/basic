@@ -19,13 +19,13 @@
  
       <div class="table-responsive" style="margin-top: 20px;">
         
-        <table class="table table-bordered table-striped align-middle table excel-like-table">
+        <table class="table table-bordered table-striped excel-like-table">
       
           <tr>
               <td colspan="7" rowspan="2" class="background2">Criteria</td>
-              <td rowspan="2" colspan="3" class="background2">TE Pre-Set Conditions</td>
-              <td  rowspan="2" class="background2">Pre-Set Score</td>
-              <td  rowspan="2" class="background2">Total Score</td>
+              <td rowspan="2" colspan="3" class="background2" v-if="user.user_type != 'vendor'">TE Pre-Set Conditions</td>
+              <td  rowspan="2" class="background2" v-if="user.user_type != 'vendor'">Pre-Set Score</td>
+              <td  rowspan="2" class="background2" v-if="user.user_type != 'vendor'">Total Score</td>
               <td  rowspan="2" class="background2" >Critical<br>Non-Critical</td>
               <!-- <td  rowspan="2" class="background2" >Actions</td> -->
               
@@ -40,30 +40,9 @@
               <td colspan="6">{{ criterion.name }}</td>
               
           
-              <td colspan="3">Pre-Set Conditions</td>
+              <td colspan="3" v-if="user.user_type != 'vendor'">Pre-Set Conditions</td>
               <td colspan="3"></td>    
-              <!-- <td style="background: white ;">
-
-                <div class="d-flex flex-center rounded p-4 h-80px mb-1 overlay">
-                
-                <div class="overlay-wrapper text-gray-600">
-                    <i @click="getModalEdit(criterion)" class="ki-duotone ki-notepad-edit fs-2x"><span class="path1"></span><span class="path2"></span></i>
-                  </div>
-
-                  
-
-
-                  <div class="overlay-wrapper text-gray-600">
-                    <i @click="deleteItem(criterion.id)" class="ki-duotone ki-trash-square fs-2x">
-                     <span class="path1"></span>
-                     <span class="path2"></span>
-                     <span class="path3"></span>
-                     <span class="path4"></span>
-                    </i>
-                  </div>
-                      
-                </div> 
-              </td> -->          
+             
                     
              
           </tr>
@@ -72,16 +51,16 @@
               <td>{{ criterionIndex + 1 }}.{{ featureIndex + 1 }}</td>
               <td colspan="6">{{ feature.title }}</td>
               
-             <td colspan="3">
+             <td colspan="3" v-if="user.user_type != 'vendor'">
                 <span
                   v-for="(val, i) in feature.features_value"
                   :key="val.id || i"
                 >
                   {{ val.name }} = {{ val.value }}<br />
                 </span>
-              </td>
+              </td> 
 
-              <td>
+              <td v-if="user.user_type != 'vendor'">
                 {{
                   Math.max(
                     ...feature.features_value.map((f) => parseFloat(f.value || 0))
@@ -89,8 +68,8 @@
                 }}
               </td>
 
-              <td
-                v-if="featureIndex === 0"
+              <td 
+                v-if="featureIndex === 0 && user.user_type != 'vendor'"
                 :rowspan="criterion.features.length "
               >
                 {{
@@ -121,7 +100,7 @@
          
           </template>
 
-          <tr>
+          <!-- <tr>
               <td colspan="10">Total Score:</td>
               
               <td> Total Score</td>
@@ -130,13 +109,13 @@
          
           
           </tr>
-
-
+ -->
+ 
           <tr>
-              <td colspan="10">Passing Score:</td>
+              <td colspan="11">Passing Score:</td>
               
-              <td> total score</td>
-              <td colspan="2">70.00</td>
+              <!-- <td> total score</td> -->
+              <td colspan="2">{{object.techinical_passing_score}}</td>
              
             
           </tr>
@@ -308,6 +287,9 @@ export default {
               ],
 
 
+            object:{},
+
+
         };
     },  
 
@@ -333,17 +315,27 @@ export default {
         });
 
 
+        // console.log(this.user)
 
-
+        this.object = JSON.parse(localStorage.getItem("object_rfp"));
 
     },
 
+
+  watch: {
+    user(newUser) {
+      if (newUser) {
+        setTimeout(() => {
+        }, 500); // تأخير لمدة 500 ميلي ثانية
+      }
+    },
+  }, 
     computed: {
           locale() {
               return this.$route.params.locale;
           },
 
-
+          ...mapState(['user']),
           bidderInputs() {
             return Array.from({ length: 8 }, (_, i) => this.formData[`st4${i}`] || '');
           },
@@ -518,7 +510,7 @@ export default {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-primary"
+                            confirmButton: "btn btn-info"
                         }
                     });
                 }
@@ -570,7 +562,7 @@ export default {
             confirmButtonText: "Yes",
             denyButtonText: 'No',
             customClass: {
-              confirmButton: "btn btn-primary",
+              confirmButton: "btn btn-info",
               denyButton: "btn btn-light-danger"
             }
           }).then((result) => {
@@ -590,7 +582,7 @@ export default {
                     confirmButtonText: "Ok",
                     buttonsStyling: false,
                     customClass: {
-                      confirmButton: "btn btn-light-primary"
+                      confirmButton: "btn btn-light-info"
                     }
                   });
                 });
@@ -602,7 +594,7 @@ export default {
                 confirmButtonText: "Ok",
                 buttonsStyling: false,
                 customClass: {
-                  confirmButton: "btn btn-light-primary"
+                  confirmButton: "btn btn-light-info"
                 }
               });
             }
@@ -678,7 +670,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
         },
@@ -703,7 +695,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -730,7 +722,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -880,8 +872,8 @@ export default {
 .excel-like-table td, .excel-like-table th {
     border: 1px solid #dee2e6 !important;
     padding: 8px;
-    text-align: center;
-    vertical-align: middle;
+    text-align: left;
+/*    vertical-align: middle;*/
   }
 
 
@@ -917,7 +909,7 @@ input{
 }
 
 .background5{
-  background: #00b0f0;
+  background: #7239EA;
 }
 
 .background6{

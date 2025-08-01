@@ -59,7 +59,7 @@
            
               <td class="align-items-center" style="margin-top: 15px;">
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.ID_rfp}}</a>
+                  <a href="#" class="text-gray-800 text-hover-info mb-1">{{item.ID_rfp}}</a>
                 </div>
               </td>
 
@@ -70,7 +70,7 @@
                 <!--end::Avatar-->
                 <!--begin::User details-->
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.name}}</a>
+                  <a href="#" class="text-gray-800 text-hover-info mb-1">{{item.name}}</a>
                   <!-- <span>{{item.code}} </span> -->
                 </div>
                 <!--begin::User details-->
@@ -213,7 +213,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
         },
@@ -248,7 +248,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 

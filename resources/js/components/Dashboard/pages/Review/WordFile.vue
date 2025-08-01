@@ -26,6 +26,7 @@
             <th>Reference</th>
             <th>duration</th>
             <th>Quantity</th>
+            <th>UOM</th>
             <th>Unit Price</th>
             <th>Total Price</th>
           </tr>
@@ -37,6 +38,7 @@
             <td>{{ item.reference }}</td>
             <td>{{ item.duration }}</td>
             <td>{{ item.quantity }}</td>
+            <td>{{ item.uom }}</td>
             <td>{{ item.unit_price }}</td>
             <td>{{ item.total_price }}</td>
           </tr>
@@ -135,7 +137,7 @@ export default {
             buttonsStyling: false,
             confirmButtonText: "Ok, got it!",
             customClass: {
-                confirmButton: "btn btn-primary"
+                confirmButton: "btn btn-info"
             }
         });
     },
@@ -167,7 +169,7 @@ export default {
           buttonsStyling: false,
           confirmButtonText: "Ok, got it!",
           customClass: {
-            confirmButton: "btn btn-primary"
+            confirmButton: "btn btn-info"
           }
         });
       } finally {
@@ -212,7 +214,7 @@ export default {
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
                   customClass: {
-                      confirmButton: "btn btn-primary"
+                      confirmButton: "btn btn-info"
                   }
               });
 

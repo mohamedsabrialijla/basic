@@ -60,7 +60,7 @@
            
               <td class="align-items-center" style="margin-top: 15px;">
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.code}}</a>
+                  <a href="#" class="text-gray-800 text-hover-info mb-1">{{item.code}}</a>
                 </div>
               </td>
 
@@ -71,7 +71,7 @@
                 <!--end::Avatar-->
                 <!--begin::User details-->
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.name}}</a>
+                  <a href="#" class="text-gray-800 text-hover-info mb-1">{{item.name}}</a>
                   <!-- <span>{{item.code}} </span> -->
                 </div>
                 <!--begin::User details-->
@@ -142,7 +142,7 @@
                 <h5 class="modal-title">Add Edit Informations</h5>
 
                 <!--begin::Close-->
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <div class="btn btn-icon btn-sm btn-active-light-info ms-2" data-bs-dismiss="modal" aria-label="Close">
                     <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
                 </div>
                 <!--end::Close-->
@@ -185,7 +185,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" @click="addEditItem()">Save changes</button>
+                <button type="button" class="btn btn-info" @click="addEditItem()">Save changes</button>
             </div>
           </form>
         </div>
@@ -355,7 +355,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
         },
@@ -390,7 +390,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -486,7 +486,7 @@ export default {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-primary"
+                            confirmButton: "btn btn-info"
                         }
                     });
                 }
@@ -514,7 +514,7 @@ export default {
             confirmButtonText: "Yes",
             denyButtonText: 'No',
             customClass: {
-              confirmButton: "btn btn-primary",
+              confirmButton: "btn btn-info",
               denyButton: "btn btn-light-danger"
             }
           }).then((result) => {
@@ -534,7 +534,7 @@ export default {
                     confirmButtonText: "Ok",
                     buttonsStyling: false,
                     customClass: {
-                      confirmButton: "btn btn-light-primary"
+                      confirmButton: "btn btn-light-info"
                     }
                   });
                 });
@@ -546,7 +546,7 @@ export default {
                 confirmButtonText: "Ok",
                 buttonsStyling: false,
                 customClass: {
-                  confirmButton: "btn btn-light-primary"
+                  confirmButton: "btn btn-light-info"
                 }
               });
             }

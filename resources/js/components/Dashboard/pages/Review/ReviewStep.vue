@@ -14,7 +14,7 @@
               <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">RFP Dashboard</h1>
               <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                 <li class="breadcrumb-item text-muted">
-                  <a href="index.html" class="text-muted text-hover-primary">RFP</a>
+                  <a href="index.html" class="text-muted text-hover-info">RFP</a>
                 </li>
                 <li class="breadcrumb-item">
                   <span class="bullet bg-gray-500 w-5px h-2px"></span>
@@ -30,37 +30,33 @@
                 @click="openList()">Cancel</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-primary" @click="Approve2('approve')">Approve</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" @click="Approve2('approve')">Approve</a>
               
  
             
               
-              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep == 1" @click="getModalCreate()">Return To Comment</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1" @click="getModalCreate()">Return To Comment</a>
             </div>
           </div>
         </div> 
 
-        <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 53%;margin: auto;">
+       <!--  <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 53%;margin: auto;">
 
           <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
                 :key="index"  @click="setStep(index)">
-            <!--begin::Symbol-->
             <div class="symbol symbol-30px symbol-circle me-3">
-              <span class="symbol-label bg-light-primary" >
+              <span class="symbol-label bg-light-info" >
                   
                   <i class="ki-duotone ki-black-right fs-2 text-gray-500" v-if="currentStep === index"></i>
                   <l v-else>{{index+1}}</l>
 
               </span>
             </div>
-            <!--end::Symbol-->
-            <!--begin::Info-->
             <div class="m-0">
               <span class="fw-semibold text-gray-500 d-block fs-8" style="cursor:pointer;"> {{ step }}</span>
             </div>
-            <!--end::Info-->
           </div>
-        </div>
+        </div> -->
       </div>
 
 
@@ -100,9 +96,8 @@
 
 
 
-
-                  <table class="table">
-                    <thead class="thead-light" style="background: #e5dcdc;font-weight: bold;">
+                  <table class="table table-bordered">
+                    <thead class="thead-light" style="background: #f4f4f4;font-weight: bold;">
                       <tr>
                         <th scope="col">ReviewBy</th>
                         <th scope="col">Department</th>
@@ -177,7 +172,7 @@
           <h2 class="fw-bold">Send Comment</h2>
           <!--end::Modal title-->
           <!--begin::Close-->
-          <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close" @click="closeModal">
+          <div class="btn btn-icon btn-sm btn-active-icon-info" data-kt-users-modal-action="close" @click="closeModal">
             <i class="ki-duotone ki-cross fs-1">
               <span class="path1"></span>
               <span class="path2"></span>
@@ -208,7 +203,7 @@
 
             </div>
             <div class="text-center pt-10">
-              <button type="submit" class="btn btn-primary" @click.prevent="Approve('comment')" :disabled="isLoading">
+              <button type="submit" class="btn btn-info" @click.prevent="Approve('comment')" :disabled="isLoading">
               <span  class="indicator-label">Submit</span>
               <span  class="indicator-progress">Please wait...
                 <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -371,7 +366,7 @@ export default {
             buttonsStyling: false,
             confirmButtonText: "Ok, got it!",
             customClass: {
-                confirmButton: "btn btn-primary"
+                confirmButton: "btn btn-info"
             }
         });
     },
@@ -494,7 +489,7 @@ export default {
             confirmButtonText: "Yes",
             denyButtonText: 'No',
             customClass: {
-              confirmButton: "btn btn-primary",
+              confirmButton: "btn btn-info",
               denyButton: "btn btn-light-danger"
             }
           }).then((result) => {
@@ -514,7 +509,7 @@ export default {
                     confirmButtonText: "Ok",
                     buttonsStyling: false,
                     customClass: {
-                      confirmButton: "btn btn-light-primary"
+                      confirmButton: "btn btn-light-info"
                     }
                   });
                 });
@@ -526,7 +521,7 @@ export default {
                 confirmButtonText: "Ok",
                 buttonsStyling: false,
                 customClass: {
-                  confirmButton: "btn btn-light-primary"
+                  confirmButton: "btn btn-light-info"
                 }
               });
             }

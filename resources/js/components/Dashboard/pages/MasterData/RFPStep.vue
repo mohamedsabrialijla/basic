@@ -11,7 +11,7 @@
               <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">RFP Dashboard</h1>
               <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                 <li class="breadcrumb-item text-muted">
-                  <a href="index.html" class="text-muted text-hover-primary">RFP</a>
+                  <a href="index.html" class="text-muted text-hover-info">RFP</a>
                 </li>
                 <li class="breadcrumb-item">
                   <span class="bullet bg-gray-500 w-5px h-2px"></span>
@@ -22,21 +22,21 @@
               </ul>
             </div>
             <div class="d-flex align-items-center gap-2 gap-lg-3">
-              <a href="#" class="btn btn-sm fw-bold btn-secondary" v-if="currentStep !== 0 "
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep !== 0 "
                 @click="setStep(currentStep -1)">Previous</a>
-              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep === 0" 
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep === 0" 
                 @click="openList()">Back</a>
-              <a href="#" class="btn btn-sm fw-bold btn-primary"  v-if="currentStep == 1" @click="addEditItem(1)">save Draft</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info"  v-if="currentStep == 1" @click="addEditItem(1)">save Draft</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-primary" disabled="currentStep === steps.length - 1" v-if="currentStep == 0 " @click="nextStep">Next</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" disabled="currentStep === steps.length - 1" v-if="currentStep == 0 " @click="nextStep">Next</a>
               
-              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep == 1" @click="addEditItem(2)">Send To RFP Review Team</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1" @click="addEditItem(2)">Send To RFP Review Team</a>
             </div>
           </div>
         </div>
 
-        <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 53%;margin: auto;">
+        <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 84%;margin: auto;margin-top: 26px;margin-bottom: 20px;">
 
           <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
                 :key="index" 
@@ -44,7 +44,7 @@
                 @click="setStep(index)">
             <!--begin::Symbol-->
             <div class="symbol symbol-30px symbol-circle me-3">
-              <span class="symbol-label bg-light-primary" >
+              <span class="symbol-label bg-light-info" >
                   
                   <i class="ki-duotone ki-black-right fs-2 text-gray-500" v-if="currentStep === index"></i>
                   <l v-else>{{index+1}}</l>
@@ -335,14 +335,48 @@
                   <input type="date" :name="'name'" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Date" value="" v-model="formData.review_team_deadline"   required />
               </div>
 
-              <div class="fv-row col-md-4">
-                <label class="required fw-semibold fs-6 mb-2" for="name"> RFP Project Review Team Deadline </label>
-                <input type="numer" :name="'name'" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Days" value="" v-model="formData.soi_days_deadline"   required />
+              <div class="col-md-4">
+               
+
+                <label class="required fw-semibold fs-6 mb-2" for="name"> SOI Vendor Response Deadline Days </label>
+               
+                    <div class="input-group mb-5">
+                      <input
+                        type="number"
+                        class="form-control"
+                        placeholder="Days"
+                        aria-label="Deadline Days"
+                        aria-describedby="basic-addon1"
+                        v-model="formData.soi_days_deadline"
+                      />
+
+                      <span
+                        class="input-group-text"
+                        id="basic-addon1"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="5 Days Start Counting from the last RFP Approval ."
+                        style="cursor: pointer;"
+                      >
+                        <i class="ki-duotone ki-information-5 fs-2x">
+                     <span class="path1"></span>
+                     <span class="path2"></span>
+                     <span class="path3"></span>
+                    </i>
+                      </span>
+                    </div>
+
+
+
               </div>
+
+
+
+
             </div>
 
             <div class="row">
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <div class="card card-flush">
                   <div class="card-header pt-5">
                     <h3 class="card-title text-gray-800">Sections</h3>
@@ -365,7 +399,7 @@
               </div>
 
 
-              <div class="col-md-9">
+              <div class="col-md-10">
 
 
 
@@ -404,7 +438,7 @@
                       
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" style="margin-top:25px;" @click="addEditSection()">Save changes</button>
+                        <button type="button" class="btn btn-info" style="margin-top:25px;" @click="addEditSection()">Save changes</button>
                     </div>
 
                 </div>
@@ -578,7 +612,7 @@ export default {
             },
 
             currentStep: 0,
-            steps: ["Information RFP", "RFP Sheet", "RFP"],
+            steps: ["Create RFP", "Scope Review", "Soi Response" , "TPS", "RFP Publish", "Selection","Award"],
 
             logo:'',
             quill: null,
@@ -607,7 +641,13 @@ export default {
 
 
 
-       
+       document.addEventListener('DOMContentLoaded', function () {
+          const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+          tooltipTriggerList.map(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+          });
+        });
+
 
 
     }, 
@@ -646,7 +686,7 @@ export default {
             buttonsStyling: false,
             confirmButtonText: "Ok, got it!",
             customClass: {
-                confirmButton: "btn btn-primary"
+                confirmButton: "btn btn-info"
             }
         });
     },
@@ -662,6 +702,7 @@ export default {
     async nextStep() {
 
           if(this.currentStep == 0){
+            
             this.addEditItem()
           }
 
@@ -709,7 +750,7 @@ export default {
      //              buttonsStyling: false,
      //              confirmButtonText: "Ok, got it!",
      //              customClass: {
-     //                  confirmButton: "btn btn-primary"
+     //                  confirmButton: "btn btn-info"
      //              }
      //          });
 
@@ -1036,7 +1077,7 @@ export default {
             buttonsStyling: false,
             confirmButtonText: "Ok, got it!",
             customClass: {
-                confirmButton: "btn btn-primary"
+                confirmButton: "btn btn-info"
             }
         });
 
@@ -1086,19 +1127,18 @@ export default {
 <style scoped>
 
 .multiselect__option--highlight {
-    background: #3ebdb1 !important;
+    background: #7239EA !important;
     outline: none;
     color: #fff;}
 
-    .multiselect__tag {
-    background: #3ebdb1;}
+   
 
     .multiselect__tag-icon:after {
-    color: ##33a196;
+    color: #7239EA;
     }
 
 
-
+  
 
     ol, p, ul {
         line-height: 1.0;
@@ -1167,7 +1207,9 @@ export default {
 
 
 
-
+.multiselect__tag {
+    background: #7239EA !important;
+}
 
 
 

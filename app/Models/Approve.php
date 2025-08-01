@@ -11,7 +11,7 @@ class Approve extends Model
 {
     protected $fillable = ['status', 'rfp_id', 'type', 'deadline', 'date_approved'];
 
-    protected $appends=['dead','approv','disable'];
+    protected $appends=['dead','approv'];
  
     public function getCreatedAtAttribute($value){
         return date('Y-m-d H:i', strtotime($value));
@@ -51,15 +51,15 @@ class Approve extends Model
     }
 
 
-    public function getDisableAttribute(){
+    // public function getDisableAttribute(){
         
-        $id = auth('sanctum')->id();
-        if($this->user_id == $id){
-            return 1;
-        }else{
-            return 0;
-        }
-    }
+    //     $id = auth('sanctum')->id();
+    //     if($this->user_id == $id){
+    //         return 1;
+    //     }else{
+    //         return 0;
+    //     }
+    // }
 
    
 

@@ -30,12 +30,12 @@
                 @click="openList()">Cancel</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-primary" @click="Approve('approve')">Confirm </a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" @click="Approve('approve')">Confirm </a>
               
  
             
               
-              <a href="#" class="btn btn-sm fw-bold btn-primary" v-if="currentStep == 1 " @click="getModalCreate()">Decline</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1 " @click="getModalCreate()">Decline</a>
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@
                 
                 @click="setStep(index)">
             <div class="symbol symbol-30px symbol-circle me-3">
-              <span class="symbol-label bg-light-primary" >
+              <span class="symbol-label bg-light-info" >
                   
                   <i class="ki-duotone ki-black-right fs-2 text-gray-500" v-if="currentStep === index"></i>
                   <l v-else>{{index+1}}</l>
@@ -96,15 +96,15 @@
                 </div>
 
 
+ 
 
-
-                   <span class="indicator-label" style="font-size: 17px;"> If press on “Send” button.. the below criteria must be completed</span>
-                  <table class="table">
-                    <thead class="thead-light" style="background: #e5dcdc;font-weight: bold;">
-                      <tr>
-                        <th scope="col">NO</th>
-                        <th scope="col">SOI Criteria</th>
-                        <th scope="col" >Status &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Attachment</th>
+                   <span class="indicator-label" style="font-size: 17px;"> Complete SOI Criteiria</span>
+                  <table class="table table-bordered">
+                    <thead class="thead-light" style="background: #f4f4f4;font-weight: bold;">
+                      <tr >
+                        <th scope="col" width="5%">NO</th>
+                        <th scope="col" width="60%">SOI Criteria</th>
+                        <th scope="col" >Status &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Attachment</th>
                         <th scope="col">File</th>
                       </tr>
                     </thead>
@@ -114,19 +114,19 @@
                         <td style="    width: 394px;">{{item.name}}</td>
                         <td style="display: flex;">
                    
-                          <span v-if="item.criteria?.file || item.criteria?.approve " :class="getStatusClass('Completed')" class="btn btn-sm ">
+                          <span v-if="item.criteria?.file || item.criteria?.approve " :class="getStatusClass('Completed')" class="btn btn-sm " style="height: 36px">
                             Completed
                           </span>
 
 
-                          <span v-else-if="item.criteria?.approve != 'true'"  class="btn btn-sm btn-light-warning">
+                          <span v-else-if="item.criteria?.approve != 'true'"  class="btn btn-sm btn-light-warning" style="height: 36px">
                             Ready
-                          </span>
-                          <span v-else  class="btn btn-sm btn-light-warning">
+                          </span >
+                          <span v-else  class="btn btn-sm btn-light-warning" style="height: 36px">
                             Ready
                           </span>
 
-                          &nbsp;&nbsp;&nbsp;&nbsp;
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
                           <div class="form-check form-switch form-check-custom form-check-success form-check-solid" v-if="item.type_cretiria == 'yesORno'">
                               <input v-model="item.answer" @change="ApproveDocument(item.id, item.answer)" class="form-check-input " type="checkbox" value=""  id="kt_flexSwitchCustomDefault_1_1" style="cursor:pointer;"   :checked="item.criteria && item.criteria?.approve == 'true' ">
@@ -141,8 +141,8 @@
                          <div class="fv-row mb-7" v-else>                          
                             <div class="image-input image-input-outline image-input-placeholder" data-kt-image-input="true">
                               <div class="image-input-wrapper w-5px h-5px"></div>
-                              <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar" style="margin-left: 22px;">
-                                <i class="fas fa-file" style="cursor: pointer">
+                              <label class="btn btn-icon btn-circle btn-active-color-info w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar" style="margin-left: 22px;">
+                                <i class="fas fa-file fs-2" style="cursor: pointer">
                                   <span class="path1"></span>
                                   <span class="path2"></span>
                                 </i>
@@ -156,7 +156,7 @@
 
                         </td>
 
- 
+  
                         <td>
                           <a v-if="item.criteria?.file" :href="item.criteria.file" target="_blank">Open</a>
                         </td>
@@ -209,7 +209,7 @@
           <h2 class="fw-bold">Decline Justifications</h2>
           <!--end::Modal title-->
           <!--begin::Close-->
-          <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close" @click="closeModal">
+          <div class="btn btn-icon btn-sm btn-active-icon-info" data-kt-users-modal-action="close" @click="closeModal">
             <i class="ki-duotone ki-cross fs-1">
               <span class="path1"></span>
               <span class="path2"></span>
@@ -267,7 +267,7 @@
 
             </div>
             <div class="text-center pt-10">
-              <button type="submit" class="btn btn-primary" @click.prevent="Approve('comment')" :disabled="isLoading">
+              <button type="submit" class="btn btn-info" @click.prevent="Approve('comment')" :disabled="isLoading">
               <span  class="indicator-label">Submit</span>
               <span  class="indicator-progress">Please wait...
                 <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -435,14 +435,17 @@ export default {
   methods: {
 
 
-    swalFunction(type , text){
-      Swal.fire({
+    swalFunction(type, text) {
+        Swal.fire({
             text: text,
             icon: type,
-            buttonsStyling: false,
-            confirmButtonText: "Ok, got it!",
+            showConfirmButton: false, // إخفاء زر التأكيد
+            timer: 2000, // يغلق تلقائياً بعد 2 ثانية
+            timerProgressBar: true, // شريط مؤقت
+            toast: true, // إشعار صغير مثل التوست
+            position: 'top-end', // المكان: أعلى يمين
             customClass: {
-                confirmButton: "btn btn-primary"
+                popup: 'bg-light shadow-sm',
             }
         });
     },
@@ -542,7 +545,7 @@ export default {
             confirmButtonText: "Yes",
             denyButtonText: 'No',
             customClass: {
-              confirmButton: "btn btn-primary",
+              confirmButton: "btn btn-info",
               denyButton: "btn btn-light-danger"
             }
           }).then((result) => {
@@ -562,7 +565,7 @@ export default {
                     confirmButtonText: "Ok",
                     buttonsStyling: false,
                     customClass: {
-                      confirmButton: "btn btn-light-primary"
+                      confirmButton: "btn btn-light-info"
                     }
                   });
                 });
@@ -574,7 +577,7 @@ export default {
                 confirmButtonText: "Ok",
                 buttonsStyling: false,
                 customClass: {
-                  confirmButton: "btn btn-light-primary"
+                  confirmButton: "btn btn-light-info"
                 }
               });
             }
@@ -614,7 +617,7 @@ export default {
             axios.post('VendorApprove/createItemDocument',form,config).then((response)=>{
                this.isLoading = false;
               if(response.data.code==200){ 
-                 
+                 this.swalFunction('info','The File uploaded successfully');
                  if(this.formData.comment){
                   $('#kt_modal_add_item').modal('hide');
                  }

@@ -27,14 +27,14 @@
             <!--end::Menu 1-->
             <!--end::Filter-->
             <!--begin::Export-->
-            <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_export_items">
+            <button type="button" class="btn btn-light-info me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_export_items">
             <i class="ki-duotone ki-exit-up fs-2">
               <span class="path1"></span>
               <span class="path2"></span>
             </i>Export</button>
             <!--end::Export-->
             <!--begin::Add user-->
-            <button @click="openRFPSteper()" type="button" class="btn btn-primary" >
+            <button @click="openRFPSteper()" type="button" class="btn btn-info" >
             <i class="ki-duotone ki-plus fs-2"></i>Add New</button>
             <!--end::Add user-->
           </div>
@@ -85,7 +85,7 @@
            
               <td class="align-items-center" style="margin-top: 15px;">
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.ID_rfp}}</a>
+                  <a href="#" class="text-gray-800 text-hover-info mb-1">{{item.ID_rfp}}</a>
                 </div>
               </td>
 
@@ -96,7 +96,7 @@
                 <!--end::Avatar-->
                 <!--begin::User details-->
                 <div class="d-flex flex-column">
-                  <a href="#" class="text-gray-800 text-hover-primary mb-1">{{item.name}}</a>
+                  <a href="#" class="text-gray-800 text-hover-info mb-1">{{item.name}}</a>
                   <!-- <span>{{item.code}} </span> -->
                 </div>
                 <!--begin::User details-->
@@ -104,7 +104,7 @@
                
               <td>
                   <div v-if="item.draft== 0 " class="badge badge-light-danger fw-bold">Saved</div>
-                  <div v-if="item.draft== 1 " class="badge badge-light-primary fw-bold">Draft</div>
+                  <div v-if="item.draft== 1 " class="badge badge-light-info fw-bold">Draft</div>
                   <div v-else-if="item.draft== 2" class="badge badge-light-success fw-bold">Sent To Review Team</div>
               </td>
 
@@ -282,7 +282,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
         },
@@ -316,7 +316,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -341,7 +341,7 @@ export default {
             confirmButtonText: "Yes",
             denyButtonText: 'No',
             customClass: {
-              confirmButton: "btn btn-primary",
+              confirmButton: "btn btn-info",
               denyButton: "btn btn-light-danger"
             }
           }).then((result) => {
@@ -361,7 +361,7 @@ export default {
                     confirmButtonText: "Ok",
                     buttonsStyling: false,
                     customClass: {
-                      confirmButton: "btn btn-light-primary"
+                      confirmButton: "btn btn-light-info"
                     }
                   });
                 });
@@ -373,7 +373,7 @@ export default {
                 confirmButtonText: "Ok",
                 buttonsStyling: false,
                 customClass: {
-                  confirmButton: "btn btn-light-primary"
+                  confirmButton: "btn btn-light-info"
                 }
               });
             }

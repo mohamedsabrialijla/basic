@@ -4,7 +4,7 @@
       
 
   
-  <div class="documents-list">
+  <div class="">
     <div class="table-responsive">
       
 
@@ -13,14 +13,14 @@
 
   <!-- Header معلومات عامة -->
   <tr>
-    <td class="label_text" colspan="2" rowspan="2">SOI RECORDS</td>
+    <td class="label_text" colspan="3" rowspan="2">SOI RECORDS</td>
     <td class="label_text">Vendors Reached</td>
     <td class="label_text">Vendors Responded</td>
     <td class="label_text">Vendors Passed</td>
     <td class="label_text">Vendors Failed</td>
     <td class="label_text">Vendors Declined</td>
     <td class="label_text">Vendors Invited</td>
-    <td colspan="2" rowspan="2"></td>
+    <!-- <td colspan="2" rowspan="2"></td> -->
   </tr>
 
   <tr>
@@ -39,21 +39,20 @@
   </tr>
 
   <tr>
-    <td></td>
-    <td></td>
-    <td colspan="14" class="label_text text-center">Vendors</td>
+    <td colspan="3"></td>
+    <td colspan="13" class="label_text text-center">Vendors</td>
   </tr>
 
   <tr>
-    <td class="label_text">S.N</td>
-    <td class="label_text">SOI Criteria</td>
-    <td v-for="(vendor, index) in ItemsVendors" :key="vendor.id">{{ vendor.name }}</td>
+    <td class="label_text" width="5%">S.N</td>
+    <td class="label_text" colspan="2">SOI Criteria</td>
+    <td v-for="(vendor, index) in ItemsVendors" :key="vendor.id" >{{ vendor.name }}</td>
   </tr>
 
   <!-- جدول الـ criteria -->
   <tr v-for="(row, rowIndex) in ItemsCriteria" :key="row.id">
     <td class="label_text">{{ rowIndex + 1 }}</td>
-    <td>{{ row.name }}</td>
+    <td colspan="2">{{ row.name }}</td>
     <td v-for="vendor in ItemsVendors" :key="vendor.id">
       <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
         <input v-if="formData[row.id]"
@@ -65,6 +64,7 @@
           :true-value="'YES'"
           :false-value="'NO'"
           @change="saveResponseAuto(row.id, vendor.id, formData[row.id][vendor.id])"
+          :disabled="disabel==1"
         >
         <label class="form-check-label" :for="`switch_${row.id}_${vendor.id}`">
           {{ formData[row.id][vendor.id] === 'YES' ? 'Yes' : 'No' }}
@@ -75,8 +75,12 @@
 
   <!-- تأكيد الاستجابة -->
   <tr>
-    <td colspan="2">Response Confirm/Decline</td>
-    <td v-for="vendor in ItemsVendors" :key="'confirm_' + vendor.id">Confirmed</td>
+    <td colspan="3">Final Resulte</td>
+     <td v-for="vendor in ItemsVendors" :key="'status_' + vendor.id">
+    <span :class="vendorResults[vendor.id] === 'Pass' ? 'text-success' : 'text-danger'">
+      {{ vendorResults[vendor.id] }}
+    </span>
+  </td>
   </tr>
 
 </table>
@@ -141,6 +145,7 @@ export default {
             responses:[],
 
             staticitics:null,
+            disabel:null,
 
         };
     },
@@ -164,15 +169,37 @@ export default {
               return this.$route.params.locale;
           },
 
+
+      vendorResults() {
+        const results = {};
+        const criteriaIds = this.ItemsCriteria.map(c => c.id);
+
+        this.ItemsVendors.forEach(vendor => {
+          let isPass = true;
+
+          for (let criteriaId of criteriaIds) {
+            const response = this.formData[criteriaId]?.[vendor.id];
+            if (response !== 'YES') {
+              isPass = false;
+              break;
+            }
+          }
+
+          results[vendor.id] = isPass ? 'Pass' : 'Fail';
+        });
+
+        return results;
+      },
+
     },
 
 
 
   methods: {
 
-async loadAllDataInOrder() {
-    await this.fetchItemsBase();     // ← ننتظر انتهاء تحميل الفندور والـ criteria
-    await this.fetchItemsResponse(); // ← بعدين نحمل responses ونبني الفورم
+  async loadAllDataInOrder() {
+    await this.fetchItemsBase();     
+    await this.fetchItemsResponse(); 
   },
     swalFunction(type , text){
       Swal.fire({
@@ -181,7 +208,7 @@ async loadAllDataInOrder() {
             buttonsStyling: false,
             confirmButtonText: "Ok, got it!",
             customClass: {
-                confirmButton: "btn btn-primary"
+                confirmButton: "btn btn-info"
             }
         });
     },
@@ -232,7 +259,7 @@ async loadAllDataInOrder() {
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
                   customClass: {
-                      confirmButton: "btn btn-primary"
+                      confirmButton: "btn btn-info"
                   }
               });
 
@@ -290,7 +317,7 @@ async loadAllDataInOrder() {
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
                   customClass: {
-                      confirmButton: "btn btn-primary"
+                      confirmButton: "btn btn-info"
                   }
               });
 
@@ -312,6 +339,7 @@ async loadAllDataInOrder() {
         axios.post('BuyerApprove/Store', payload)
           .then(response => {
             this.swalFunction('success', 'saved successfully');
+            this.fetchItemsStaticitics()
           })
           .catch(error => {
             console.error("فشل الحفظ ❌", error);
@@ -333,6 +361,7 @@ async loadAllDataInOrder() {
             })
               .then(response => {
                   this.staticitics  = response.data.items;
+                  this.disabel  = response.data.message;
                   this.isLoading = false;
 
 
@@ -344,7 +373,7 @@ async loadAllDataInOrder() {
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
                   customClass: {
-                      confirmButton: "btn btn-primary"
+                      confirmButton: "btn btn-info"
                   }
               });
 

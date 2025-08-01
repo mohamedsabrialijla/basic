@@ -87,7 +87,7 @@ export default {
             buttonsStyling: false,
             confirmButtonText: "Ok, got it!",
             customClass: {
-                confirmButton: "btn btn-primary"
+                confirmButton: "btn btn-info"
             }
         });
     },
@@ -120,7 +120,7 @@ export default {
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
                   customClass: {
-                      confirmButton: "btn btn-primary"
+                      confirmButton: "btn btn-info"
                   }
               });
 

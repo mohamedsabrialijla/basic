@@ -5,13 +5,13 @@
     <!--begin::Card-->
     <div class="card">
      
-      <div class="card-body py-4">
+      <div class="card-body py-4" style="padding: 0px;">
         <!--begin::Table-->
         <div v-if="isLoading">
           please wait ...
         </div>
         
-          <button @click="getModalCreate()" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_item">
+          <button @click="getModalCreate()" type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#kt_modal_add_item">
             <i class="ki-duotone ki-plus fs-2"></i>Add New
           </button>
  
@@ -19,7 +19,7 @@
  
       <div class="table-responsive" style="margin-top: 20px;">
         
-        <table class="table table-bordered table-striped align-middle table excel-like-table">
+        <table class="table table-bordered table-striped excel-like-table">
       
           <tr>
               <td colspan="7" rowspan="2" class="background2">Criteria</td>
@@ -44,7 +44,7 @@
               <td colspan="3"></td>    
               <td style="background: white ;">
 
-                <div class="d-flex flex-center rounded p-4 h-80px mb-1 overlay">
+                <div class="d-flex flex-center rounded  mb-1 overlay">
                 <div class="overlay-wrapper text-gray-600">
                     <i @click="getModalEdit(criterion)" class="ki-duotone ki-notepad-edit fs-2x"><span class="path1"></span><span class="path2"></span></i>
                   </div>
@@ -67,7 +67,7 @@
              
           </tr>
 
-          <tr v-if="criterion.features" class="background6" v-for="(feature, featureIndex) in criterion.features" :key="feature.id">
+          <tr v-if="criterion.features"  v-for="(feature, featureIndex) in criterion.features" :key="feature.id">
               <td>{{ criterionIndex + 1 }}.{{ featureIndex + 1 }}</td>
               <td colspan="6">{{ feature.title }}</td>
               
@@ -135,7 +135,7 @@
               <td colspan="10">Passing Score:</td>
               
               <td> total score</td>
-              <td colspan="2">70.00</td>
+              <td colspan="2">{{object.techinical_passing_score}}</td>
              
             
           </tr>
@@ -183,7 +183,7 @@
                 <h5 class="modal-title">Modal title</h5>
 
                 <!--begin::Close-->
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <div class="btn btn-icon btn-sm btn-active-light-info ms-2" data-bs-dismiss="modal" aria-label="Close">
                     <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
                 </div>
                 <!--end::Close-->
@@ -301,7 +301,7 @@
                     </button>
 
                     <!-- زر الإضافة -->
-                    <a class="btn btn-light-primary d-flex align-items-center gap-2" v-if="index === formEntries.length - 1" @click="addNewEntry" style="width: 55px;">
+                    <a class="btn btn-light-info d-flex align-items-center gap-2" v-if="index === formEntries.length - 1" @click="addNewEntry" style="width: 55px;">
                       <span class="svg-icon svg-icon-2">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                           <rect opacity="0.5" x="11" y="5" width="2" height="14" rx="1" fill="currentColor"/>
@@ -327,7 +327,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary" @click.prevent="addEditItem" :disabled="isLoading">
+          <button type="submit" class="btn btn-info" @click.prevent="addEditItem" :disabled="isLoading">
             <span  class="indicator-label">Submit</span>
             <span  class="indicator-progress">Please wait...
               <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -427,11 +427,8 @@ export default {
                 Ts7:'',
                 Ts8:'',
                 Ts9:'',
-               
-
-           
             },
- 
+  
             itemsDepartments:[],
             itemsUsersDefualt:[],
             itemsAllSteps:[],
@@ -481,6 +478,7 @@ export default {
             features_value: [
                 
               ],
+            object:{},
 
 
         };
@@ -508,6 +506,7 @@ export default {
         });
 
 
+        this.object = JSON.parse(localStorage.getItem("object_rfp"));
 
 
 
@@ -693,7 +692,7 @@ export default {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-primary"
+                            confirmButton: "btn btn-info"
                         }
                     });
                 }
@@ -745,7 +744,7 @@ export default {
             confirmButtonText: "Yes",
             denyButtonText: 'No',
             customClass: {
-              confirmButton: "btn btn-primary",
+              confirmButton: "btn btn-info",
               denyButton: "btn btn-light-danger"
             }
           }).then((result) => {
@@ -765,7 +764,7 @@ export default {
                     confirmButtonText: "Ok",
                     buttonsStyling: false,
                     customClass: {
-                      confirmButton: "btn btn-light-primary"
+                      confirmButton: "btn btn-light-info"
                     }
                   });
                 });
@@ -777,7 +776,7 @@ export default {
                 confirmButtonText: "Ok",
                 buttonsStyling: false,
                 customClass: {
-                  confirmButton: "btn btn-light-primary"
+                  confirmButton: "btn btn-light-info"
                 }
               });
             }
@@ -853,7 +852,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
         },
@@ -878,7 +877,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -905,7 +904,7 @@ export default {
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
                 customClass: {
-                    confirmButton: "btn btn-primary"
+                    confirmButton: "btn btn-info"
                 }
             });
 
@@ -1055,8 +1054,8 @@ export default {
 .excel-like-table td, .excel-like-table th {
     border: 1px solid #dee2e6 !important;
     padding: 8px;
-    text-align: center;
-    vertical-align: middle;
+    text-align: left;
+/*    vertical-align: middle;*/
   }
 
 
@@ -1092,12 +1091,9 @@ input{
 }
 
 .background5{
-  background: #00b0f0;
+  background: #7239EA;
 }
 
-.background6{
-  background: #d8d8d8;
-}
 
 
 

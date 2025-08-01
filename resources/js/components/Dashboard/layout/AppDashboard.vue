@@ -58,11 +58,13 @@ import Breadcrumb from './Breadcrumb.vue';
 import Menu from './Menu.vue';
 import MenuReview from './MenuReview.vue';
 import MenuVendor from './MenuVendor.vue';
+import MenuVendorManagement from './MenuVendorManagement.vue';
 import MenuBuyer from './MenuBuyer.vue';
 import MenuSOI from './MenuSOI.vue';
 
 import DashboardReview from '../pages/DashboardReview.vue';
 import DashboardVendor from '../pages/DashboardVendor.vue';
+import DashboardVendorManagement from '../pages/DashboardVendorManagement.vue';
 import DashboardBuyer from '../pages/DashboardBuyer.vue';
 import DashboardSOI from '../pages/DashboardSOI.vue';
 import DashboardAdmin from '../pages/Dashboard.vue';
@@ -78,6 +80,8 @@ export default {
     Menu,
     MenuReview,
     MenuVendor,
+    MenuVendorManagement,
+    DashboardVendorManagement,
     MenuBuyer,
     DashboardReview,
     DashboardVendor,
@@ -104,6 +108,7 @@ export default {
     menuComponent() {
 
       if (this.userType === 'vendor') return 'MenuVendor';
+      if (this.userType === 'vendor_management') return 'MenuVendorManagement';
       if (this.userType === 'buyer') return 'MenuBuyer';
       if (this.userType === 'review') return 'MenuReview';
       if (this.userType === 'soi') return 'MenuSOI';
@@ -112,6 +117,7 @@ export default {
 
     contentComponent() {
       if (this.userType === 'vendor') return 'DashboardVendor';
+      if (this.userType === 'vendor_management') return 'DashboardVendorManagement';
       if (this.userType === 'buyer') return 'DashboardBuyer';
       if (this.userType === 'review') return 'DashboardReview';
       if (this.userType === 'soi') return 'DashboardSOI';
@@ -152,3 +158,8 @@ export default {
 
 }
 </script>
+<style type="text/css">
+  .px-5{
+    padding: 0 px !important;
+  }
+</style>

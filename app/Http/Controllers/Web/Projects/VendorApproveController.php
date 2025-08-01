@@ -86,7 +86,7 @@ class VendorApproveController extends Controller
 
                     if($cre != $doc ){
 
-                        $message ="Please Check Documants sent ?! ";
+                        $message ="Please Add missing Attachmets to Technical Criteiria ?! ";
                         return mainResponse(true, $message ,'', 203, 'items','');
 
                     }
