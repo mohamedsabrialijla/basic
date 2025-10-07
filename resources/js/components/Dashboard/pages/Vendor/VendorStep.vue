@@ -12,14 +12,11 @@
           <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
               <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Vendor SOI Response</h1>
-              <span v-if="formData && formData.status=='Completed'"  :class="getStatusClass('Completed')" class="btn btn-sm ">
-                Completed
+              <span v-if="formData && formData.status"  :class="getStatusClass(formData.status)" class="btn btn-sm ">
+                {{formData.status}}
               </span>
 
-              <span v-else  class="btn btn-sm btn-light-warning">
-                Decline
-              </span>
-
+        
 
 
               
@@ -30,12 +27,12 @@
                 @click="openList()">Cancel</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-info" @click="Approve('approve')">Confirm </a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" @click="Approve('approve')" v-if="formData.status =='Ready'">Confirm </a>
               
  
             
               
-              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1 " @click="getModalCreate()">Decline</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1 && formData.status =='Ready'" @click="getModalCreate()" >Decline</a>
             </div>
           </div>
         </div>
@@ -663,14 +660,17 @@ export default {
                 }); 
 
               
-        },
+        }, 
 
 
         async fetchItemsCriteria() {
           this.isLoading = true;
+          let rfp_id = JSON.parse(localStorage.getItem('RFPVendor'));
+
              await axios.get('ItemsCategories/getAllItems', {
                 params: {
                   pagination: 0,
+                  rfp_id:rfp_id.id,
                 }
               }).then(response => {
                     this.items = response.data.items;

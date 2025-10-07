@@ -26,12 +26,17 @@
                 @click="setStep(currentStep -1)">Previous</a>
               <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep === 0" 
                 @click="openList()">Back</a>
-              <a href="#" class="btn btn-sm fw-bold btn-info"  v-if="currentStep == 1" @click="addEditItem(1)">save Draft</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info"  v-if="currentStep == 1 && !formData.approve_for_review_team" @click="addEditItem(1)">save Draft</a>
               
 
               <a href="#" class="btn btn-sm fw-bold btn-info" disabled="currentStep === steps.length - 1" v-if="currentStep == 0 " @click="nextStep">Next</a>
               
-              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1" @click="addEditItem(2)">Send To RFP Review Team</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1 && !formData.approve_for_review_team" @click="addEditItem(2)">Send To RFP Review Team</a>
+
+
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 4 " @click="publish()">Publish</a>
+
+
             </div>
           </div>
         </div>
@@ -73,11 +78,11 @@
 
 
                  
-            <div class="row">
+            <div class="row" v-if="formData && formData.ID_rfp">
 
               <div class="fv-row col-md-2">
                 <label class="required fw-semibold fs-6 mb-2">Event ID Number</label>
-                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="ID Number" value="" v-model="formData.ID_rfp" required />
+                <input  type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="ID Number" value="" v-model="formData.ID_rfp" required />
               </div>
 
 
@@ -142,7 +147,7 @@
 
              
               <div class="fv-row col-md-12">
-                <label class="required fw-semibold fs-6 mb-2" for="name">Event Project Description</label>
+                <label class="required fw-semibold fs-6 mb-2" for="name">Event Project Description (Scope Overview) :</label>
                 <textarea row="6" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Description" value="" v-model="formData.description" >
                   
                 </textarea>
@@ -200,29 +205,50 @@
                 <multiselect class="" v-model="formData.vendors" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="ItemsVendors" :multiple="true" :taggable="false" :options-limit="10" :allow-empty="false" ></multiselect>
 
               </div>
-
+ 
 
 
               <div class="fv-row col-md-4">
-                <label class="required fw-semibold fs-6 mb-2">SOI Teams</label>
+                <label class="required fw-semibold fs-6 mb-2">SOI Teams (vendors Management)</label>
                 <multiselect class="" v-model="formData.soi_team" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="ItemsUsers" :multiple="true" :taggable="false" :options-limit="10" :allow-empty="false" ></multiselect>
 
               </div>
 
 
+              
               <div class="fv-row col-md-4">
-                <label class="required fw-semibold fs-6 mb-2">Technical Passing Score :</label>
-               <input type="text" :name="'name'" class="form-control form-control-solid mb-3 mb-lg-0"  value="" v-model="formData.techinical_passing_score"   required />
+                <label class="required fw-semibold fs-6 mb-2">Nogotiation Team</label>
+                <multiselect class="" v-model="formData.nogotiation_team" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="ItemsUsers" :multiple="true" :taggable="false" :options-limit="10" :allow-empty="false" ></multiselect>
 
               </div>
 
 
+              <div class="row" style="margin-top:50px;">
+
+
+                <div class="fv-row col-md-4">
+                  <label class="required fw-semibold fs-6 mb-2">Buyer Tender Team</label>
+                  <multiselect class="" v-model="formData.buyer_tender_team" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="ItemsUsers" :multiple="true" :taggable="false" :options-limit="10" :allow-empty="false" ></multiselect>
+
+                </div>
+
+
+
+
+                <div class="fv-row col-md-4">
+                  <label class="required fw-semibold fs-6 mb-2">Technical Passing Score :</label>
+                 <input type="text" :name="'name'" class="form-control form-control-solid mb-3 mb-lg-0"  value="" v-model="formData.techinical_passing_score"   required />
+
+                </div>
+              </div>
 
 
 
 
               <div class="row" style="margin-top:50px;">
 
+
+             
 
                   <div class="fv-row col-md-4">
                       <div class="form-check form-check-custom form-check-success form-check-solid" style="gap: 25px; color: rgb(255, 255, 255);"> 
@@ -514,8 +540,70 @@
       <!-- Step 3 -->
       <div v-if="currentStep === 2" class="col-12">
 
-        step three
+        <VendorsResponseExcel></VendorsResponseExcel>
 
+      </div>
+
+
+
+      <!-- Step 4 -->
+      <div v-if="currentStep === 3" class="col-12">
+
+        <TPS></TPS>
+
+      </div>
+
+
+ 
+
+      <!-- Step 5 -->
+      <div v-if="currentStep === 4" class="col-12">
+
+        <WordFile></WordFile>
+
+        <!-- Table Dates -->
+
+          <table class="table table-bordered align-middle gs-0 gy-3">
+            <thead>
+              <tr class="fw-bold text-gray-800 bg-light">
+                <th colspan="2" class="text-center">Start Date</th>
+                <th colspan="2" class="text-center" v-for="(d, index) in formDataDates.days.slice(1)" :key="'date-head-' + index">
+                  Day {{ index + 1 }}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td colspan="2" class="fw-semibold text-center text-gray-700">
+                  {{ formDataDates.startDate }}
+                </td>
+                <td colspan="2" v-for="(d, index) in formDataDates.days.slice(1)" :key="'date-' + index" class="text-center text-gray-700">
+                  {{ calculatedDates[index] }}
+                </td>
+              </tr>
+
+              <tr class="fw-bold text-gray-800 bg-light">
+                <td colspan="2" class="text-center">Working Days</td>
+                <td
+                  colspan="2"
+                  v-for="(day, index) in formDataDates.days.slice(0, -1)"
+                  :key="'day-' + index"
+                  class="text-center text-gray-700"
+                >
+                  {{ day }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+
+
+        <a href="#" class="btn btn-sm fw-bold btn-info" @click="PreivouesDate()">Go To Edit Date </a>
+
+       
+        <!-- Table Dates -->
+          
       </div>
 
 
@@ -569,7 +657,9 @@ import 'quill-better-table/dist/quill-better-table.css';
 import PricingSheet from '../buyer/PricingSheet.vue';
 import Technical from '../buyer/Technical.vue';
 import PDFHtml from '../buyer/PDFHtml.vue';
-
+import VendorsResponseExcel from '../buyer/VendorsResponseExcel.vue';
+import TPS from '../buyer/TPS.vue';
+import WordFile from '../Review/WordFile.vue';
  Quill.register({
   'modules/better-table': QuillBetterTable
 }, true);
@@ -579,7 +669,7 @@ import { nextTick } from 'vue';
  
 export default {
   components: {
-    Pagination,Multiselect,PricingSheet,Technical,PDFHtml
+    Pagination,Multiselect,PricingSheet,Technical,PDFHtml,VendorsResponseExcel,TPS,WordFile
   },
     data() {
         return {
@@ -617,6 +707,12 @@ export default {
             logo:'',
             quill: null,
             click:false,
+            formDataDates: {
+                
+
+                startDate: '2024-11-17',
+                days: [0, 0, 0, 0, 0, 0, 0,0],
+              },
 
 
             
@@ -638,6 +734,8 @@ export default {
         this.getItemById()
         // this.fetchItemsVendors()
         this.fetchItemsUsers()
+
+        this.fetchItemsRFPObject()
 
 
 
@@ -671,7 +769,26 @@ export default {
               default:
                 return 'Dashboards';
             }
-          }
+          },
+
+
+          calculatedDates() {
+              let result = [];
+              let current = this.formDataDates.startDate ? new Date(this.formDataDates.startDate) : null;
+
+              for (let i = 0; i < this.formDataDates.days.length; i++) {
+                if (!current || !this.formDataDates.days[i]) {
+                  result.push('');
+                  continue;
+                }
+
+                current = new Date(current); // clone current
+                current.setDate(current.getDate() + this.formDataDates.days[i]);
+                result.push(current.toISOString().split('T')[0]);
+              }
+
+              return result;
+          },
     },
 
 
@@ -700,20 +817,18 @@ export default {
 
 
     async nextStep() {
+        if (this.currentStep == 0) {
+            const success = await this.addEditItem();
+            if (!success) {
+                return; // ❌ لا تنتقل إذا فشل
+            }
+        }
 
-          if(this.currentStep == 0){
-            
-            this.addEditItem()
-          }
-
-
-
-
-          if (this.currentStep < this.steps.length - 1) {
+        if (this.currentStep < this.steps.length - 1) {
             this.currentStep++;
-          }
-        
+        }
     },
+
 
 
     openList(){
@@ -731,37 +846,9 @@ export default {
 
 
 
-     // async fetchItemsSections(page,query = '') {
-     //    this.isLoading = true;
-     //      await axios.get('RFPWord/getAllItems', {
-     //          params: {
-     //            pagination: 0,
-     //            // object: 'RFP',
-     //          }
-     //        })
-     //          .then(response => {
-     //              this.sections = response.data.items;
-     //              this.isLoading = false;
-     //          })
-     //          .catch(error => {
-     //             Swal.fire({
-     //              text: error,
-     //              icon: "error",
-     //              buttonsStyling: false,
-     //              confirmButtonText: "Ok, got it!",
-     //              customClass: {
-     //                  confirmButton: "btn btn-info"
-     //              }
-     //          });
+    
 
-     //             this.isLoading = false;
-     //          });
-     //  },
-
-
-
-
-        async fetchItemsCategories() {
+      async fetchItemsCategories() {
           axios.get('/ItemsCategories/getAllItems?pagination=0', {
               params: {
                   pagination: 0,
@@ -783,106 +870,89 @@ export default {
 
 
 
-      addEditItem(Draft=0){
+      async addEditItem(Draft = 0) {
+          this.isLoading = true;
+          this.formData.draft = Draft;
+
+          if (this.currentStep == 0) {
+              this.formData.category_id = this.formData.category.id;
+              this.formData.contract_id = this.formData.contract.id;
+              this.formData.type_event_id = this.formData.type_event.id;
+          }
 
 
+
+
+          if(Draft == 2 && this.formData.review_team_deadline == null ){
+              this.swalFunction('info', 'Please Fill Date DeadLine and Days .');
+              return ;
+          }
+
+
+
+          if (Draft == 2) {
+            this.formData.approve_for_review_team = 'now';
+          }
+
+          if (this.ItemID && this.ItemID != '') {
+              this.formData.Item_id = this.ItemID;
+              this.URL = 'RFPStep/editItem';
+          }
+
+          try {
+              const response = await axios.post(this.URL, this.formData);
+              this.isLoading = false;
+
+              if (response.data.items) {
+                  this.formData = response.data.items;
+                  localStorage.setItem('object_rfp', JSON.stringify(this.formData));
+                  localStorage.setItem('RFPItem', JSON.stringify(this.formData));
  
 
-        this.isLoading = true;  
-        this.formData.draft = Draft;
+                  this.sections = this.formData.sections;
 
-
-          if(this.currentStep == 0){
-            this.formData.category_id = this.formData.category.id
-            this.formData.contract_id = this.formData.contract.id
-            this.formData.type_event_id = this.formData.type_event.id
-          }
-          
-          if(this.ItemID && this.ItemID != ''){
-             // form.append('Item_id', this.ItemID);
-            this.formData.Item_id = this.ItemID
-             this.URL = 'RFPStep/editItem'
-          }
-        axios.post(this.URL,this.formData).then((response)=>{
-               this.isLoading = false;
-              if(response.data.items){ 
-                 
-                 this.formData = response.data.items
-                 localStorage.setItem('object_rfp', JSON.stringify(this.formData));
-
-                 this.sections = this.formData.sections
-
-                  this.formData.review_team =  JSON.parse(this.formData.review_team)
-                  this.formData.soi_team =  JSON.parse(this.formData.soi_team)
-                  this.formData.commercial_commite =  JSON.parse(this.formData.commercial_commite)
-                  this.formData.technical_commite =  JSON.parse(this.formData.technical_commite)
-                  this.formData.vendors =  JSON.parse(this.formData.vendors)
+                  this.formData.review_team = JSON.parse(this.formData.review_team);
+                  this.formData.soi_team = JSON.parse(this.formData.soi_team);
+                  this.formData.nogotiation_team = JSON.parse(this.formData.nogotiation_team);
+                  this.formData.buyer_tender_team = JSON.parse(this.formData.buyer_tender_team);
+                  this.formData.commercial_commite = JSON.parse(this.formData.commercial_commite);
+                  this.formData.technical_commite = JSON.parse(this.formData.technical_commite);
+                  this.formData.vendors = JSON.parse(this.formData.vendors);
 
                   for (let i = 1; i <= 6; i++) {
-                    const key = `check_${i}`;
-                    this.formData[key] = this.formData[key] == 1;
+                      const key = `check_${i}`;
+                      this.formData[key] = this.formData[key] == 1;
                   }
-
-                 // this.KcEditor()
 
                   let message = 'Saved Draft Successfully';
-                  if(Draft == 2){
+                  if (Draft == 2) {
                       message = 'Sent To Review Team Successfully';
-                      this.swalFunction('info', message)
+                      this.swalFunction('info', message);
                   }
 
-
-              }else{
+                  return true; // ✅ نجح
+              } else {
                   swal.fire({
-                  text: response.data.message,
+                      text: response.data.message,
+                      icon: 'error',
+                      timer: false,
+                      button: true,
+                  });
+                  return false; // ❌ فشل
+              }
+          } catch (error) {
+              this.isLoading = false;
+              swal.fire({
+                  text: error.message || "Error occurred",
                   icon: 'error',
                   timer: false,
-                  button: true
-                  });
-              }             
-          
-        }).catch(error => {
-                this.isLoading = false;
-                  swal.fire({
-                  text: error,
-                  icon: 'error',
-                  timer: false,
-                  button: true
-                  });
+                  button: true,
               });
-
+              return false; // ❌ فشل
+          }
       },
 
 
-
-      // addEditItemDeadline(){
-
-
-      //   this.isLoading = true;           
-      //     if(this.ItemID && this.ItemID != ''){
-      //       this.formData.Item_id = this.ItemID
-      //        this.URL = 'RFPStep/editItem'
-      //     }
-
-      //   axios.post(this.URL,this.formData).then((response)=>{
-      //          this.isLoading = false;
-      //         if(response.data.items){ 
-                 
-      //            this.formDataDeadline = response.data.items
-
-
-      //         }else{
-                  
-      //             this.swalFunction('info',response.data.message);
-      //         }             
-          
-      //   }).catch(error => {
-      //           this.isLoading = false;
-      //           this.swalFunction('error','Error Happens');
-
-      //         });
-
-      // },
 
 
 
@@ -922,20 +992,6 @@ export default {
 
 
 
-
-
-
-    // sectionData(ID){
-
-
-    //   this.click = true
-    //   this.formSection = this.formData.sections.filter(item => item.id && item.id ===ID );
-    //   this.formSection = this.formSection[0]
-    //   this.KcEditor()
-
-    //   this.quill.root.innerHTML = this.formSection.description
-    //   // console.log(this.formSection.title)
-    // },
 
 
     sectionData(ID) {
@@ -1011,17 +1067,24 @@ export default {
 
     async getItemById(){
 
-      let object = JSON.parse(localStorage.getItem('RFPItem'));
-      
-      if(!object.id || object.id == ''){
+     let savedItem = localStorage.getItem('RFPItem');
+       
+
+      if (!savedItem) {
         return false;
       }
-      
-      if(!object || object == ''){
-        return false;
-      } 
+
+
+      let object;
+      try {
+        object = JSON.parse(savedItem);
+      } catch (e) {
+        object = savedItem;
+      }
       
       this.ItemID = object.id ;
+
+
 
       axios.get('RFPStep/getById', { params: { ID: object.id } }).then(response => {
           if(response.data){
@@ -1030,9 +1093,10 @@ export default {
          
             localStorage.setItem('RFPItem', JSON.stringify(this.formData));
              this.sections = this.formData.sections
-
             this.formData.review_team =  JSON.parse(this.formData.review_team)
             this.formData.soi_team =  JSON.parse(this.formData.soi_team)
+            this.formData.nogotiation_team =  JSON.parse(this.formData.nogotiation_team)
+            this.formData.buyer_tender_team = JSON.parse(this.formData.buyer_tender_team);
             this.formData.commercial_commite =  JSON.parse(this.formData.commercial_commite)
             this.formData.technical_commite =  JSON.parse(this.formData.technical_commite)
             this.formData.vendors =  JSON.parse(this.formData.vendors)
@@ -1052,7 +1116,7 @@ export default {
       });
     },
 
-
+ 
 
 
     async fetchItemsUsers() {
@@ -1108,6 +1172,39 @@ export default {
 
                this.isLoading = false;
             });
+    },
+
+
+    async fetchItemsRFPObject() {
+        this.isLoading = true;
+          await axios.get('RFPStep/getById', {
+              params: {
+                ID:this.ItemID,
+              }
+            })
+              .then(response => { 
+                  this.RfpObject = response.data.items;
+                  this.formDataDates = JSON.parse(this.RfpObject.data_json_tps);
+                  console.log(this.formDataDates)
+
+
+                                 
+              })
+              .catch(error => {
+                console.log(error)
+                 this.swalFunction('error','Error Happens 77')
+                 this.isLoading = false;
+
+              }); 
+   
+     },
+
+
+
+    async PreivouesDate(){
+
+      this.currentStep = 3;
+
     },
 
 

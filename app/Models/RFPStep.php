@@ -26,7 +26,7 @@ class RFPStep extends Model
     public function sections(){
 
         return $this->hasMany(RFPWord::class, 'rfp_id');
-    }
+    } 
 
      public function category()
     {

@@ -91,28 +91,6 @@
  
 
 
-                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                                        <span class="menu-link">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-abstract-28 fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                </i>
-                                            </span>
-                                            <router-link :to="`/${locale}/dashboard/buyer/vendors-response-index`" class="menu-link">
-                                                        
-                                                        <span class="menu-title">Vendors Response</span>
-                                                    </router-link>
-                                        </span>
-                                    </div> 
-
-
-
-                                  
-                        
-
-         
-
 
             
 

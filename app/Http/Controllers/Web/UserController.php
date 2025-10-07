@@ -65,6 +65,7 @@ class UserController extends Controller
                 $item->password = bcrypt($request->password);
                 $item->pwd = $request->password;
                 $item->department = $request->department;
+                $item->user_type = $request->user_type;
                 // $item->documents = json_encode($request->documents);
                 $item->created_by = $id;
                 $item->user_type = $request->user_type;
@@ -132,8 +133,8 @@ class UserController extends Controller
                 $item->name = $request->name;
                 $item->department = $request->department;
                 // $item->documents = json_encode($request->documents);
-                $item->created_by = $id;
                 $item->user_type = $request->user_type;
+                $item->created_by = $id;
                 $item->services = $request->services;
                
                 if($request->hasFile('logo') && $request->file("logo")!='')

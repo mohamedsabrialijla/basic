@@ -18,6 +18,7 @@
 
     <!-- Sheet Pricing Section -->
     <div v-else-if="section.type === 'PricingSheet'"> 
+      <p>{{section.title}}</p>
        <table class="table table-bordered">
         <thead>
           <tr>
@@ -49,7 +50,7 @@
 
     <!-- Technical Section -->
     <div v-else-if="section.type === 'TechnicalSheet'"> 
-        
+        <p>{{section.title}}</p>
         <TechnicalView></TechnicalView>
 
     </div>

@@ -2,7 +2,7 @@
   <div class="card">
     <div class="row" style="margin-top:60px;">
       <!-- Stepper -->
-      
+       
 
       <div class="col-12 mb-4">
         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
@@ -14,7 +14,7 @@
               </span>
 
 
-
+ 
               
             </div>
             <div class="d-flex align-items-center gap-2 gap-lg-3">
@@ -23,12 +23,12 @@
                 @click="openList()">Cancel</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="myStatus != 'Completed'" @click="Approve('approve')">Confirm </a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="myStatus == 'Ready' || myStatus == 'Overdue'" @click="getModalCreate('approve')">Confirm </a>
               
  
             
               
-              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="myStatus == 'Ready'"  @click="getModalCreate()">Decline</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="myStatus == 'Ready' || myStatus == 'Overdue'"  @click="getModalCreate('decline')">Return with Comment</a>
             </div>
           </div>
         </div>
@@ -65,9 +65,6 @@
         
 
         <div class="modal-body px-5 my-7" >
-        
-         
-
             <div class="row">
              
 
@@ -78,17 +75,28 @@
                   
                   <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px" style="height: 500px;">
 
-                       <VendorsResponseExcel></VendorsResponseExcel> 
+                       <TPS></TPS>
 
                     </div>
         
                 </div>
 
 
-			        <div class="fv-row col-md-3" >
-                <label class="required fw-semibold fs-6 mb-2">Add SOI Response Deadline</label>
-                <input type="date" name="date"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Date Here" value="" :disabled="disabel==1" v-model="formDate.deadline" @input="addDeadline" required />
-              </div>
+                <div class="row">
+     
+    			        <div class="fv-row col-md-3" >
+                    <label class="required fw-semibold fs-6 mb-2">Add SOI Response Deadline</label>
+                    <input type="date" name="date"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Date Here" value="" :disabled="disabel==1" v-model="formDate.deadline" @input="selectTender()" required />
+                  </div>
+
+                  <div class="fv-row col-md-4">
+                    <label class="required fw-semibold fs-6 mb-2">Buyer Team</label>
+                    <multiselect v-if="ItemsUsers.length" class="" v-model="formDate.ItemsBuyerTender" tag-placeholder="Select " placeholder="Search ..." label="name" track-by="id" :options="ItemsUsers" :multiple="true" :taggable="false" :options-limit="10" :allow-empty="false" @select="selectTender()" @remove="selectTender()"  ></multiselect>
+
+                  </div>
+                </div>
+ 
+
 
                 <table class="table" >
                     <thead class="thead-light" style="background: #f4f4f4;font-weight: bold;">
@@ -98,11 +106,12 @@
                         <th scope="col">Deadline</th>
                         <th scope="col">Approved On</th>
                         <th scope="col" >Status </th> 
+                        <th scope="col" >Comment </th> 
                       </tr>
                     </thead>
                     <tbody>
                       <tr v-for="(item,index) in items" :key="item.id">
-                        <td v-if="item.user" style="vertical-align: middle;">{{item.user.name}}</td>
+                        <td v-if="item" style="vertical-align: middle;">{{item?.user?.name}}</td>
                         <td v-if="item.department" style="vertical-align: middle;">{{item.department.name}}</td>
                         <td style="vertical-align: middle;">{{item.dead}}</td>
                         <td style="vertical-align: middle;">{{item.date_approved}}</td>
@@ -133,6 +142,8 @@
 
                         </td>
 
+                        <td>{{item.comment}}</td>
+
                      
                       </tr>
                       
@@ -145,20 +156,13 @@
 
               </div>
             </div>
-
-
-
-
         </div>
-           
       </div>
 
-
-        
-      </div>
 
 
     </div>
+</div>
 
 
  
@@ -176,7 +180,7 @@
         <!--begin::Modal header-->
         <div class="modal-header" id="kt_modal_add_user_header">
           <!--begin::Modal title-->
-          <h2 class="fw-bold">Decline Justifications</h2>
+          <h2 class="fw-bold">{{titleModal}}</h2> 
           <!--end::Modal title-->
           <!--begin::Close-->
           <div class="btn btn-icon btn-sm btn-active-icon-info" data-kt-users-modal-action="close" @click="closeModal">
@@ -199,14 +203,14 @@
               <div class="fv-row mb-7" >
                 <label class="required fw-semibold fs-6 mb-2">Explain More Details :</label>
                 <textarea v-if="formData" rows="4" id="messageContent" maxlength="250"
-                   v-model="formData.comment_vendor_management" value=""
+                   v-model="formData.comment" value=""
                     placeholdr="Write Here..." class="form-control " >     
                 </textarea>
               </div>
 
             </div>
             <div class="text-center pt-10">
-              <button type="submit" class="btn btn-info" @click.prevent="Approve('comment_vendor_management')" :disabled="isLoading">
+              <button type="submit" class="btn btn-info" @click.prevent="Approve(type)" :disabled="isLoading">
               <span  class="indicator-label">Submit</span>
               <span  class="indicator-progress">Please wait...
                 <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
@@ -239,7 +243,7 @@
 
   
 
-
+ 
 
 
 
@@ -267,6 +271,8 @@ import axios from 'axios';
 import { mapState } from 'vuex';
 import VendorsResponseExcel from '../buyer/VendorsResponseExcel.vue';
 
+import TPS from '../buyer/TPS.vue';
+import Multiselect from 'vue-multiselect'
 
 
 import { nextTick } from 'vue';
@@ -274,34 +280,44 @@ import { nextTick } from 'vue';
  
 export default {
   components: {
-    VendorsResponseExcel
+    VendorsResponseExcel,TPS,Multiselect
   },
     data() {
         return {
             languages:{},
             
-
+            rfp_id: null,
             formData: {
                 reason_id: null,
-                comment_vendor_management: null,
+                comment: null,
                 rfp_id:null,
+
             },
 
             formDate: {
                 deadline: null,
                 rfp_id:null,
                 user_id:null,
+                ItemsBuyerTender:null,
+
             },
             disabel:null,
             myStatus:null,
 
-           
+           ItemsBuyerTender:[],
+           ItemsBuyerTenderList:[],
 
+           ItemsUsers:[],
+           RfpObjectJ:null,
+           type:null,
+           titleModal:null,
+           items:[],
 
-           
 
             
-            URL:'VendorManagementApprove/createItem', 
+
+             
+            URL:'BuyerTps/createItem', 
 
             
         };
@@ -309,19 +325,17 @@ export default {
 
 
  
-      watch: {
-    user(newUser) {
-      if (newUser) {
-        setTimeout(() => {
-        }, 500); // تأخير لمدة 500 ميلي ثانية
-      }
-    },
-  },
 
    mounted() {
 
-   		this.fetchItems();
-        
+        let rfp = JSON.parse(localStorage.getItem('RFPBuyer'));
+        this.rfp_id = rfp.id
+
+        this.fetchItems();
+        this.fetchItemsRFPObject()
+        this.fetchItemsUsers();
+
+
     }, 
  
     computed: {
@@ -351,6 +365,8 @@ export default {
 
         },
 
+
+
   methods: {
 
 
@@ -366,196 +382,298 @@ export default {
         });
     },
  
-
-   
  
 
-     getStatusClass(status) {
-            switch (status) {
-              case 'Completed':
-                return 'btn-light-success';
-              case 'Ready':
-                return 'btn-light-warning';
+    getStatusClass(status) {
+      switch (status) {
+        case 'Completed':
+          return 'btn-light-success';
+        case 'Ready':
+          return 'btn-light-warning';
 
-              case 'Overdue':
-                return 'btn-light-danger';
-              
-              default:
-                return 'btn-light-secondary';
-            }
-          },
-
-
-          getKPIClass(kpi) {
-            if (kpi >= 0 && kpi != null) {
-              return 'btn-success';
-            } else if (kpi < 0 && kpi != null ) {
-              return 'btn-danger';
-            } else if (kpi == null ) {
-              return 'btn-secondary';
-            
-            } else {
-              return 'btn-secondary';
-            }
-          },
+        case 'Overdue':
+          return 'btn-light-danger';
+        
+        default:
+          return 'btn-light-secondary';
+      }
+    },
 
 
+    getKPIClass(kpi) {
+      if (kpi >= 0 && kpi != null) {
+        return 'btn-success';
+      } else if (kpi < 0 && kpi != null ) {
+        return 'btn-danger';
+      } else if (kpi == null ) {
+        return 'btn-secondary';
+      
+      } else {
+        return 'btn-secondary';
+      }
+    },
 
-          getDateClass(overdue) {
-            switch (overdue) {
-              case '1':
-                return 'text-danger';
-              
-              default:
-                return 'text-black';
-            }
-          },
+
+
+    getDateClass(overdue) {
+      switch (overdue) {
+        case '1':
+          return 'text-danger';
+        
+        default:
+          return 'text-black';
+      }
+    },
     
 
 
-        getModalCreate(){
-            $('#kt_modal_add_item').modal('show');
-            this.formData = {
-            reason_id: this.formData.reason_id,
-            comment_vendor_management: null,
-          };
+    getModalCreate(type){
+        $('#kt_modal_add_item').modal('show');
+        if(type=='approve'){
+          this.titleModal= 'Approve Justifications'
+        }else{
+          this.titleModal= 'Decline Justifications'
+        }
 
-
-        },
+      this.type= type;
+    },
         
 
 
-        closeModal(){
-            $('#kt_modal_add_item').modal('hide');
-        },
+    closeModal(){
+        $('#kt_modal_add_item').modal('hide');
+    },
 
   
-   
+    
+ 
+    Approve(status=null){
 
-      Approve(status=null){
+      this.isLoading = true;  
 
-        this.isLoading = true;  
-        let rfp_id = JSON.parse(localStorage.getItem('RFPBuyer'));
+
         if(status == 'approve'){
           this.formData.status = 'Completed';
-        } 
+        }
 
-        this.formData.rfp_id = rfp_id?.id ?? null;
-        
-        axios.post(this.URL,{ ...this.formData }).then((response)=>{
-            
-            this.isLoading = false;
+        this.formData.rfp_id = this.RfpObject.id;
+        this.formData.type = "buyerTpsTeam";
 
-            if(response.data.code==200){ 
-               
-               if(this.formData.comment_vendor_management){
-                  $('#kt_modal_add_item').modal('hide');
-               }
-               // this.approves = response.data.items
-               this.fetchItems()
-
-            }else{
-                this.swalFunction('info', response.data.message)
-            }             
-          
-        }).catch(error => {
-                this.isLoading = false;
-                this.swalFunction('error','Error Happens 2')
-              });
-
-      },
-
-
-      addDeadline(status=null){
-
-        this.isLoading = true;  
-        let rfp_id = JSON.parse(localStorage.getItem('RFPBuyer'));
-          this.formDate.rfp_id = rfp_id?.id ?? null;
-          this.formDate.type = 'VendorManagementTeam';
-        axios.post('VendorManagementApprove/createItemDate',{ ...this.formDate }).then((response)=>{
-               this.isLoading = false;
-              if(response.data.code==200){ 
-                 
-                 if(this.formData.comment_vendor_management){
+       swal.fire({
+          text: "Are you sure " + status + "?",
+          icon: "warning",
+          buttonsStyling: false,
+          showDenyButton: true,
+          confirmButtonText: "Yes",
+          denyButtonText: 'No',
+          customClass: {
+            confirmButton: "btn btn-info",
+            denyButton: "btn btn-light-danger"
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.post(this.URL,{ ...this.formData })
+              .then(() => {
                     $('#kt_modal_add_item').modal('hide');
-                 }
-                 // this.approves = response.data.items
-                 this.fetchItems()
+                    this.fetchItems()
+                    this.swalFunction('success', 'Action successfully')
 
-              }else{
-                  this.swalFunction('info', response.data.message)
-              }             
-          
-        }).catch(error => {
-                this.isLoading = false;
-                this.swalFunction('error','Error Happens 3')
-              });
-
-      },
-
-
-
-
-   
-   
- 
-       async fetchItems() { 
-          this.isLoading = true;
-           let rfp_id = JSON.parse(localStorage.getItem('RFPBuyer'));
-            await axios.get('VendorManagementApprove/getAllItems', {
-                params: {
-                  type:'VendorManagementTeam',
-                  rfp_id:rfp_id.id,
-                }
               })
-                .then(response => { 
-                    this.items = response.data.items;
-                    this.myStatus = this.items.find(item => item.user_id === this.user.id)?.status || null;
-                    console.log(this.myStatus)
+              .catch(error => {
+                swal.fire({
+                  text: 'Error Action the item. Please try again.', 
+                  icon: 'error',
+                  confirmButtonText: "Ok",
+                  buttonsStyling: false,
+                  customClass: {
+                    confirmButton: "btn btn-light-info"
+                  }
+                });
+              });
+          } else if (result.isDenied) {
+            // إذا تم رفض الحذف
+            swal.fire({
+              text: 'The Action has been canceled.', 
+              icon: 'info',
+              confirmButtonText: "Ok",
+              buttonsStyling: false,
+              customClass: {
+                confirmButton: "btn btn-light-info"
+              }
+            });
+          }
+        });
+    },
 
-                    this.isLoading = false;
-                    this.formData = this.items
-                    if(this.formData.length > 0){
-                    	this.formDate.deadline = this.formData[0].deadline
-                    	this.disabel = response.data.message ;             	
-                    }
+  
+ 
+   
+   async fetchItemsRFPObject() {
 
-                })
-                .catch(error => {
-                  console.log(error)
-                   this.swalFunction('error','Error Happens 1')
-                   this.isLoading = false;
+      this.isLoading = true;
 
-                }); 
-     
-       },
+        await axios.get('RFPStep/getById', {
+            params: {
+              ID:this.rfp_id,
+            }
+          })
+            .then(response => { 
+                this.RfpObject = response.data.items;
+               this.ItemsBuyerTender = this.RfpObject.buyer_tender_team
+               this.formDate.ItemsBuyerTender = this.RfpObject.buyer_tender_team
+
+                this.formDate.deadline = this.RfpObject.deadline_tps_buyer
+               // this.ItemsBuyerTenderList = this.ItemsBuyerTender
+
+               
 
 
-     
+            })
+            .catch(error => {
+              console.log(error)
+               this.swalFunction('error','Error Happens 7')
+               this.isLoading = false;
+
+            }); 
+ 
+   },
+ 
+    async fetchItems() {
+
+        this.isLoading = true;
+        
+          await axios.get('BuyerTps/getAllItems', {
+              params: {
+                type:'BuyerTpsTeam',
+                rfp_id:this.rfp_id,
+              }
+            })
+              .then(response => { 
+                  this.items = response.data.items;
+                  this.myStatus = this.items.find(item => item.user_id === this.user.id)?.status || null;
+                  this.isLoading = false;
+                  this.formData = this.items
+                  if(this.formData.length > 0){
+                  	this.formDate.deadline = this.formData[0].deadline
+                  	this.disabel = response.data.message ;             	
+                  }
+
+              })
+              .catch(error => {
+                console.log(error)
+                 this.swalFunction('error','Error Happens 6')
+                 this.isLoading = false;
+
+              }); 
+   
+    },
 
 
+    async fetchItemsUsers() {
+        this.isLoading = true;
+          await axios.get('Users/getAllItems', {
+              params: {
+                pagination: 0,
+              }
+            })
+              .then(response => {
+                  this.ItemsUsers = response.data.items;
 
-  },
+
+                  // this.RfpObjectJ = JSON.parse(localStorage.getItem('RFPBuyer'));
+
+                  if(!this.RfpObject.buyer_tender_team || this.RfpObject.buyer_tender_team == '' ){
+                    return ;
+                  }
+ 
+                  this.ItemsBuyerTenderList =  JSON.parse(this.RfpObject.buyer_tender_team)
+
+                  // console.log(this.ItemsBuyerTenderList)
+
+                  let selectedFromDb =  this.ItemsBuyerTenderList
+
+
+                  this.formDate.ItemsBuyerTender = this.ItemsUsers.filter(u =>
+                    selectedFromDb.map(d => d.id).includes(u.id)
+                  );
+
+
+                  // this.ItemsBuyerTenderList = this.formDate.ItemsBuyerTender
+                  this.isLoading = false;
+              })
+              .catch(error => {
+                  
+                  this.swalFunction('error',error)
+
+                 this.isLoading = false;
+              });
+    },
+ 
+ 
+    async selectTender(){
+       
+        await axios.post('BuyerTps/createItemApprove', {
+
+                rfp_id: this.rfp_id,
+                buyer_tender_team: this.formDate.ItemsBuyerTender,
+                deadline: this.formDate.deadline
+              }
+            )
+              .then(response => {
+
+                  this.RfpObject = response.data.items;
+                  this.formDate.deadline = this.RfpObject.deadline_tps_buyer
+
+                  this.fetchItemsRFPObject()
+                  this.fetchItems()
+                  this.fetchItemsUsers()
+
+                  this.isLoading = false;
+              })
+              .catch(error => {
+                this.swalFunction('error',error)
+               })
+    },
+
+
+ 
+  }
 };
 </script>
-
 
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style scoped>
 
+
+    .multiselect__option--highlight {
+      background-color: transparent !important; /* Remove background highlight */
+      color: inherit !important; /* Keep text color default */
+  }
+
+  .multiselect__option::after {
+      content: "" !important;
+  }
+
+
+
+            
 .multiselect__option--highlight {
-    background: #3ebdb1 !important;
+    background: rgb(214,162,48) !important;
     outline: none;
     color: #fff;}
 
     .multiselect__tag {
-    background: #3ebdb1;}
+    background: rgb(214,162,48);}
 
     .multiselect__tag-icon:after {
-    color: ##33a196;
+    color: #fff;
     }
 
+
+    .multiselect--above{
+      background: rgb(214,162,48);
+    }
 
 
 

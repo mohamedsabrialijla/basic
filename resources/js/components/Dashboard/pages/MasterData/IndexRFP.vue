@@ -119,6 +119,13 @@
 
 
 
+                        <div class="overlay-wrapper text-gray-600">
+
+                          <i @click="openTpsBuyer(item)" class="ki-duotone ki-exit-right fs-2"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+
+
+
                       
                         
 
@@ -255,13 +262,19 @@ export default {
           this.$router.push({ path: `/${this.locale}/dashboard/master_data/projects/rfp-step` });
         },
 
-
+ 
 
 
 
         openRFPSteperForEdit(RFPItem){
           localStorage.setItem('RFPItem', JSON.stringify(RFPItem)); 
           this.$router.push({ path: `/${this.locale}/dashboard/master_data/projects/rfp-step` });
+        },
+ 
+
+        openTpsBuyer(RFPItem){
+          localStorage.setItem('RFPBuyer', JSON.stringify(RFPItem)); 
+          this.$router.push({ path: `/${this.locale}/dashboard/buyer/tps` });
         },
 
 

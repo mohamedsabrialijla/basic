@@ -25,7 +25,7 @@ use Carbon\Carbon;
 
 
  
-class BuyerApproveController extends Controller
+class VendorManagementController extends Controller
 {
   
      public function __construct() {
@@ -65,7 +65,7 @@ class BuyerApproveController extends Controller
                 $status="Completed";
                 $rfp = RFPStep::where('id',$request->rfp_id)->first();
 
-                $item = Approve::where('user_id',$id)->where('rfp_id', $request->rfp_id)->where('type','BuyerTeam')->first();
+                $item = Approve::where('user_id',$id)->where('rfp_id', $request->rfp_id)->where('type','VendorManagementTeam')->first();
                 
                 if($item && $item != ''){
                    $item = $item; 
@@ -73,18 +73,18 @@ class BuyerApproveController extends Controller
                     $item = New Approve();
                 }
 
-                if($request->status != 'Completed' || $request->comment_buyer ){
+                if($request->status != 'Completed' || $request->comment_vendor_management ){
                     $status="Decline";
-                    $item->comment_buyer = $request->comment_buyer;                
+                    $item->comment_vendor_management = $request->comment_vendor_management;                
                     $item->reason_id = $request->reason_id; 
                 }else{
 
-                    $item->comment_buyer = null;                
+                    $item->comment_vendor_management = null;                
                     $item->reason_id = null; 
                 }
-
+ 
                 $item->rfp_id = $request->rfp_id; 
-                $item->type = 'BuyerTeam';
+                $item->type = 'VendorManagementTeam';
                 $item->user_id = $id;
                 // $item->deadline = $item->deadline ? $item->deadline: '' ;
                 $item->status = $status;
@@ -105,7 +105,7 @@ class BuyerApproveController extends Controller
                     // $status = 'Overdue'
                 }
 
-                // $item->kpi = $daysDifference;
+                $item->kpi = $daysDifference;
                 $item->overdue = $overdue;
                 $item->date_approved = Carbon::now();
                 $item->save();
@@ -122,6 +122,7 @@ class BuyerApproveController extends Controller
 
        
         }
+
     }
 
 
@@ -173,11 +174,13 @@ class BuyerApproveController extends Controller
             $deadline = $lastSoiApprovalDate->copy()->addDays($rfp->soi_days_deadline);
 
             $soiTeam = json_decode($rfp->soi_team, true); 
+
+            // dd($soiTeam);
             
             foreach ($soiTeam as $key => $value) {
                 $item = new Approve();
                 $item->rfp_id = $request->rfp_id; 
-                $item->type = 'buyerTeam'; 
+                $item->type = 'VendorManagementTeam'; 
                 $item->user_id = $value['id'];
                 $item->deadline = null;
                 $item->status = 'Ready';
@@ -272,7 +275,7 @@ class BuyerApproveController extends Controller
 
     }
 
-
+ 
     public function getAllItemsResponseVendor(Request $request)
     {
 
@@ -287,34 +290,6 @@ class BuyerApproveController extends Controller
             ->get();
 
 
-
-
-        $message = "success return";
-        return mainResponse(true, $message, $items, 200, 'items', '');
-    }
-
-
-     public function getAllItemsResponseVendorInvited(Request $request)
-    {
- 
-        // dd($request->all());
-
-        $id = auth('sanctum')->id();
-       
-        $criteriaCount = DB::table('items_categories')
-            ->where('type_id', 2)->whereNull('deleted_at')
-            ->count();
-
-        $approvedVendors = DB::table('response_vendors')
-            ->select('vendor_id', DB::raw('COUNT(*) as responses_count'))
-            ->where('rfp_id', $request->rfp_id)
-            ->where('response', 'YES') 
-            ->groupBy('vendor_id')
-            ->having('responses_count', '=', $criteriaCount)
-            ->pluck('vendor_id');
-
-
-        $items = User::with('department')->whereIn('id',$approvedVendors)->get();
 
 
         $message = "success return";
@@ -417,7 +392,7 @@ class BuyerApproveController extends Controller
            ->count();
 
 
-         $invited = 3 ;
+         $invited = $fullyApprovedCount;
 
 
 
@@ -430,7 +405,7 @@ class BuyerApproveController extends Controller
 
 
          $items22 = Approve::where('rfp_id', $request->rfp_id)
-            ->where('type', 'BuyerTeam')
+            ->where('type', 'VendorManagementTeam')
             ->orderBy('id','ASC')
             ->get();
 
@@ -443,7 +418,12 @@ class BuyerApproveController extends Controller
         }   
 
          return mainResponse(true, $disable, $items, 200, 'items', '');
+
+
+      
+       
     }
+
 
 
 

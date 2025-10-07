@@ -23,19 +23,32 @@
                 <li class="breadcrumb-item text-muted">{{ breadcrumbLabel }}</li>
 
               </ul>
-            </div>
+
+
+               <span style="margin-top:10px;" v-if="myStatus"  :class="getStatusClass(myStatus)" class="btn btn-sm ">
+                {{myStatus}}
+              </span>
+
+             <!--  <span v-else  class="btn btn-sm btn-light-warning">
+                Ready
+              </span> -->
+
+
+
+
+            </div> 
             <div class="d-flex align-items-center gap-2 gap-lg-3">
               
               <a href="#" class="btn btn-sm fw-bold btn-secondary" 
                 @click="openList()">Cancel</a>
               
 
-              <a href="#" class="btn btn-sm fw-bold btn-info" @click="Approve2('approve')">Approve</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="myStatus=='Ready'" @click="Approve2('approve')">Approve</a>
               
  
             
               
-              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1" @click="getModalCreate()">Return To Comment</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1 && myStatus=='Ready'" @click="getModalCreate()">Return To Comment</a>
             </div>
           </div>
         </div> 
@@ -309,7 +322,7 @@ export default {
             logo:'',
             quill: null,
             click:false,
-
+            myStatus: 'Ready',
 
             
             ItemID: null,
@@ -330,10 +343,21 @@ export default {
         this.fetchItems()
     }, 
 
+    watch: {
+      user(newUser) {
+        if (newUser) {
+          setTimeout(() => {
+          }, 500); // تأخير لمدة 500 ميلي ثانية
+        }
+      },
+    },
+
     computed: {
       locale() {
               return this.$route.params.locale;
           },
+
+          ...mapState(['user']),
 
 
            breadcrumbLabel() {
@@ -371,6 +395,7 @@ export default {
         });
     },
  
+
 
      getStatusClass(status) {
             switch (status) {
@@ -533,18 +558,6 @@ export default {
 
 
 
-
-
-
-
-
-
- 
-     
-
-
-
-
       async fetchItems() {
           this.isLoading = true;
            let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
@@ -556,6 +569,9 @@ export default {
               })
                 .then(response => {
                     this.items = response.data.items;
+                   
+                   this.myStatus = this.items.find(item => item.user_id === this.user.id)?.status || null;
+
                     this.isLoading = false;
                 })
                 .catch(error => {

@@ -67,7 +67,8 @@
                 </div>
               </th>
               <th class="min-w-125px">User</th>
-              <th class="min-w-125px">Role</th>
+              <th class="min-w-125px">Type</th>
+              <!-- <th class="min-w-125px">Role</th> -->
               <th class="min-w-125px">Status</th>
               <th class="min-w-125px">Joined Date</th>
               <th class="text-center min-w-100px">Actions</th>
@@ -97,7 +98,8 @@
                 </div>
                 <!--begin::User details-->
               </td>
-              <td v-if="item.role_name">{{item.role_name.display_name}}</td>
+              <td>{{item.user_type}}</td>
+              <!-- <td v-if="item.role_name">{{item.role_name.display_name}}</td> -->
               <td>
                 <div v-if="item.status=='active'" class="badge badge-light-success fw-bold">{{item.status}}</div>
                 <div v-else class="badge badge-light-danger fw-bold">{{item.status}}</div>
@@ -245,6 +247,20 @@
                     <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
                  </select>
               </div> -->
+
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">User Type</label>
+                <select class="form-control" v-model="formData.user_type">
+                  <option disabled value="">-- اختر النوع --</option>
+                  <option value="admin">Admin</option>
+                  <option value="vendor">Vendor</option>
+                  <option value="review">Review</option>
+                  <option value="buyer">Buyer</option>
+                  <option value="vendor management">Vendor Management</option>
+                </select>
+              </div>
+
 
  
 
@@ -591,7 +607,7 @@ export default {
           this.formData.role_id = roleId;
         },
 
- 
+  
         addEditItem() {
           
           this.isLoading = true;
@@ -613,6 +629,10 @@ export default {
               form.append('position', this.formData.position);
               form.append('level', this.formData.level);
 
+              if (this.formData.user_type) {
+                form.append('user_type', this.formData.user_type);
+              }
+              
 
               if(this.formData.department){
 

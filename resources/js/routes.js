@@ -35,6 +35,8 @@ import StepTemplate from './components/Dashboard/pages/MasterData/StepTemplate.v
 
 
 
+
+
 // Review Team
 
 import IndexReview from './components/Dashboard/pages/Review/Index.vue';
@@ -62,6 +64,7 @@ import VendorStep from './components/Dashboard/pages/Vendor/VendorStep.vue';
 
 import VendorsResponseIndex from './components/Dashboard/pages/buyer/VendorsResponseIndex.vue';
 import VendorsResponseRfp from './components/Dashboard/pages/buyer/VendorsResponseRfp.vue';
+import TPSApprove from './components/Dashboard/pages/buyer/TPSApprove.vue';
 
 
 
@@ -296,6 +299,13 @@ const routes = [
         path: '/:locale/dashboard/buyer/vendors-response-rfp', 
         component: VendorsResponseRfp, 
         meta: { requiresAuth: true, breadcrumb: 'RFP Management' } 
+    },
+
+
+    { 
+        path: '/:locale/dashboard/buyer/tps', 
+        component: TPSApprove, 
+        meta: { requiresAuth: true, breadcrumb: 'TPS Management' }
     },
 
 

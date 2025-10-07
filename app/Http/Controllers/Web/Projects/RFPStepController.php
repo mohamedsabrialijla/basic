@@ -63,7 +63,6 @@ class RFPStepController extends Controller
         if ($validator->fails()) {
             return mainResponse(false, '' , null, 203, 'items',$validator);
         }else{
-
           
                 $item = New RFPStep;
                
@@ -83,6 +82,8 @@ class RFPStepController extends Controller
                 $item->commercial_commite = json_encode($request->commercial_commite);
                 $item->review_team = json_encode($request->review_team);
                 $item->soi_team = json_encode($request->soi_team);
+                $item->nogotiation_team = json_encode($request->nogotiation_team);
+                $item->buyer_tender_team = json_encode($request->buyer_tender_team);
                 $item->technical_commite = json_encode($request->technical_commite);
                 $item->vendors = json_encode($request->vendors);
                 $item->currency = $request->currency;
@@ -175,6 +176,8 @@ class RFPStepController extends Controller
                 $item->commercial_commite = json_encode($request->commercial_commite);
                 $item->review_team = json_encode($request->review_team);
                 $item->soi_team = json_encode($request->soi_team);
+                $item->nogotiation_team = json_encode($request->nogotiation_team);
+                $item->buyer_tender_team = json_encode($request->buyer_tender_team);
                 $item->technical_commite = json_encode($request->technical_commite);
                 $item->vendors = json_encode($request->vendors);
                 $item->currency = $request->currency;
@@ -194,6 +197,9 @@ class RFPStepController extends Controller
                 $item->review_team_deadline = $request->review_team_deadline ? $request->review_team_deadline : null ;
                 $item->soi_days_deadline = $request->soi_days_deadline ? $request->soi_days_deadline : null ;
                 $item->draft = $request->draft  ? $request->draft: 0 ;
+
+                $item->approve_for_review_team = $request->approve_for_review_team ? Carbon::now() : null ;
+                
                
 
                 $item->save();
@@ -232,7 +238,7 @@ class RFPStepController extends Controller
 
          $id = auth('sanctum')->id();
 
-            $items = RFPStep::query();
+            $items = RFPStep::query()->with('category');
 
 
             if($request->has('search') && !empty($request->search)) {
@@ -255,11 +261,18 @@ class RFPStepController extends Controller
             }            
 
 
-            if($request->has('review') && !empty($request->review)) {
-                
+            if ($request->has('review') && !empty($request->review)) {
                 $items = $items->filter(function ($item) use ($id) {
                     $reviewTeam = json_decode($item->review_team, true);
-                    if (!is_array($reviewTeam)) return false;
+
+                    // تأكد من وجود تاريخ صالح
+                    if (empty($item->approve_for_review_team)) {
+                        return false;
+                    }
+
+                    if (!is_array($reviewTeam)) {
+                        return false;
+                    }
 
                     foreach ($reviewTeam as $member) {
                         if (isset($member['id']) && $member['id'] == $id) {
@@ -268,69 +281,69 @@ class RFPStepController extends Controller
                     }
 
                     return false;
-                })->values(); 
-
+                })->values();
             }
+
 
       
 
 
-        if ($request->has('buyer') && !empty($request->buyer)) {
-            $items = $items->filter(function ($item) use ($id) {
-                $soiTeam = json_decode($item->soi_team, true);
-                if (!is_array($soiTeam) || empty($soiTeam)) return false;
+            if ($request->has('buyer') && !empty($request->buyer)) {
+                $items = $items->filter(function ($item) use ($id) {
+                    $soiTeam = json_decode($item->soi_team, true);
+                    if (!is_array($soiTeam) || empty($soiTeam)) return false;
 
-                // شرط أساسي: المستخدم موجود في الفريق
-                // $userInTeam = collect($soiTeam)->pluck('id')->contains($id);
-                // if (!$userInTeam) return false;
+                    // شرط أساسي: المستخدم موجود في الفريق
+                    // $userInTeam = collect($soiTeam)->pluck('id')->contains($id);
+                    // if (!$userInTeam) return false;
 
-                // شرط جديد: كل vendorTeam عاملين approval
-                $anyReviewPending = \App\Models\Approve::where('rfp_id', $item->id)
-                    ->where('type', 'vendorTeam')
-                    ->whereNull('date_approved')
-                    ->exists();
+                    // شرط جديد: كل vendorTeam عاملين approval
+                    $anyReviewPending = \App\Models\Approve::where('rfp_id', $item->id)
+                        ->where('type', 'vendorTeam')
+                        ->whereNull('date_approved')
+                        ->exists();
 
-                if ($anyReviewPending) return false;
+                    if ($anyReviewPending) return false;
 
-                // جلب أول شخص لم يوافق بعد (soiTeam)
-                $firstPendingApprove = \App\Models\Approve::where('rfp_id', $item->id)
-                    ->where('type', 'BuyerTeam')
-                    ->whereNull('date_approved')
-                    ->orderBy('id', 'ASC')
-                    ->first();
+                    // جلب أول شخص لم يوافق بعد (soiTeam)
+                    $firstPendingApprove = \App\Models\Approve::where('rfp_id', $item->id)
+                        ->where('type', 'BuyerTeam')
+                        ->whereNull('date_approved')
+                        ->orderBy('id', 'ASC')
+                        ->first();
 
-                if ($firstPendingApprove) {
-                    return $firstPendingApprove->user_id == $id;
-                } else {
-                    // لا يوجد موافقات بعد → فقط أول واحد في الفريق يظهر له
-                    $firstTeamMemberId = $soiTeam[0]['id'] ?? null;
-                    return $firstTeamMemberId == $id;
-                }
-            })->values();
-        }
+                    if ($firstPendingApprove) {
+                        return $firstPendingApprove->user_id == $id;
+                    } else {
+                        // لا يوجد موافقات بعد → فقط أول واحد في الفريق يظهر له
+                        $firstTeamMemberId = $soiTeam[0]['id'] ?? null;
+                        return $firstTeamMemberId == $id;
+                    }
+                })->values();
+            }
 
 
-        if ($request->has('vendor') && !empty($request->vendor)) {
-            $items = $items->filter(function ($item) use ($id) {
-                $vendors = json_decode($item->vendors, true);
-                if (!is_array($vendors) || empty($vendors)) return false;
+            if ($request->has('vendor') && !empty($request->vendor)) {
+                $items = $items->filter(function ($item) use ($id) {
+                    $vendors = json_decode($item->vendors, true);
+                    if (!is_array($vendors) || empty($vendors)) return false;
 
-                // شرط أساسي: المستخدم موجود في الفريق
-                $userInTeam = collect($vendors)->pluck('id')->contains($id);
-                if (!$userInTeam) return false;
+                    // شرط أساسي: المستخدم موجود في الفريق
+                    $userInTeam = collect($vendors)->pluck('id')->contains($id);
+                    if (!$userInTeam) return false;
 
-                // شرط جديد: كل reviewTeam عاملين approval
-                $anyReviewPending = \App\Models\Approve::where('rfp_id', $item->id)
-                    ->where('type', 'reviewTeam')
-                    ->whereNull('date_approved')
-                    ->exists();
+                    // شرط جديد: كل reviewTeam عاملين approval
+                    $anyReviewPending = \App\Models\Approve::where('rfp_id', $item->id)
+                        ->where('type', 'reviewTeam')
+                        ->whereNull('date_approved')
+                        ->exists();
 
-                if ($anyReviewPending) return false;
+                    if ($anyReviewPending) return false;
 
-                return true;
+                    return true;
 
-            })->values();
-        }
+                })->values();
+            }
 
 
 

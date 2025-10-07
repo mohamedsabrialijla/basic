@@ -327,11 +327,46 @@ Route::group([
             Route::post('createItemDate', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'createItemDate']);
             Route::get('excelResponse', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'excelResponse']);
             Route::get('getAllItemsResponseVendor', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'getAllItemsResponseVendor']);
+            Route::get('getAllItemsResponseVendorInvited', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'getAllItemsResponseVendorInvited']);
             Route::get('getAllItemsStaticitics', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'getAllItemsStaticitics']);
             
             Route::post('Store', [App\Http\Controllers\Web\Projects\BuyerApproveController::class,'Store']);
 
+
         });
+
+
+
+
+        Route::group(['prefix' => 'VendorManagementApprove'], function () {
+
+            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\VendorManagementController::class,'getAll']);
+            Route::get('getById', [App\Http\Controllers\Web\Projects\VendorManagementController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\Projects\VendorManagementController::class,'create']);
+            Route::post('createItemDate', [App\Http\Controllers\Web\Projects\VendorManagementController::class,'createItemDate']);
+            Route::get('excelResponse', [App\Http\Controllers\Web\Projects\VendorManagementController::class,'excelResponse']);
+            Route::get('getAllItemsResponseVendor', [App\Http\Controllers\Web\Projects\VendorManagementController::class,'getAllItemsResponseVendor']);
+            Route::get('getAllItemsStaticitics', [App\Http\Controllers\Web\Projects\VendorManagementController::class,'getAllItemsStaticitics']);
+            
+            Route::post('Store', [App\Http\Controllers\Web\Projects\VendorManagementController::class,'Store']);
+
+        });
+
+
+
+
+        Route::group(['prefix' => 'BuyerTps'], function () {
+
+            Route::get('getAllItems', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'getAll']);
+            Route::get('getById', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'getById']);
+            Route::post('createItem', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'create']);
+            Route::post('Store', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'Store']);
+            Route::post('createItemApprove', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'createItemApprove']);
+            Route::post('createTPSData', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'createTPSData']);
+
+
+        });
+
 
 
 

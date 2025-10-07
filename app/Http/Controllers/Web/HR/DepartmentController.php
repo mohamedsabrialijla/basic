@@ -132,7 +132,7 @@ class DepartmentController extends Controller
     {
          $id = auth('sanctum')->id();
 
-            $items = Department::query()->where('company_id', company_auth_id());
+            $items = Department::query();
 
             if($request->has('search') && !empty($request->search)) {
                 $items->where(function($query) use ($request) {

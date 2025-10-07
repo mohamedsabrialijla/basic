@@ -8,6 +8,7 @@ use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 
 class ItemsCategories extends Model
 {
@@ -47,9 +48,13 @@ class ItemsCategories extends Model
 
 
     public function criteria() {
-        $id = auth('sanctum')->id();
-        return $this->hasOne(Document::class, 'criteria_id')->where('user_id',$id);
-    }
+    $rfp_id = Request::get('rfp_id'); // أو Request::input('rfp_id')
+    $user_id = auth('sanctum')->id();
+
+    return $this->hasOne(Document::class, 'criteria_id')
+                ->where('user_id', $user_id)
+                ->where('rfp_id', $rfp_id);
+}
     
    
     

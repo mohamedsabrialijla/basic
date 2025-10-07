@@ -23,14 +23,16 @@
     <!-- <td colspan="2" rowspan="2"></td> -->
   </tr>
 
-  <tr>
-    <td class="bb">{{staticitics.rashed}}</td>
-    <td class="bb">{{staticitics.response}}</td>
-    <td class="bb">{{staticitics.passed}}</td>
-    <td class="bb">{{staticitics.fail}}</td>
-    <td class="bb">{{staticitics.decline}}</td>
-    <td class="bb">{{staticitics.invited}}</td>
-    
+  <tr v-if="staticitics">
+    <td class="bb">{{ staticitics.rashed }}</td>
+    <td class="bb">{{ staticitics.response }}</td>
+    <td class="bb">{{ staticitics.passed }}</td>
+    <td class="bb">{{ staticitics.fail }}</td>
+    <td class="bb">{{ staticitics.decline }}</td>
+    <td class="bb">{{ staticitics.invited }}</td>
+  </tr>
+  <tr v-else>
+    <td colspan="6" class="text-center">جاري التحميل أو لا يوجد بيانات</td>
   </tr>
 
   <tr>
@@ -67,7 +69,9 @@
           :disabled="disabel==1"
         >
         <label class="form-check-label" :for="`switch_${row.id}_${vendor.id}`">
-          {{ formData[row.id][vendor.id] === 'YES' ? 'Yes' : 'No' }}
+          <!-- {{ formData[row.id][vendor.id] === 'YES' ? 'Yes' : 'No' }} -->
+          {{ formData[row.id] && formData[row.id][vendor.id] === 'YES' ? 'Yes' : 'No' }}
+
         </label>
       </div>
     </td>
@@ -171,6 +175,7 @@ export default {
 
 
       vendorResults() {
+
         const results = {};
         const criteriaIds = this.ItemsCriteria.map(c => c.id);
 
@@ -242,7 +247,7 @@ export default {
       let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
       this.object = rfp_id
         this.isLoading = true;
-          await axios.get('BuyerApprove/excelResponse', {
+          await axios.get('VendorManagementApprove/excelResponse', {
               params: {
                 rfp_id: rfp_id.id,
               }
@@ -297,7 +302,7 @@ export default {
       let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
       this.object = rfp_id
         this.isLoading = true;
-          await axios.get('BuyerApprove/getAllItemsResponseVendor', {
+          await axios.get('VendorManagementApprove/getAllItemsResponseVendor', {
               params: {
                 rfp_id: rfp_id.id,
               }
@@ -336,7 +341,7 @@ export default {
           response: value
         };
 
-        axios.post('BuyerApprove/Store', payload)
+        axios.post('VendorManagementApprove/Store', payload)
           .then(response => {
             this.swalFunction('success', 'saved successfully');
             this.fetchItemsStaticitics()
@@ -353,7 +358,7 @@ export default {
       let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
       this.object = rfp_id
         this.isLoading = true;
-          await axios.get('BuyerApprove/getAllItemsStaticitics', {
+          await axios.get('VendorManagementApprove/getAllItemsStaticitics', {
               params: {
                 rfp_id: rfp_id.id,
                 type: 'vendorTeam',

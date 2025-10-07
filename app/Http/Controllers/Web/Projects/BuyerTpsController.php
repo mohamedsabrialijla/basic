@@ -25,7 +25,7 @@ use Carbon\Carbon;
 
 
  
-class BuyerApproveController extends Controller
+class BuyerTpsController extends Controller
 {
   
      public function __construct() {
@@ -53,6 +53,7 @@ class BuyerApproveController extends Controller
 
          $rules = [
                  "rfp_id" => 'required',
+                 "type" => 'required',
               ];
 
          $validator = Validator::make($request->all(), $rules,);
@@ -65,7 +66,8 @@ class BuyerApproveController extends Controller
                 $status="Completed";
                 $rfp = RFPStep::where('id',$request->rfp_id)->first();
 
-                $item = Approve::where('user_id',$id)->where('rfp_id', $request->rfp_id)->where('type','BuyerTeam')->first();
+                $item = Approve::where('user_id',$id)->where('rfp_id', $request->rfp_id)->where('type',$request->type)->first();
+                // dd($item);
                 
                 if($item && $item != ''){
                    $item = $item; 
@@ -73,18 +75,17 @@ class BuyerApproveController extends Controller
                     $item = New Approve();
                 }
 
-                if($request->status != 'Completed' || $request->comment_buyer ){
+                if($request->status != 'Completed' ){
                     $status="Decline";
-                    $item->comment_buyer = $request->comment_buyer;                
-                    $item->reason_id = $request->reason_id; 
                 }else{
 
-                    $item->comment_buyer = null;                
-                    $item->reason_id = null; 
+                    $status="Completed";
                 }
-
+ 
+                $item->status = $status; 
+                $item->comment = $request->comment; 
                 $item->rfp_id = $request->rfp_id; 
-                $item->type = 'BuyerTeam';
+                $item->type = $request->type;
                 $item->user_id = $id;
                 // $item->deadline = $item->deadline ? $item->deadline: '' ;
                 $item->status = $status;
@@ -98,14 +99,15 @@ class BuyerApproveController extends Controller
                 $deadline = Carbon::parse($item->deadline);
                 $overdue = 0 ;
 
-                $daysDifference = $createdAt->diffInDays($deadline, false);
+                $daysDifference = $createdAt->diffInDays($deadline, false) + 1;
+
 
                 if($daysDifference < 0){
                     $overdue = 1 ;
                     // $status = 'Overdue'
                 }
 
-                // $item->kpi = $daysDifference;
+                $item->kpi = $daysDifference;
                 $item->overdue = $overdue;
                 $item->date_approved = Carbon::now();
                 $item->save();
@@ -122,6 +124,7 @@ class BuyerApproveController extends Controller
 
        
         }
+
     }
 
 
@@ -143,43 +146,21 @@ class BuyerApproveController extends Controller
             ->get();
 
 
+
+             $rfp = RFPStep::where('id', $request->rfp_id)->first();
+            $soiTeam = json_decode($rfp->buyer_tender_team, true); 
+
+
         if (!isset($items) || $items->count() == 0) {
 
-            $rfp = RFPStep::where('id', $request->rfp_id)->first();
-            // dd($rfp);
-
-            // تحديد تاريخ آخر موافقة من VendorTeam
-            $lastSoiApprovalDate = Approve::where('rfp_id', $request->rfp_id)
-                ->where('type', 'vendorTeam')
-                ->whereNotNull('date_approved')
-                ->orderByDesc('date_approved')
-                ->value('date_approved');
-
-            if(!isset($lastSoiApprovalDate) || $lastSoiApprovalDate == ''){
-
-                $message = "success return";
-                return mainResponse(true, $message, [], 200, 'items', '');
-
-            }
-
-            // إذا لا يوجد إطلاقًا، خذ التاريخ الحالي (كـ fallback)
-            if (!$lastSoiApprovalDate) {
-                $lastSoiApprovalDate = Carbon::now();
-            } else {
-                $lastSoiApprovalDate = Carbon::parse($lastSoiApprovalDate);
-            }
-
-            // حساب deadline النهائي
-            $deadline = $lastSoiApprovalDate->copy()->addDays($rfp->soi_days_deadline);
-
-            $soiTeam = json_decode($rfp->soi_team, true); 
-            
+           
+                        
             foreach ($soiTeam as $key => $value) {
                 $item = new Approve();
                 $item->rfp_id = $request->rfp_id; 
-                $item->type = 'buyerTeam'; 
+                $item->type = 'buyerTpsTeam'; 
                 $item->user_id = $value['id'];
-                $item->deadline = null;
+                $item->deadline = $rfp->deadline_tps_buyer;
                 $item->status = 'Ready';
                 $item->department_id = $value['department']['id'];
                 $item->save();
@@ -203,7 +184,7 @@ class BuyerApproveController extends Controller
 
         $disable= 1 ;
         
-        if(isset($items[0]['user_id']) && $items[0]['user_id'] == $id){
+        if(isset($soiTeam[0]['id']) && $soiTeam[0]['id'] == $id){
             $disable = 0 ;
         }   
 
@@ -287,34 +268,6 @@ class BuyerApproveController extends Controller
             ->get();
 
 
-
-
-        $message = "success return";
-        return mainResponse(true, $message, $items, 200, 'items', '');
-    }
-
-
-     public function getAllItemsResponseVendorInvited(Request $request)
-    {
- 
-        // dd($request->all());
-
-        $id = auth('sanctum')->id();
-       
-        $criteriaCount = DB::table('items_categories')
-            ->where('type_id', 2)->whereNull('deleted_at')
-            ->count();
-
-        $approvedVendors = DB::table('response_vendors')
-            ->select('vendor_id', DB::raw('COUNT(*) as responses_count'))
-            ->where('rfp_id', $request->rfp_id)
-            ->where('response', 'YES') 
-            ->groupBy('vendor_id')
-            ->having('responses_count', '=', $criteriaCount)
-            ->pluck('vendor_id');
-
-
-        $items = User::with('department')->whereIn('id',$approvedVendors)->get();
 
 
         $message = "success return";
@@ -417,11 +370,7 @@ class BuyerApproveController extends Controller
            ->count();
 
 
-         $invited = 3 ;
-
-
-
-
+         $invited = $fullyApprovedCount;
 
 
 
@@ -430,7 +379,7 @@ class BuyerApproveController extends Controller
 
 
          $items22 = Approve::where('rfp_id', $request->rfp_id)
-            ->where('type', 'BuyerTeam')
+            ->where('type', 'VendorManagementTeam')
             ->orderBy('id','ASC')
             ->get();
 
@@ -442,12 +391,131 @@ class BuyerApproveController extends Controller
             $disable = 0 ;
         }   
 
-         return mainResponse(true, $disable, $items, 200, 'items', '');
+         return mainResponse(true, $disable, $items, 200, 'items', '');  
     }
 
 
+    public function createItemApprove(Request $request)
+    { 
+
+      // dd($request->all());
+
+        $id = auth('sanctum')->id();
+
+        $user = auth('sanctum')->user();
+
+        $rules = [
+                 "rfp_id" => 'required',
+                 // "deadline" => 'required',
+                 "buyer_tender_team" => 'required',
+              ];
+
+         $validator = Validator::make($request->all(), $rules,);
+
+        if ($validator->fails()) {
+            return mainResponse(false, '' , null, 203, 'items',$validator);
+        }else{
+
+            $item = RFPStep::where('id',$request->rfp_id)->first();
+            $item->deadline_tps_buyer = $request->deadline ? $request->deadline : null ;
+            $item->buyer_tender_team = json_encode($request->buyer_tender_team);
+
+            $item->save();
 
 
+
+            $buyerTps = json_decode($item->buyer_tender_team, true);
+
+            if (!empty($buyerTps)) {
+                $newUserIds = collect($buyerTps)->pluck('id')->toArray();
+
+                Approve::where('rfp_id', $request->rfp_id)
+                    ->where('type', 'buyerTpsTeam')
+                    ->whereNotIn('user_id', $newUserIds)
+                    ->delete();
+
+                foreach ($buyerTps as $value) {
+                    $check_is_found = Approve::where('rfp_id', $request->rfp_id)
+                        ->where('user_id', $value['id'])
+                        ->where('type', 'buyerTpsTeam')
+                        ->exists();
+
+                    if (!$check_is_found) {
+                        $approve = new Approve();
+                        $approve->rfp_id = $request->rfp_id;
+                        $approve->type = 'buyerTpsTeam';
+                        $approve->user_id = $value['id'];
+                        $approve->deadline = $item->deadline_tps_buyer;
+                        $approve->status = 'Ready';
+                        $approve->department_id = $value['department']['id'];
+                        $approve->save();
+                    }
+                }
+            }
+
+
+                Approve::where('rfp_id', $request->rfp_id)
+                    ->where('type', 'buyerTpsTeam')
+                    ->whereNull('date_approved')
+                    ->where('deadline', '<', Carbon::now())
+                    ->update(['status' => 'Overdue']);
+            
+
+
+
+            Approve::where('rfp_id',$request->rfp_id)->where('type','buyerTpsTeam')->update(['deadline'=> $item->deadline_tps_buyer]);
+
+            $items = RFPStep::with('sections','category','contract','type_event')->where('id',$request->rfp_id)->first();
+
+
+            $message ="The Operation Done successfully";
+            return mainResponse(true, $message , $items, 200, 'items','');
+
+               
+
+
+
+       
+        }
+    }
+
+
+    public function createTPSData(Request $request)
+    {
+
+      // dd($request->all());
+
+        $id = auth('sanctum')->id();
+
+        $rules = [
+            // 'selectedValues' => 'required',  
+            
+        ];
+
+      
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return mainResponse(false, '', null, 203, 'items', $validator);
+        }
+
+        $rfp_id = $request->input('rfp_id');
+        $data_json = json_encode($request->all());
+
+        $item = RFPStep::where('id', $rfp_id)->first();
+        $item->data_json_tps = $data_json;
+        $item->save();
+
+        $message ="The Operation Done successfully";
+        return mainResponse(true, $message , $item, 200, 'items','');
+
+               
+
+       
+        }
+
+    
 
 
 
