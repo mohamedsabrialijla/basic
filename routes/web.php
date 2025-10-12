@@ -363,6 +363,8 @@ Route::group([
             Route::post('Store', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'Store']);
             Route::post('createItemApprove', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'createItemApprove']);
             Route::post('createTPSData', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'createTPSData']);
+            Route::post('publish', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'publish']);
+            Route::post('sendQuestion', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'sendQuestion']);
 
 
         });

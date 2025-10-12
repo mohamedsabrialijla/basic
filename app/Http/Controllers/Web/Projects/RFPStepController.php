@@ -15,6 +15,7 @@ use App\Models\RFPStep;
 use App\Models\Step;
 use App\Models\Project;
 use App\Models\RFPWord;
+use App\Models\Approve;
 use Carbon\Carbon;
 
 
@@ -357,9 +358,23 @@ class RFPStepController extends Controller
 
     public function getById(Request $request)
     {
+        $id = auth('sanctum')->id();
         $items = RFPStep::with('sections','category','contract','type_event')->where('id',$request->ID)->first();
         $message ="success return";
-        return mainResponse(true, $message , $items, 200, 'items',''); 
+
+        $items22 = Approve::where('rfp_id', $request->ID)
+            ->where('type', 'buyerTpsTeam')
+            ->orderBy('id','ASC')
+            ->get();
+
+        $disable= 1 ;
+
+        // dd($items22[0]['user_id']);
+        
+        if(isset($items22[0]['user_id']) && $items22[0]['user_id'] == $id){
+            $disable = 0 ;
+        }   
+        return mainResponse(true, $disable , $items, 200, 'items',''); 
     }
 
     public function delete($id)

@@ -18,6 +18,8 @@ use App\Models\RFPWord;
 use App\Models\Document;
 use App\Models\ItemsCategories;
 use App\Models\ResponseVendors;
+use App\Models\Question;
+
 use DB;
 
 use Carbon\Carbon;
@@ -515,7 +517,69 @@ class BuyerTpsController extends Controller
        
         }
 
-    
+
+
+    public function publish(Request $request)
+    {
+ 
+      // dd($request->all());
+
+        $id = auth('sanctum')->id();
+
+        $rules = [
+            "rfp_id" => 'required'
+        ];
+
+        $validator = Validator::make($request->all(), $rules,);
+
+
+        if ($validator->fails()) {
+            return mainResponse(false, '' , null, 203, 'items',$validator);
+        }else{
+          
+            $items = RFPStep::where('id',$request->rfp_id)->first();
+            $items->publish_buyer = $id ;
+            $items->publish_buyer_date = Carbon::now()->format('Y-m-d');
+            $items->save();
+            $message ="The Operation Done successfully";
+            return mainResponse(true, $message , $items, 200, 'items','');
+       
+        }
+
+    }
+
+    public function sendQuestion(Request $request)
+    {
+ 
+      // dd($request->all());
+
+        $id = auth('sanctum')->id();
+
+        $rules = [
+            "rfp_id" => 'required',
+            "scope_id" => 'required',
+            "question" => 'required'
+        ];
+
+        $validator = Validator::make($request->all(), $rules,);
+
+
+        if ($validator->fails()) {
+            return mainResponse(false, '' , null, 203, 'items',$validator);
+        }else{
+          
+            $items = new Question;
+            $items->rfp_id = $request->rfp_id ;
+            $items->scope_id = $request->scope_id ;
+            $items->question = $request->question ;
+            $items->user_id = $id ;
+            $items->save();
+            $message ="The Question Done successfully";
+            return mainResponse(true, $message , $items, 200, 'items','');
+       
+        }
+
+    }
 
 
 

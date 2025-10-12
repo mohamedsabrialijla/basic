@@ -38,7 +38,7 @@ class ItemsTechnicals extends Model
     }
 
     public function features() {
-        return $this->hasMany(CategoryTitleTechnical::class, 'items_technical_id');
+        return $this->hasMany(CategoryTitleTechnical::class, 'items_technical_id')->with('file');
     }
     
    

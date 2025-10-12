@@ -20,7 +20,25 @@
                 <li class="breadcrumb-item text-muted">{{ breadcrumbLabel }}</li>
 
               </ul>
+
+              <div class="row mb-7 d-flex" v-if="currentStep == 4">
+                <div class="col-md-12 d-flex">
+                  <label class="fw-semibold fs-6 mb-2 col-md-4" style="font-weight: bold; color: red; margin-top: 11px;">DeadLine Date</label>
+                  <input
+                    type="text"
+                    name="first_name"
+                    class="form-control form-control-solid"
+                    placeholder="Date"
+                    v-model="formDataDates.startDate"
+                    required
+                  />
+                </div>
+              </div>
+
+
             </div>
+ 
+
             <div class="d-flex align-items-center gap-2 gap-lg-3">
               <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep !== 0 "
                 @click="setStep(currentStep -1)">Previous</a>
@@ -34,7 +52,20 @@
               <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1 && !formData.approve_for_review_team" @click="addEditItem(2)">Send To RFP Review Team</a>
 
 
-              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 4 " @click="publish()">Publish</a>
+              <a href="#"
+                 class="btn btn-sm fw-bold btn-secondary disabled"
+                 v-if="currentStep == 4 && disable == 0 && formData.publish_buyer"
+                 style="pointer-events: none; opacity: 0.7;">
+                Published
+              </a>
+
+              <a href="#"
+                 class="btn btn-sm fw-bold btn-info"
+                 v-else-if="currentStep == 4 && disable == 0"
+                 @click="publish()">
+                Publish
+              </a>
+
 
 
             </div>
@@ -710,9 +741,11 @@ export default {
             formDataDates: {
                 
 
-                startDate: '2024-11-17',
+              
+              startDate: '2024-11-17',
                 days: [0, 0, 0, 0, 0, 0, 0,0],
               },
+              disable: 1,
 
 
             
@@ -1185,7 +1218,7 @@ export default {
               .then(response => { 
                   this.RfpObject = response.data.items;
                   this.formDataDates = JSON.parse(this.RfpObject.data_json_tps);
-                  console.log(this.formDataDates)
+                  this.disable = response.data.message
 
 
                                  
@@ -1206,6 +1239,57 @@ export default {
       this.currentStep = 3;
 
     },
+
+
+    publish(){
+
+        this.isLoading = true;  
+
+         swal.fire({
+            text: "Are you sure ?",
+            icon: "warning",
+            buttonsStyling: false,
+            showDenyButton: true,
+            confirmButtonText: "Yes",
+            denyButtonText: 'No',
+            customClass: {
+              confirmButton: "btn btn-info",
+              denyButton: "btn btn-light-danger"
+            }
+          }).then((result) => { 
+            if (result.isConfirmed) {
+              axios.post('BuyerTps/publish',{ rfp_id: this.ItemID })
+                .then(() => {
+                      this.getItemById()
+                      this.swalFunction('success', 'Publish successfully')
+ 
+                })
+                .catch(error => {
+                  swal.fire({
+                    text: 'Error Publish the item. Please try again.', 
+                    icon: 'error',
+                    confirmButtonText: "Ok",
+                    buttonsStyling: false,
+                    customClass: {
+                      confirmButton: "btn btn-light-info"
+                    }
+                  });
+                });
+            } else if (result.isDenied) {
+              swal.fire({
+                text: 'The Publish has been canceled.', 
+                icon: 'info',
+                confirmButtonText: "Ok",
+                buttonsStyling: false,
+                customClass: {
+                  confirmButton: "btn btn-light-info"
+                }
+              });
+            }
+          });
+
+
+      },
 
 
 

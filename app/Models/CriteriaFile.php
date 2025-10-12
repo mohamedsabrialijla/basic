@@ -7,27 +7,30 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-class CategoryTitleTechnical extends Model
+class CriteriaFile extends Model
 {
+    protected $fillable = ['status', 'rfp_id', 'file', 'feature_title_id','user_id'];
 
-   
+ 
     public function getCreatedAtAttribute($value){
         return date('Y-m-d H:i', strtotime($value));
     }
 
-    public function file()
+
+
+    public function user()
     {
-        return $this->belongsTo(CriteriaFile::class,'criteria_title_id');
-    }
-
-
-
-    public function features_value() {
-        return $this->hasMany(CategoryFeatureTechnical::class, 'title_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
 
    
+    
+    
+    
+
+
+    
    
     
 

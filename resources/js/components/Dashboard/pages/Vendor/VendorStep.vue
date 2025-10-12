@@ -1,45 +1,33 @@
-
-
-
 <template>
   <div class="card">
     <div class="row" style="margin-top:60px;">
       <!-- Stepper -->
       
-
       <div class="col-12 mb-4">
-        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+       
+
+         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
           <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
-            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-              <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Vendor SOI Response</h1>
-              <span v-if="formData && formData.status"  :class="getStatusClass(formData.status)" class="btn btn-sm ">
-                {{formData.status}}
-              </span>
-
-        
-
-
-              
-            </div>
+          
             <div class="d-flex align-items-center gap-2 gap-lg-3">
               
               <a href="#" class="btn btn-sm fw-bold btn-secondary" 
-                @click="openList()">Cancel</a>
-              
+                @click="openList()">Return To List</a>
 
-              <a href="#" class="btn btn-sm fw-bold btn-info" @click="Approve('approve')" v-if="formData.status =='Ready'">Confirm </a>
-              
- 
-            
-              
-              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1 && formData.status =='Ready'" @click="getModalCreate()" >Decline</a>
+              <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep !== 0 "
+                @click="setStep(currentStep -1)">Previous</a>
+
+              <a href="#" class="btn btn-sm fw-bold btn-info" disabled="currentStep === steps.length - 1" v-if="currentStep < 3 " @click="nextStep">Next</a>
+
+
+
             </div>
           </div>
         </div>
 
-        <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 53%;margin: auto;">
+        <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 65%;margin: auto;">
 
-          <!-- <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
+          <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
                 :key="index" 
                 
                 @click="setStep(index)">
@@ -54,27 +42,43 @@
             <div class="m-0">
               <span class="fw-semibold text-gray-500 d-block fs-8" style="cursor:pointer;"> {{ step }}</span>
             </div>
-          </div> -->
+          </div> 
         </div>
       </div>
 
-
-       
+      
           
       <!-- Step 1: Kanban Board -->
       <div v-if="currentStep === 0" class="col-12">
-         Step One
-      </div>
+         <div class="modal-body px-5 my-7" >
+          
+            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+              <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                  <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Vendor SOI Response</h1>
+                  
 
 
+                  
+                </div>
+                <div class="d-flex align-items-center gap-2 gap-lg-3">
+                  
+                  <span v-if="formData && formData.status"  :class="getStatusClass(formData.status)" class="btn btn-sm ">
+                    {{formData.status}}
+                  </span>
 
-      <!-- Step 2 -->
-      <div v-if="currentStep === 1" class="col-12">
-        
+             
 
-        <div class="modal-body px-5 my-7" >
-        
-         
+                  <a href="#" class="btn btn-sm fw-bold btn-info" @click="Approve('approve')" v-if="formData.status =='Ready'">Confirm </a>
+                  
+     
+                
+                  
+                  <a href="#" class="btn btn-sm fw-bold btn-info" v-if="currentStep == 1 && formData.status =='Ready'" @click="getModalCreate()" >Decline</a>
+                </div>
+              </div>
+            </div>
+             
 
             <div class="row">
              
@@ -169,25 +173,36 @@
               </div>
             </div>
         </div>
-           
+      </div>
+ 
+
+
+      <!-- Step 2 -->
+      <div v-if="currentStep === 1" class="col-12">
+          
+          <PricingSheetView></PricingSheetView>
+
       </div>
 
 
-        
-      </div>
 
       <!-- Step 3 -->
       <div v-if="currentStep === 2" class="col-12">
+        <TechnicalView></TechnicalView>
+      </div>
 
-        step three
 
+
+      <!-- Step 4 -->
+      <div v-if="currentStep === 3" class="col-12">
+        step Four
       </div>
 
 
 
     </div>
 
-
+</div>
 
 
 
@@ -330,6 +345,8 @@ import QuillBetterTable from 'quill-better-table';
 import 'quill/dist/quill.snow.css';
 import 'quill-better-table/dist/quill-better-table.css';
 import WordFile from '../Review/WordFile.vue';
+import PricingSheetView from './PricingSheetView.vue';
+import TechnicalView from './TechnicalView.vue';
 
  Quill.register({
   'modules/better-table': QuillBetterTable
@@ -340,7 +357,7 @@ import { nextTick } from 'vue';
  
 export default {
   components: {
-    Pagination,Multiselect,WordFile
+    Pagination,Multiselect,WordFile,PricingSheetView,TechnicalView  
   },
     data() {
         return {
@@ -370,8 +387,8 @@ export default {
               answer: null,
             },
 
-            currentStep: 1,
-            steps: ["Information RFP", "RFP Sheet", "RFP"],
+            currentStep: 0,
+            steps: ["RFP", "Pricing sheet", "Technical Proposal" ,"Company Information and Authorized Signee"],
 
             logo:'',
             quill: null,
@@ -430,6 +447,32 @@ export default {
         },
 
   methods: {
+
+
+     setStep(index) {
+     
+      this.currentStep = index;
+    },
+
+
+
+    async nextStep() {
+      
+        if (this.currentStep < this.steps.length - 1) {
+            this.currentStep++;
+        }
+    },
+
+
+
+    prevStep() {
+      if (this.currentStep > 0) {
+        this.currentStep--;
+      }
+    },
+
+
+
 
 
     swalFunction(type, text) {
