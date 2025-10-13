@@ -268,12 +268,19 @@ export default {
 
         openRFPSteperForEdit(RFPItem){
           localStorage.setItem('RFPItem', JSON.stringify(RFPItem)); 
+          localStorage.setItem('RFPBuyer', JSON.stringify(RFPItem)); 
+          localStorage.setItem('RFPReview', JSON.stringify(RFPItem)); 
+          localStorage.setItem('object_rfp', JSON.stringify(RFPItem)); 
+
           this.$router.push({ path: `/${this.locale}/dashboard/master_data/projects/rfp-step` });
         },
  
 
         openTpsBuyer(RFPItem){
+          localStorage.setItem('RFPItem', JSON.stringify(RFPItem)); 
           localStorage.setItem('RFPBuyer', JSON.stringify(RFPItem)); 
+          localStorage.setItem('RFPReview', JSON.stringify(RFPItem));
+          localStorage.setItem('object_rfp', JSON.stringify(RFPItem));
           this.$router.push({ path: `/${this.locale}/dashboard/buyer/tps` });
         },
 

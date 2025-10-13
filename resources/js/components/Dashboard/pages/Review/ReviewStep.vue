@@ -398,22 +398,22 @@ export default {
 
 
      getStatusClass(status) {
-            switch (status) {
-              case 'Completed':
-                return 'btn-light-success';
-              case 'Ready':
-                return 'btn-light-warning';
+        switch (status) {
+          case 'Completed':
+            return 'btn-light-success';
+          case 'Ready':
+            return 'btn-light-warning';
 
-              case 'Overdue':
-                return 'btn-light-danger';
+          case 'Overdue':
+            return 'btn-light-danger';
 
-              case 'Decline':
-                return 'btn-light-danger';
-              
-              default:
-                return 'btn-light-secondary';
-            }
-          },
+          case 'Decline':
+            return 'btn-light-danger';
+          
+          default:
+            return 'btn-light-secondary';
+        }
+      },
 
 
           getKPIClass(kpi) {
@@ -584,20 +584,6 @@ export default {
         },
 
     
-
-
-
-      
-
-
-
-    
-
-
- 
-
-  
-
 
 
 

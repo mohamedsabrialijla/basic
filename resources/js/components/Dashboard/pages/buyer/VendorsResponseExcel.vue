@@ -223,28 +223,22 @@ export default {
 
     initializeFormData() {
 
+      this.ItemsCriteria.forEach(criterion => {
+        this.formData[criterion.id] = {};
+          this.ItemsVendors.forEach(vendor => {
+            const existing = this.responses.find(r =>
+              r.criteria_id === criterion.id &&
+              r.vendor_id === vendor.id
+            );
+                      
+            this.formData[criterion.id][vendor.id] = existing ? existing.response : 'NO';
+          });
+        });
+      },
 
-    this.ItemsCriteria.forEach(criterion => {
-    this.formData[criterion.id] = {};
-      this.ItemsVendors.forEach(vendor => {
-        const existing = this.responses.find(r =>
-          r.criteria_id === criterion.id &&
-          r.vendor_id === vendor.id
-        );
-                  
-        this.formData[criterion.id][vendor.id] = existing ? existing.response : 'NO';
-      });
-    });
-  },
-
-
-
-    
-
-
-
+ 
      async fetchItems() {
-      let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
+      let rfp_id = JSON.parse(localStorage.getItem('RFPItem'));
       this.object = rfp_id
         this.isLoading = true;
           await axios.get('VendorManagementApprove/excelResponse', {
@@ -282,7 +276,7 @@ export default {
               })
                 .then(response => {
                     this.items = response.data.items;
-                    let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
+                    let rfp_id = JSON.parse(localStorage.getItem('RFPItem'));
                     this.ItemsVendors = JSON.parse(rfp_id.vendors);
                     this.ItemsCriteria = this.items.filter(item => item.type && item.type.name === "criteria");
                    
@@ -299,7 +293,7 @@ export default {
 
 
      async fetchItemsResponse() {
-      let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
+      let rfp_id = JSON.parse(localStorage.getItem('RFPItem'));
       this.object = rfp_id
         this.isLoading = true;
           await axios.get('VendorManagementApprove/getAllItemsResponseVendor', {
@@ -328,12 +322,12 @@ export default {
 
                  this.isLoading = false;
               });
-      },
+      }, 
 
 
       saveResponseAuto(criteria_id, vendor_id, value) {
 
-        let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
+        let rfp_id = JSON.parse(localStorage.getItem('RFPItem'));
         const payload = {
           rfp_id: rfp_id.id,
           criteria_id: criteria_id,
@@ -355,7 +349,7 @@ export default {
 
 
       async fetchItemsStaticitics() {
-      let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
+      let rfp_id = JSON.parse(localStorage.getItem('RFPItem'));
       this.object = rfp_id
         this.isLoading = true;
           await axios.get('VendorManagementApprove/getAllItemsStaticitics', {

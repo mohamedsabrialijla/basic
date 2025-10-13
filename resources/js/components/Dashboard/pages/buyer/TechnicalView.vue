@@ -315,10 +315,11 @@ export default {
         });
 
 
-        // console.log(this.user)
+        
 
         this.object = JSON.parse(localStorage.getItem("object_rfp"));
-
+        console.log('wwwwwwww')
+        console.log(this.object)
     },
 
 
