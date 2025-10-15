@@ -280,6 +280,9 @@ Route::group([
             Route::post('editItem', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'edit']);
             Route::Delete('deleteItem/{id}', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'delete']);
             Route::Delete('deleteAllItem', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'deleteAllItem']);
+
+            Route::post('createItemDocument', [App\Http\Controllers\Web\MasterData\ItemsTechnicalsController::class,'createDocument']);
+
         
         });
 

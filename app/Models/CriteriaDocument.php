@@ -7,9 +7,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-class CriteriaFile extends Model
+class CriteriaDocument extends Model
 {
-    protected $fillable = ['status', 'rfp_id', 'file', 'feature_title_id','user_id'];
+    protected $fillable = ['status', 'rfp_id', 'file', 'feature_id','user_id'];
 
  
     public function getCreatedAtAttribute($value){

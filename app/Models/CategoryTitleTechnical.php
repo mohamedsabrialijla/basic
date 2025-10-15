@@ -17,7 +17,7 @@ class CategoryTitleTechnical extends Model
 
     public function file()
     {
-        return $this->belongsTo(CriteriaFile::class,'criteria_title_id');
+        return $this->hasOne(CriteriaDocument::class,'feature_id');
     }
 
 

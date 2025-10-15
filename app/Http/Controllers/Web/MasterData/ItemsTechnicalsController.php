@@ -13,6 +13,7 @@ use App\Models\ItemsCategories;
 use App\Models\CategoryTitle;
 use App\Models\CategoryFeature;
 
+use App\Models\CriteriaDocument;
 use App\Models\ItemsTechnicals;
 use App\Models\CategoryTitleTechnical;
 use App\Models\CategoryFeatureTechnical;
@@ -218,23 +219,19 @@ class ItemsTechnicalsController extends Controller
     public function getAll(Request $request)
     {
 
-         $id = auth('sanctum')->id();
+        $id = auth('sanctum')->id();
 
-            $items = ItemsTechnicals::where('rfp_id',$request->rfp_id)->with('features.features_value');
+        $items = ItemsTechnicals::where('rfp_id',$request->rfp_id)->with('features.features_value');
 
+        if(isset($request->pagination) && $request->pagination == 1) {
+            $items = $items->orderBy('order','ASC')->paginate(10); 
+        } else {
+            $items = $items->orderBy('order','ASC')->get();
+        }
 
-           
+        $message = "success return";
 
-
-            if(isset($request->pagination) && $request->pagination == 1) {
-                $items = $items->orderBy('order','ASC')->paginate(10); 
-            } else {
-                $items = $items->orderBy('order','ASC')->get();
-            }
-
-            $message = "success return";
-
-            return mainResponse(true, $message, $items, 200, 'items', '');
+        return mainResponse(true, $message, $items, 200, 'items', '');
     }
 
 
@@ -318,6 +315,64 @@ class ItemsTechnicalsController extends Controller
 
 
     }
+
+
+
+
+    public function createDocument(Request $request)
+    {
+       
+        // dd($request->all());
+
+        $id = auth('sanctum')->id();
+
+        $validator = Validator::make($request->all(), [
+          
+            'feature_id' => 'required',
+            'cretiria_id' => 'required',
+            'rfp_id' => 'required',
+            'file' => 'required',
+        ]);
+
+       
+
+        if ($validator->fails()) {
+            return mainResponse(false, '' , null, 203, 'items',$validator);
+        }else{
+
+ 
+                
+                $item = New CriteriaDocument;
+                $item->user_id = $id;
+                $item->rfp_id = $request->rfp_id;
+                $item->cretiria_id = $request->cretiria_id;
+                $item->feature_id = $request->feature_id;
+
+                if ($request->hasFile('file') && $request->file('file')->isValid()) {
+                    $destinationPath = public_path('uploads/cretiria');                    
+                    $fileName = pathinfo($request->file('file')->getClientOriginalName(), PATHINFO_FILENAME);
+                    $extension = strtolower($request->file('file')->getClientOriginalExtension());
+                    $fileName = $fileName . '_' . time() . '.' . $extension;
+                    $request->file('file')->move($destinationPath, $fileName);
+                    $item->file = 'uploads/cretiria/' . $fileName;
+                }
+
+                
+                $item->save();
+
+ 
+
+
+
+                $message ="success Doing";
+                return mainResponse(true, $message , $item, 200, 'items','');
+
+               
+
+       
+        }
+    }
+
 
     
 

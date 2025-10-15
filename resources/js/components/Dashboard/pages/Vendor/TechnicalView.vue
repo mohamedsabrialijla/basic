@@ -48,14 +48,15 @@
               <td colspan="6">{{ feature.title }}</td>
               
              <td >  {{ feature.features_value.reduce((sum, v) => sum + parseFloat(v.value || 0), 0) }}</td> 
+             
              <td v-if="feature.file" >
                <i class="bi bi-file-earmark fs-2x"></i>
              </td> 
-             <td v-else ><input type="file" class="form-control" style="width: 54%;"></td> 
+             <td v-else ><input type="file" @change="onFileChange($event, feature.id, criterion.id)" class="form-control" style="width: 54%;"></td> 
              
 
 
-             <td v-if="feature.file"><span class="badge badge-light-success">Completed </span> <i class="bi bi-file-earmark fs-2x"></i></td> 
+             <td v-if="feature.file"> <span class="badge badge-light-success" style="background-color: none;">Completed </span> </td> 
              <td v-else ><span class="badge badge-light-danger">Ready</span></td> 
 
           </tr>
@@ -131,8 +132,8 @@ export default {
   components: {
     Multiselect
   },
-
-
+ 
+ 
 
     data() {
         return {
@@ -146,41 +147,21 @@ export default {
             items: [], 
             itemsCategories: [], 
             searchQuery: '',
-            formData: {
-                
-               
-
-           
-            },
+            formData: {},
  
             itemsUsersDefualt:[],
             itemsAllSteps:[],
             ItemsTECriteria:[],
-
-
-          
-
             logo:'',
-
-            
             ItemID: null,
             URL:'ItemsObjects/createItem',
-
             itemStep:{},
-
-
-  
-           
-            features: [
-               
-              ],
-
-            features_value: [
-                
-              ],
-
-
+            features: [],
+            features_value: [],
             object:{},
+            formDataDocument:[],
+            file: '',
+
 
 
         };
@@ -370,12 +351,64 @@ export default {
                  this.isLoading = false;
               });
       },
+
+
+
+      onFileChange(e,feature_id,cretiria_id) {
+        this.file = e.target.files[0];
+            const file = e.target.files[0];
+            if (file) {
+                this.formDataDocument.file = URL.createObjectURL(file);
+            }
+
+            this.sendDocument(feature_id,cretiria_id, file);
+
+        },
+
+
+    
+
+
+      sendDocument(feature_id,cretiria_id) {
+
+        this.isLoading = true;
+
+        const config = {
+                headers: {
+                    'content-type': 'multipart/form-data'
+                }
+            }
+
+        let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
+        let form = new FormData();
+
+        form.append('rfp_id', rfp_id.id);
+        form.append('feature_id', feature_id);
+        form.append('cretiria_id', cretiria_id);
+       
+        if (this.file) {
+          form.append('file', this.file);
+        }
  
+        axios.post('ItemsTechnicals/createItemDocument',form,config).then((response)=>{
+            this.isLoading = false;
+            if(response.data.items){
+              this.fetchItemCretiria()
+                this.swalFunction('success','uploaded Successfully')
+            }else{
+               this.swalFunction('error',response.data.message)
+            }             
+          
+          }).catch(error => {
+              this.isLoading = false;
+              this.swalFunction('error',error)
+          });
+      },
 
 
 
 
-
+   
 
 
 

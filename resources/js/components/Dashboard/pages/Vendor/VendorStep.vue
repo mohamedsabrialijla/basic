@@ -130,7 +130,7 @@
                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
                           <div class="form-check form-switch form-check-custom form-check-success form-check-solid" v-if="item.type_cretiria == 'yesORno'">
-                              <input v-model="item.answer" @change="ApproveDocument(item.id, item.answer)" class="form-check-input " type="checkbox" value=""  id="kt_flexSwitchCustomDefault_1_1" style="cursor:pointer;"   :checked="item.criteria && item.criteria?.approve == 'true' ">
+                              <input disabled v-model="item.answer" @change="ApproveDocument(item.id, item.answer)" class="form-check-input " type="checkbox" value=""  id="kt_flexSwitchCustomDefault_1_1" style="cursor:pointer;"   :checked="item.criteria && item.criteria?.approve == 'true' ">
 
                               <label class="form-check-label" for="kt_flexSwitchCustomDefault_1_1">
                                   Yes
@@ -147,7 +147,7 @@
                                   <span class="path1"></span>
                                   <span class="path2"></span>
                                 </i>
-                                <input type="file" name="file" @change="onFileChange($event, item.id, item.answer)" accept="*" />
+                                <input  type="file" name="file" @change="onFileChange($event, item.id, item.answer)" accept="*" />
                                 <input type="hidden" name="avatar_remove" />
                               </label>
                              
