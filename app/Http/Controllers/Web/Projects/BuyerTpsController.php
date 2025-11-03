@@ -548,38 +548,66 @@ class BuyerTpsController extends Controller
 
     }
 
+     
+
     public function sendQuestion(Request $request)
     {
- 
-      // dd($request->all());
+        // dd($request->all());
 
-        $id = auth('sanctum')->id();
+
+        $userId = auth('sanctum')->id();
 
         $rules = [
-            "rfp_id" => 'required',
-            "scope_id" => 'required',
-            "question" => 'required'
+            "questionable_type" => 'required|string', 
+            "questionable_id"   => 'required|integer', 
+            "question"          => 'required|string'
         ];
 
-        $validator = Validator::make($request->all(), $rules,);
-
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return mainResponse(false, '' , null, 203, 'items',$validator);
-        }else{
-          
-            $items = new Question;
-            $items->rfp_id = $request->rfp_id ;
-            $items->scope_id = $request->scope_id ;
-            $items->question = $request->question ;
-            $items->user_id = $id ;
-            $items->save();
-            $message ="The Question Done successfully";
-            return mainResponse(true, $message , $items, 200, 'items','');
-       
+            return mainResponse(false, '', null, 203, 'items', $validator);
         }
 
+        $question = Question::create([
+            'user_id'           => $userId,
+            'rfp_id'           => $request->rfp_id,
+            'questionable_id'   => $request->questionable_id,
+            'questionable_type' => $request->questionable_type,
+            'question'          => $request->question,
+        ]);
+
+        $message = "The question was created successfully";
+        return mainResponse(true, $message, $question, 200, 'items', '');
     }
+
+
+    public function getAllItemsQuestions(Request $request)
+    {
+        $userId = auth('sanctum')->id();
+
+        $rules = [
+            "questionable_type" => 'required|string',
+            "questionable_id"   => 'required|integer'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return mainResponse(false, '', null, 203, 'items', $validator);
+        }
+
+        $questions = Question::where('user_id', $userId)->where('rfp_id',$request->rfp_id)
+            ->where('questionable_type', $request->questionable_type)
+            ->where('questionable_id', $request->questionable_id)
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        $message = "Questions retrieved successfully";
+        return mainResponse(true, $message, $questions, 200, 'items', '');
+    }
+
+
 
 
 

@@ -368,6 +368,7 @@ Route::group([
             Route::post('createTPSData', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'createTPSData']);
             Route::post('publish', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'publish']);
             Route::post('sendQuestion', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'sendQuestion']);
+            Route::get('getAllItemsQuestions', [App\Http\Controllers\Web\Projects\BuyerTpsController::class,'getAllItemsQuestions']);
 
 
         });

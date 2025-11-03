@@ -17,6 +17,13 @@ class RFPWord extends Model
         return date('Y-m-d H:i', strtotime($value));
     }
 
+
+    public function questions()
+    {
+        return $this->morphMany(Question::class, 'questionable');
+    }
+
+
    
 
 

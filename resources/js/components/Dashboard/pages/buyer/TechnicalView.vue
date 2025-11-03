@@ -115,7 +115,7 @@
               <td colspan="11">Passing Score:</td>
               
               <!-- <td> total score</td> -->
-              <td colspan="2">{{object.techinical_passing_score}}</td>
+              <td colspan="2">{{object?.techinical_passing_score}}</td>
              
             
           </tr>

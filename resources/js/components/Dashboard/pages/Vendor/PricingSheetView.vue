@@ -30,8 +30,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in itemsFlatTree" :key="item.id">
-                  <td>{{ index }}</td>
+              <template v-for="(item, index) in itemsFlatTree" :key="item.id">
+
+                <!-- الصف العادي -->
+                <tr>
+                  <td>{{ index + 1 }}</td>
                   <td :style="{ paddingLeft: item.level * 20 + 'px' }">{{ item.text }}</td>
                   <td>{{ item.reference }}</td>
                   <td>{{ item.duration }}</td>
@@ -39,38 +42,31 @@
                   <td>{{ item.uom }}</td>
                   <td>{{ item.unit_price }}</td>
                   <td>{{ item.total_price }}</td>
-                  <td><button v-if="item.parent==0" @click="getModalCreate(item.id)" class="btn btn-info">Q</button></td>
+                  <td>
+                    <button @click="getModalCreate(item.id)" class="btn btn-info">QNA</button>
+                  </td>
                 </tr>
 
-                <tr>
-                  <td colspan="2"></td>
-                  <td colspan="5"><b>Activity 2 Total (Excluding VAT/WHT)</b></td>
-                  <td colspan="2">SAR    {{overallPrice}}</td>
+                <!-- المجموع بعد آخر عنصر من نفس السكوب -->
+                <tr
+                  v-if="isLastChildInScope(index)"
+                  class="table-light fw-bold"
+                >
+                  <td colspan="7" class="text-end">
+                    {{ getRootName(item.id) }} Total (Excl. VAT/WHT)
+                  </td>
+                  <td colspan="2">SAR {{ getScopeTotal(getRootId(item.id)) }}</td>
                 </tr>
 
-                <tr>
-                  <td colspan="9"><hr style="border: 1px solid #ccc; margin: 10px 0;"></td>
-                </tr>
-                <tr>
-                  <td colspan="2"></td>
-                  <td colspan="5"><b>Activity 2 Total (Excluding VAT/WHT)</b></td>
-                  <td colspan="2">SAR    {{overallPrice}}</td>
-                </tr>
+              </template>
 
-                <tr>
-                  <td colspan="2"></td>
-                  <td colspan="5"><b>Activity 2 Total (Excluding VAT/WHT)</b></td>
-                  <td colspan="2">SAR    {{overallPrice}}</td>
+                <!-- المجموع العام -->
+                <tr class="table-secondary">
+                  <td colspan="7" class="text-end fw-bold">Overall Total</td>
+                  <td colspan="2" class="fw-bold">SAR {{ overallPrice }}</td>
                 </tr>
-
-
-                <tr>
-                  <td colspan="2"></td>
-                  <td colspan="5"><b>Activity 2 Total (Excluding VAT/WHT)</b></td>
-                  <td colspan="2">SAR    {{overallPrice}}</td>
-                </tr>
-
               </tbody>
+
              </table>
 
           </div>
@@ -102,7 +98,7 @@
         <!--begin::Modal header-->
         <div class="modal-header" id="kt_modal_add_user_header">
           <!--begin::Modal title-->
-          <h2 class="fw-bold">Send Question </h2>
+          <h2 class="fw-bold">Question </h2>
           <!--end::Modal title-->
           <!--begin::Close-->
           <div class="btn btn-icon btn-sm btn-active-icon-info" data-kt-users-modal-action="close" @click="closeModal">
@@ -121,7 +117,7 @@
             
 
               <div class="fv-row mb-7" >
-                <label class="required fw-semibold fs-6 mb-2">Explain Waht do you Know ? </label>
+                <label class="required fw-semibold fs-6 mb-2">Write Your Question </label>
                 <textarea  rows="4" id="messageContent" maxlength="250"
                    v-model="formDataQuestion.question" value=""
                     placeholdr="Write Any Question Here..." class="form-control " >     
@@ -143,6 +139,68 @@
             </button>
 
             </div>
+
+
+
+            <!--begin::Accordion - Old Questions-->
+            <div class="separator my-10"></div>
+
+           <div v-if="oldQuestions && oldQuestions.length">
+              <h3 class="fw-bold mb-5 text-gray-800">
+                🧠 Previous Questions
+              </h3>
+
+              <div class="accordion" id="kt_accordion_old_questions">
+                <div
+                  class="accordion-item"
+                  v-for="(q, index) in oldQuestions"
+                  :key="q.id"
+                >
+                  <h2 class="accordion-header" :id="'heading_' + index">
+                    <button
+                      class="accordion-button fs-6 fw-semibold text-gray-800 collapsed justify-content-between"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      :data-bs-target="'#collapse_' + index"
+                      aria-expanded="false"
+                      :aria-controls="'collapse_' + index"
+                    >
+                      <div class="d-flex align-items-center w-100 justify-content-between">
+                        <div class="d-flex align-items-center">
+                          <!-- 🔻 سهم الأكوردين على اليسار -->
+                          <i class="ki-outline ki-down fs-3 me-3 rotate-icon"></i>
+                          <span>{{ q.question }}</span>
+                        </div>
+
+                        <!-- ✅ الحالة -->
+                        <span
+                          class="badge"
+                          :class="q.answer ? 'badge-light-success' : 'badge-light-warning'"
+                        >
+                          {{ q.answer ? 'Answered' : 'Pending' }}
+                        </span>
+                      </div>
+                    </button>
+                  </h2>
+
+                  <div
+                    :id="'collapse_' + index"
+                    class="accordion-collapse collapse"
+                    :aria-labelledby="'heading_' + index"
+                    data-bs-parent="#kt_accordion_old_questions"
+                  >
+                    <div class="accordion-body text-gray-700">
+                      <p v-if="q.answer">{{ q.answer }}</p>
+                      <p v-else class="text-muted fst-italic">Not Found Answer.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <!--end::Accordion - Old Questions-->
+
           </form>
         </div>
 
@@ -194,14 +252,15 @@ export default {
 
             formDataQuestion:{
               rfp_id:null,
-              scope_id:null,
+              item_id:null,
               question:null,
             },
 
 
             rfp_id:null,
-            scope_id:null,
+            item_id:null,
             overallPrice:null,
+            oldQuestions:[], 
 
         };
     },
@@ -213,6 +272,7 @@ export default {
    mounted() {
         this.fetchItemsSections()
         this.fetchItemsTree()
+
 
     }, 
 
@@ -228,86 +288,114 @@ export default {
   methods: {
 
 
-    swalFunction(type , text){
-      Swal.fire({
-            text: text,
-            icon: type,
-            buttonsStyling: false,
-            confirmButtonText: "Ok, got it!",
-            customClass: {
-                confirmButton: "btn btn-info"
-            }
-        });
-    },
+        swalFunction(type , text){
+          Swal.fire({
+                text: text,
+                icon: type,
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn btn-info"
+                }
+            });
+        },
+ 
 
 
-
-      getModalCreate(scope_id){
-        this.scope_id = scope_id
-        $('#kt_modal_add_item').modal('show');
-        formDataQuestion = {
-          question: null,
-        }
-      },
+        getModalCreate(item_id) {
+          this.item_id = item_id;
+          this.formDataQuestion = {
+            questionable_type: "App\\Models\\GanttTask", 
+            questionable_id: item_id, 
+            question: null,
+          };
+          this.fetchItemsQuestions();
+          $('#kt_modal_add_item').modal('show');
+        },
         
 
 
-      closeModal(){
-        $('#kt_modal_add_item').modal('hide');
-      },
+        closeModal(){
+          $('#kt_modal_add_item').modal('hide');
+        },
 
   
 
+        getRootId(id) {
+            let item = this.itemsTree.find(i => i.id === id);
+            while (item && item.parent !== 0) {
+              item = this.itemsTree.find(i => i.id === item.parent);
+            }
+            return item ? item.id : null;
+          },
 
+          getRootName(id) {
+            const rootId = this.getRootId(id);
+            const root = this.itemsTree.find(i => i.id === rootId);
+            return root ? root.text : '';
+          },
+
+          getScopeTotal(rootId) {
+            const scopeItems = this.itemsTree.filter(i => this.getRootId(i.id) === rootId);
+            return scopeItems.reduce((sum, i) => sum + parseFloat(i.total_price || 0), 0).toFixed(2);
+          },
+
+          isLastChildInScope(index) {
+            const current = this.itemsFlatTree[index];
+            const next = this.itemsFlatTree[index + 1];
+            const currentRoot = this.getRootId(current.id);
+            const nextRoot = next ? this.getRootId(next.id) : null;
+            return currentRoot !== nextRoot; // يعني انتهى السكوب الحالي
+          },
 
  
 
     
 
-    async fetchItemsTree() {
-      this.isLoading = true;
+        async fetchItemsTree() {
+            this.isLoading = true;
 
-      let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
+            let rfp_id = JSON.parse(localStorage.getItem('RFPReview'));
 
-      try {
-        const response = await axios.get('/Gantt/gantt', {
-          params: { rfp_id: rfp_id.id }
-        });
+            try {
+              const response = await axios.get('/Gantt/gantt', {
+                params: { rfp_id: rfp_id.id }
+              });
 
-        this.itemsTree = response.data.items;
-        const totalSum = this.itemsTree.reduce((sum, item) => {
-          return sum + parseFloat(item.total_price || 0);
-        }, 0);
+              this.itemsTree = response.data.items;
+              const totalSum = this.itemsTree.reduce((sum, item) => {
+                return sum + parseFloat(item.total_price || 0);
+              }, 0);
 
-        this.overallPrice = totalSum;
+              this.overallPrice = totalSum;
 
-        this.itemsFlatTree = this.buildTree(this.itemsTree, 0, 0);
+              this.itemsFlatTree = this.buildTree(this.itemsTree, 0, 0);
 
-      } catch (error) {
-        Swal.fire({
-          text: error.message || "Unexpected error",
-          icon: "error",
-          buttonsStyling: false,
-          confirmButtonText: "Ok, got it!",
-          customClass: {
-            confirmButton: "btn btn-info"
-          }
-        });
-      } finally {
-        this.isLoading = false;
-      }
-    },
+            } catch (error) {
+              Swal.fire({
+                text: error.message || "Unexpected error",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                  confirmButton: "btn btn-info"
+                }
+              });
+            } finally {
+              this.isLoading = false;
+            }
+          },
 
-    buildTree(items, parentId = 0, level = 0) {
-      let tree = [];
-      items
-        .filter(item => item.parent === parentId)
-        .forEach(item => {
-          tree.push({ ...item, level });
-          tree = tree.concat(this.buildTree(items, item.id, level + 1));
-        });
-      return tree;
-    },
+        buildTree(items, parentId = 0, level = 0) {
+          let tree = [];
+          items
+            .filter(item => item.parent === parentId)
+            .forEach(item => {
+              tree.push({ ...item, level });
+              tree = tree.concat(this.buildTree(items, item.id, level + 1));
+            });
+          return tree;
+        },
 
 
 
@@ -351,13 +439,15 @@ export default {
 
         this.isLoading = true;
         this.formDataQuestion.rfp_id = this.rfp_id;
-        this.formDataQuestion.scope_id = this.scope_id;
+        this.formDataQuestion.item_id = this.item_id;
 
         axios.post('BuyerTps/sendQuestion',this.formDataQuestion).then((response)=>{
             this.isLoading = false;
             if(response.data.items){
+              this.formDataQuestion.question = '';
+              this.fetchItemsQuestions()
                 this.swalFunction('success','Send Question Successfully')
-                this.closeModal()
+                // this.closeModal()
             }else{
                this.swalFunction('error',response.data.message)
             }             
@@ -367,6 +457,26 @@ export default {
               this.swalFunction('error',error)
           });
       },
+
+
+
+    async fetchItemsQuestions() {
+      this.isLoading = true;
+      try {
+        const response = await axios.get('BuyerTps/getAllItemsQuestions', {
+          params: {
+            questionable_type: "App\\Models\\GanttTask", 
+            questionable_id: this.item_id,         
+            rfp_id: this.rfp_id,         
+          },
+        });
+        this.oldQuestions = response.data.items;
+      } catch (error) {
+        this.swalFunction("error", error.message);
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
 
 
@@ -476,10 +586,19 @@ export default {
 }
 
 
+ 
+
+.rotate-icon {
+  transition: transform 0.3s ease !important;
+}
+
+.accordion-button:not(.collapsed) .rotate-icon {
+  transform: rotate(180deg) !important;
+}
 
 
-
-
-
+.accordion-button::after {
+  display: none !important;
+}
 
 </style>

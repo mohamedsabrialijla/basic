@@ -34,6 +34,9 @@
           <!--begin::Main-->
           <div style="padding: 30px 0px 0px 30px;">
                 <router-view :key="$route.fullPath"></router-view>
+                  <!-- <component :is="contentComponent"></component> -->
+
+
           </div>
           <!--end:::Main-->
 
@@ -106,7 +109,6 @@ export default {
 
     // اختار المينيو المناسب
     menuComponent() {
-
       if (this.userType === 'vendor') return 'MenuVendor';
       if (this.userType === 'vendor_management') return 'MenuVendorManagement';
       if (this.userType === 'buyer') return 'MenuBuyer';
@@ -115,17 +117,25 @@ export default {
       return 'Menu';
     },
 
-    contentComponent() {
-      if (this.userType === 'vendor') return 'DashboardVendor';
-      if (this.userType === 'vendor_management') return 'DashboardVendorManagement';
-      if (this.userType === 'buyer') return 'DashboardBuyer';
-      if (this.userType === 'review') return 'DashboardReview';
-      if (this.userType === 'soi') return 'DashboardSOI';
-      return 'Dashboard';
-    }
+    // contentComponent() {
+    //   if (this.userType === 'vendor') return 'DashboardVendor';
+    //   if (this.userType === 'vendor_management') return 'DashboardVendorManagement';
+    //   if (this.userType === 'buyer') return 'DashboardBuyer';
+    //   if (this.userType === 'review') return 'DashboardReview';
+    //   if (this.userType === 'soi') return 'DashboardSOI';
+    //   return 'Dashboard';
+    // }
   },
-
+ 
   mounted() {
+     if (this.$route.name === 'dashboard') {
+    if (this.userType === 'vendor') this.$router.push({ name: 'dashboard.vendor' });
+    else if (this.userType === 'buyer') this.$router.push({ name: 'dashboard' });
+    else if (this.userType === 'review') this.$router.push({ name: 'dashboard' });
+    else if (this.userType === 'soi') this.$router.push({ name: 'dashboard' });
+    else this.$router.push({ name: 'dashboard' });
+  }
+
     const url = window.location.origin;
     this.loadScript(url + '/assets/js/custom/apps/user-management/users/list/table.js');
 

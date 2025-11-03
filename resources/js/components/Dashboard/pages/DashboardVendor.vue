@@ -58,232 +58,282 @@
                     >
                         <!--begin::Form-->
                         <form
-                            id="kt_account_profile_details_form"
-                            class="form fv-plugins-bootstrap5 fv-plugins-framework"
-                            novalidate="novalidate"
+                          id="kt_account_profile_details_form"
+                          class="form fv-plugins-bootstrap5 fv-plugins-framework"
+                          novalidate="novalidate"
                         >
-                            <div class="card-body border-top p-9">
-                                <div class="row mb-6">
-                                    <!--begin::Label-->
-                                    <label
-                                        class="col-lg-4 col-form-label fw-semibold fs-6"
-                                        >image</label
-                                    >
-                                    <!--end::Label-->
-                                    <!--begin::Col-->
-                                    <div class="col-lg-8">
-                                        <!--begin::Image input-->
-                                        <div
-                                            class="image-input image-input-outline"
-                                            data-kt-image-input="true"
-                                        >
-                                            <!--begin::Preview existing avatar-->
-                                            <div
-                                                class="image-input-wrapper w-125px h-125px"
-                                                :style="{
-                                                    'background-image':
-                                                        user.logo
-                                                            ? `url(${user.logo})`
-                                                            : 'url(/assets_user/media/avatars/blank.png)',
-                                                }"
-                                            ></div>
-                                            <!--end::Preview existing avatar-->
-                                            <!--begin::Label-->
-                                            <label
-                                                class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="change"
-                                                data-bs-toggle="tooltip"
-                                                aria-label="Change avatar"
-                                                data-bs-original-title="Change avatar"
-                                                data-kt-initialized="1"
-                                            >
-                                                <i
-                                                    class="ki-outline ki-pencil fs-7"
-                                                ></i>
-                                                <!--begin::Inputs-->
-                                                <input
-                                                    type="file"
-                                                    name="avatar"
-                                                    accept=".png, .jpg, .jpeg"
-                                                    @change="onFileChange"
-                                                />
-                                                <input
-                                                    type="hidden"
-                                                    name="avatar_remove"
-                                                />
-                                                <!--end::Inputs-->
-                                            </label>
-                                            <!--end::Label-->
-                                            <!--begin::Cancel-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="cancel"
-                                                data-bs-toggle="tooltip"
-                                                aria-label="Cancel avatar"
-                                                data-bs-original-title="Cancel avatar"
-                                                data-kt-initialized="1"
-                                            >
-                                                <i
-                                                    class="ki-outline ki-cross fs-2"
-                                                ></i>
-                                            </span>
-                                            <!--end::Cancel-->
-                                            <!--begin::Remove-->
-                                            <span
-                                                class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                                                data-kt-image-input-action="remove"
-                                                data-bs-toggle="tooltip"
-                                                aria-label="Remove avatar"
-                                                data-bs-original-title="Remove avatar"
-                                                data-kt-initialized="1"
-                                            >
-                                                <i
-                                                    class="ki-outline ki-cross fs-2"
-                                                ></i>
-                                            </span>
-                                            <!--end::Remove-->
-                                        </div>
-                                        <!--end::Image input-->
-                                        <!--begin::Hint-->
-                                        <div class="form-text">
-                                            allow 
-                                        </div>
-                                        <!--end::Hint-->
-                                    </div>
-                                    <!--end::Col-->
-                                </div>
+                          <div class="card-body border-top p-9">
+                            <!-- صورة -->
+                            <div class="row mb-6 align-items-center">
+                              <!-- <label class="col-lg-2 col-form-label fw-semibold fs-6">Image</label> -->
+                              <div class="col-lg-10">
+                                <div class="image-input image-input-outline" data-kt-image-input="true">
+                                  <div
+                                    class="image-input-wrapper w-125px h-125px"
+                                    :style="{
+                                      'background-image':
+                                        user.logo
+                                          ? `url(${user.logo})`
+                                          : 'url(/assets_user/media/avatars/blank.png)',
+                                    }"
+                                  ></div>
 
-                                <div class="row mb-6">
-                                    <!--begin::Label-->
-                                    <label
-                                        class="col-lg-4 col-form-label required fw-semibold fs-6"
-                                        >name </label
-                                    >
-                                    <!--end::Label-->
-                                    <!--begin::Col-->
-                                    <div class="col-lg-8">
-                                        <!--begin::Row-->
-                                        <div class="row">
-                                            <!--begin::Col-->
-                                            <div
-                                                class="col-lg-6 fv-row fv-plugins-icon-container"
-                                            >
-                                                <input
-                                                    type="text"
-                                                    name="fname"
-                                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                                                    v-model="user.name"
-                                                    placeholder="First name"
-                                                    value="Max"
-                                                />
-                                                <div
-                                                    class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
-                                                ></div>
-                                            </div>
-                                        </div>
-                                        <!--end::Row-->
-                                    </div>
-                                    <!--end::Col-->
-                                </div>
+                                  <label
+                                    class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                                    data-kt-image-input-action="change"
+                                    data-bs-toggle="tooltip"
+                                    aria-label="Change avatar"
+                                    data-bs-original-title="Change avatar"
+                                  >
+                                    <i class="ki-outline ki-pencil fs-7"></i>
+                                    <input
+                                      type="file"
+                                      accept=".png, .jpg, .jpeg"
+                                      @change="onFileChange"
+                                    />
+                                  </label>
 
-                                <div class="row mb-6">
-                                    <!--begin::Label-->
-                                    <label
-                                        class="col-lg-4 col-form-label fw-semibold fs-6"
-                                    >
-                                        <span class="required">mobile</span>
-                                        <span
-                                            class="ms-1"
-                                            data-bs-toggle="tooltip"
-                                            aria-label="Phone number must be active"
-                                            data-bs-original-title="Phone number must be active"
-                                            data-kt-initialized="1"
-                                        >
-                                            <i
-                                                class="ki-outline ki-information-5 text-gray-500 fs-6"
-                                            ></i>
-                                        </span>
-                                    </label>
-                                    <!--end::Label-->
-                                    <!--begin::Col-->
-                                    <div
-                                        class="col-lg-4 fv-row fv-plugins-icon-container"
-                                    >
-                                        <input
-                                            type="tel"
-                                            name="phone"
-                                            class="form-control form-control-lg form-control-solid"
-                                            v-model="user.mobile"
-                                            placeholder="Phone number"
-                                            value="044 3276 454 935"
-                                        />
-                                        <div
-                                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
-                                        ></div>
-                                    </div>
-                                    <!--end::Col-->
+                                  <span
+                                    class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                                    data-kt-image-input-action="remove"
+                                    aria-label="Remove avatar"
+                                  >
+                                    <i class="ki-outline ki-cross fs-2"></i>
+                                  </span>
                                 </div>
-
-                                <div class="row mb-6">
-                                    <!--begin::Label-->
-                                    <label
-                                        class="col-lg-4 col-form-label fw-semibold fs-6"
-                                    >
-                                        <span class="required">email</span>
-                                        <span
-                                            class="ms-1"
-                                            data-bs-toggle="tooltip"
-                                            aria-label="Phone number must be active"
-                                            data-bs-original-title="Phone number must be active"
-                                            data-kt-initialized="1"
-                                        >
-                                            <i
-                                                class="ki-outline ki-information-5 text-gray-500 fs-6"
-                                            ></i>
-                                        </span>
-                                    </label>
-                                    <!--end::Label-->
-                                    <!--begin::Col-->
-                                    <div
-                                        class="col-lg-4 fv-row fv-plugins-icon-container"
-                                    >
-                                        <input
-                                            type="email"
-                                            name="phone"
-                                            class="form-control form-control-lg form-control-solid"
-                                            v-model="user.email"
-                                            placeholder="Email Address"
-                                            value=""
-                                        />
-                                        <div
-                                            class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"
-                                        ></div>
-                                    </div>
-                                    <!--end::Col-->
-                                </div>
+                                <div class="form-text">Allowed: PNG, JPG, JPEG</div>
+                              </div>
                             </div>
-                            <!--end::Card body-->
-                            <!--begin::Actions-->
-                            <div
-                                class="card-footer d-flex justify-content-end py-6 px-9"
+
+                            <!-- الصف الأول -->
+
+                            <h3 class="card-title align-items-start flex-column" style="border-bottom: 1px solid #ccc;margin-top: 30px;">
+                              <span class="card-label fw-bold text-gray-800">Company Information</span>
+                            </h3>
+
+
+                            <div class="row mb-6" style="margin-top:10px;">
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Company Name</label>
+                                <input
+                                  type="text"
+                                  v-model="user.company_name"
+                                  class="form-control form-control-solid"
+                                  placeholder="Company Name"
+                                  required
+                                />
+                              </div>
+
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Company CR Number</label>
+                                <input
+                                  type="text"
+                                  v-model="user.company_cr"
+                                  class="form-control form-control-solid"
+                                  placeholder="Company CR NO."
+                                  required
+                                />
+                              </div>
+
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Company Phone Number</label>
+                                <input
+                                  type="text"
+                                  v-model="user.company_mobile"
+                                  class="form-control form-control-solid"
+                                  placeholder="Company Phone NO."
+                                  required
+                                />
+                              </div>
+                            </div>
+
+
+
+
+                            <h3 class="card-title align-items-start flex-column" style="border-bottom: 1px solid #ccc;margin-top: 30px;">
+                              <span class="card-label fw-bold text-gray-800">Company Address</span>
+                            </h3>
+
+
+                            <!-- الصف الثاني -->
+                            <div class="row mb-6" style="margin-top:10px;">
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Unit</label>
+                                <input
+                                  type="text"
+                                  v-model="user.unit_address"
+                                  class="form-control form-control-solid"
+                                  placeholder="Unit Address"
+                                  required
+                                />
+                              </div>
+
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Street</label>
+                                <input
+                                  type="text"
+                                  v-model="user.street_address"
+                                  class="form-control form-control-solid"
+                                  placeholder="Street Address"
+                                  required
+                                />
+                              </div>
+
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">City</label>
+                                <input
+                                  type="text"
+                                  v-model="user.city_address"
+                                  class="form-control form-control-solid"
+                                  placeholder="City Address"
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            <!-- الصف الثالث -->
+                            <div class="row mb-6">
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Zip Code</label>
+                                <input
+                                  type="text"
+                                  v-model="user.zip_address"
+                                  class="form-control form-control-solid"
+                                  placeholder="Zip Code"
+                                  required
+                                />
+                              </div>
+
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Country</label>
+                                <input
+                                  type="text"
+                                  v-model="user.country_address"
+                                  class="form-control form-control-solid"
+                                  placeholder="Country"
+                                  required
+                                />
+                              </div>
+
+                            </div>
+
+
+
+
+
+
+
+                            <h3 class="card-title align-items-start flex-column" style="border-bottom: 1px solid #ccc;margin-top: 30px;">
+                              <span class="card-label fw-bold text-gray-800">Service Category</span>
+                            </h3>
+                            
+
+
+
+                            <div class="row">
+                              <div class="col-md-12">
+                                <!-- <label class="required fw-semibold fs-6 mb-2">Services</label> -->
+                                <textarea
+                                  v-model="user.services"
+                                  class="form-control form-control-solid"
+                                  placeholder="write all your services categories in Details"
+                                  maxlength="100"
+                                  required
+                                ></textarea>
+                              </div>
+                            </div>
+
+
+
+
+
+
+
+                            <h3 class="card-title align-items-start flex-column" style="border-bottom: 1px solid #ccc;margin-top: 30px;">
+                              <span class="card-label fw-bold text-gray-800">Account Manager (A Person Who Will Present The Company For All Projects)</span>
+                            </h3>
+
+
+                            <!-- الصف الرابع -->
+                            <div class="row mb-6" style="margin-top:20px;">
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Contact Person Name</label>
+                                <input
+                                  type="text"
+                                  v-model="user.name"
+                                  class="form-control form-control-solid"
+                                  placeholder="Full Name"
+                                  required
+                                />
+                              </div>
+
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Contact Person Email</label>
+                                <input
+                                  type="email"
+                                  v-model="user.email"
+                                  class="form-control form-control-solid"
+                                  placeholder="example@domain.com"
+                                  required
+                                />
+                              </div>
+
+                              <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Contact Person Mobile</label>
+                                <input
+                                  type="text"
+                                  v-model="user.mobile"
+                                  class="form-control form-control-solid"
+                                  placeholder="EX:00966556625489"
+                                  maxlength="12"
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            <!-- الصف الخامس -->
+                            <div class="row mb-6">
+                              <div class="col-md-6">
+                                <label class="required fw-semibold fs-6 mb-2">Authorized Signee Name</label>
+                                <input
+                                  type="text"
+                                  v-model="user.signee_full_name"
+                                  class="form-control form-control-solid"
+                                  placeholder="Authorized Signee Full Name"
+                                  required
+                                />
+                              </div>
+
+                              <div class="col-md-6">
+                                <label class="required fw-semibold fs-6 mb-2">Position</label>
+                                <input
+                                  type="text"
+                                  v-model="user.position"
+                                  class="form-control form-control-solid"
+                                  placeholder="Position (Full Name)"
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Actions -->
+                          <div class="card-footer d-flex justify-content-end py-6 px-9">
+                            <button
+                              type="submit"
+                              class="btn btn-primary"
+                              @click.prevent="EditInfo"
+                              :disabled="isLoading"
                             >
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary"
-                                    @click.prevent="EditInfo"
-                                    :disabled="isLoading"
-                                >
-                                    <span class="indicator-label">save</span>
-                                    <span class="indicator-progress"
-                                        >wait Message 
-                                        <span
-                                            class="spinner-border spinner-border-sm align-middle ms-2"
-                                        ></span>
-                                    </span>
-                                </button>
-                            </div>
-                            <!--end::Actions-->
+                              <span class="indicator-label">Save</span>
+                              <span class="indicator-progress"
+                                >Wait Message
+                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                              </span>
+                            </button>
+                          </div>
                         </form>
+ 
                         <!--end::Form-->
                     </div>
                     <!--end::Content-->
@@ -468,7 +518,7 @@ export default {
     },
 
     data() {
-        return {
+        return { 
             urlEditInfo: "Users/editItem",
             urlEditPassword: "Users/editItemPassword",
             isLoading: false,
@@ -538,15 +588,39 @@ export default {
 
             const config = {
                 headers: {
-                    "content-type": "multipart/form-data",
+                    "Content-Type": "multipart/form-data",
                 },
             };
 
             let form = new FormData();
+
+            // بيانات الشركة
+            form.append("company_name", this.user.company_name);
+            form.append("company_cr", this.user.company_cr);
+            form.append("company_mobile", this.user.company_mobile);
+
+            // العنوان
+            form.append("unit_address", this.user.unit_address);
+            form.append("street_address", this.user.street_address);
+            form.append("city_address", this.user.city_address);
+            form.append("zip_address", this.user.zip_address);
+            form.append("country_address", this.user.country_address);
+
+            // الخدمات
+            form.append("services", this.user.services);
+
+            // معلومات الشخص المسؤول
             form.append("name", this.user.name);
-            form.append("mobile", this.user.mobile);
             form.append("email", this.user.email);
-            form.append("notes", this.user.notes);
+            form.append("mobile", this.user.mobile);
+
+            // بيانات الشخص المفوض بالتوقيع
+            form.append("signee_full_name", this.user.signee_full_name);
+            form.append("position", this.user.position);
+            
+
+            form.append("Item_id", this.user.id);
+            form.append("user_type", this.user.user_type);
 
             if (this.logo) {
                 form.append("logo", this.logo);
@@ -556,20 +630,21 @@ export default {
                 .post(this.urlEditInfo, form, config)
                 .then((response) => {
                     this.isLoading = false;
+
                     if (response.data.items) {
-                        this.isLoading = false;
-                        this.swalFunction("success", "Doing successfully");
+                        this.swalFunction("success", "Updated successfully!");
                         this.$store.dispatch("fetchUser");
                     } else {
-                        this.isLoading = false;
-                        this.swalFunction("error", "Error happens");
+                        this.swalFunction("error", "An error occurred while saving.");
                     }
                 })
                 .catch((error) => {
+                    console.error(error);
                     this.isLoading = false;
-                    this.swalFunction("error", "Error happens");
+                    this.swalFunction("error", "An error occurred while saving.");
                 });
         },
+
 
         EditInfoPassword() {
             this.isLoading = true;

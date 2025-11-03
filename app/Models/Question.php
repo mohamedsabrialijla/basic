@@ -2,43 +2,27 @@
 
 namespace App\Models;
 
-use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class Question extends Model
 {
-    protected $fillable = ['status', 'rfp_id', 'scope_id', 'question', 'answer','user_id'];
+    protected $fillable = [
+        'user_id',
+        'rfp_id',
+        'questionable_id',
+        'questionable_type',
+        'question',
+        'answer',
+        'status',
+    ];
 
- 
-    public function getCreatedAtAttribute($value){
-        return date('Y-m-d H:i', strtotime($value));
+    public function questionable()
+    {
+        return $this->morphTo();
     }
-
-
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
-
-
-   
-    
-    
-    
-
-
-    
-   
-    
-
-
-
-
-
-
 }
-
-

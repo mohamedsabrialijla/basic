@@ -178,7 +178,7 @@
             <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
 
 
-
+ 
               <div class="fv-row mb-7">
                 <!--begin::Label-->
                 <label class="d-block fw-semibold fs-6 mb-5">Image</label>
@@ -212,31 +212,77 @@
                 </div>
                 <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
               </div>
+
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Company Name</label>
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Company Name" value="" v-model="formData.company_name" required />
+              </div>
+              
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Company CR Number</label>
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Company CR NO." value="" v-model="formData.company_cr" required />
+              </div>
+
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Company Phone Number</label>
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Company Phone NO." value="" v-model="formData.company_mobile" required />
+              </div>
+
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Company Address</label>
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Unit Address" value="" v-model="formData.unit_address" required />
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Street Address" value="" v-model="formData.street_address" required />
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="City Address" value="" v-model="formData.city_address" required />
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Zipe Code Address" value="" v-model="formData.zip_address" required />
+                <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Country Address" value="" v-model="formData.country_address" required />
+              </div>
+
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Services</label>
+                <input type="text" name="position" v-model="formData.position" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="write All Your Services Categories In Details" maxlength="100" value="" required />
+              </div>
+
+
              
               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Full Name</label>
+                <label class="required fw-semibold fs-6 mb-2">Contact Person Full Name</label>
                 <input type="text" name="name"  class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Full name" value="" v-model="formData.name" required />
               </div>
              
               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Email</label>
+                <label class="required fw-semibold fs-6 mb-2">Contact Person Email</label>
                 <input type="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="example@domain.com" value="" v-model="formData.email" required />
               </div>
 
             
 
               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">Mobile</label>
+                <label class="required fw-semibold fs-6 mb-2">Contact Person Mobile</label>
                 <input type="text" name="mobile" v-model="formData.mobile" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="EX:00966556625489" maxlength="12" value="" required />
               </div>
 
 
-
               <div class="fv-row mb-7">
-                <label class="required fw-semibold fs-6 mb-2">services</label>
-                <input type="text" name="position" v-model="formData.position" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="EX:here you are what is work  ..." maxlength="100" value="" required />
+                <label class="required fw-semibold fs-6 mb-2">Authorized Signee Full Name  (A Person Who Authorized To Sign Contract)</label>
+                <input type="text" name="mobile" v-model="formData.signee_full_name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="authorized signee full name  (Aperson who authorized to sign contract)"  value="" required />
               </div>
 
+
+
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Position (Write Position Full Name)</label>
+                <input type="text" name="mobile" v-model="formData.position" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Position (Write Position Full Name)"  value="" required />
+              </div>
+
+
+
+              
 
               <!-- <div class="fv-row mb-7">
                 <label class="required fw-semibold fs-6 mb-2">Level</label>
@@ -394,17 +440,29 @@ export default {
             itemsDepartments:[],
             searchQuery: '',
             formData: {
-                user_type:'vendor',
-                name: '',
-                email: '',
-                position: '',
-                level: '1',
-                password: '',
-                services: '',
-                documents: '',
-                logo: '',
-                logo_preview  :'./../assets/media/avatars/300-1.jpg',
-            },
+              user_type: 'vendor',
+              company_name: '',
+              company_cr: '',
+              company_mobile: '',
+              unit_address: '',
+              street_address: '',
+              city_address: '',
+              zip_address: '',
+              country_address: '',
+              services: '',
+              name: '', // Contact Person Full Name
+              email: '',
+              mobile: '',
+              signee_full_name: '',
+              position: '', // Authorized signee position
+              level: '1',
+              password: '',
+              confirm_password: '',
+              documents: '',
+              logo: '',
+              logo_preview: './../assets/media/avatars/300-1.jpg',
+          },
+
 
             formDataPassword: {
                 password: '',
@@ -479,17 +537,33 @@ export default {
             this.ItemID = null
         },
 
-        resetItem(){
+        resetItem() {
           this.URL = 'Users/createItem'
-          this.formData.mobile=''
-          this.formData.email=''
-          this.formData.name=''
-          this.formData.position=''
-          this.formData.level= '1' ,
-          this.formData.logo=''
-          this.logo_preview ='./../assets/companies/img/store-logo.jpg'
+          this.formData = {
+              user_type: 'vendor',
+              company_name: '',
+              company_cr: '',
+              company_mobile: '',
+              unit_address: '',
+              street_address: '',
+              city_address: '',
+              zip_address: '',
+              country_address: '',
+              services: '',
+              name: '',
+              email: '',
+              mobile: '',
+              signee_full_name: '',
+              position: '',
+              level: '1',
+              password: '',
+              confirm_password: '',
+              documents: '',
+              logo: '',
+              logo_preview: './../assets/companies/img/store-logo.jpg',
+          }
+      },
 
-        },
 
 
 
@@ -595,81 +669,93 @@ export default {
 
  
         addEditItem() {
-          
           this.isLoading = true;
 
           const config = {
-                  headers: {
-                      'content-type': 'multipart/form-data'
-                  }
-              }
-
-            let form = new FormData();
-              form.append('name', this.formData.name);
-              form.append('mobile', this.formData.mobile);
-              form.append('email', this.formData.email);
-              form.append('user_type', this.formData.user_type);
-              if(this.ItemID == null){
-                form.append('password', this.formData.password);
-                form.append('confirm_password', this.formData.confirm_password);
-              }
-              form.append('position', this.formData.position);
-              form.append('level', this.formData.level);
-
-
-              if(this.formData.department){
-
-                form.append('department', this.formData.department.id)
-              }
-              
-
-              // this.formData.documents.forEach(doc => {
-              //   form.append('documents[]', doc.id);
-              // });
-
-
-
-              if (this.logo) {
-                form.append('logo', this.logo);
-              }
-           
-            if(this.ItemID != ''){
-               form.append('Item_id', this.ItemID);
+            headers: {
+              'content-type': 'multipart/form-data'
             }
-             
-           axios.post(this.URL,form,config).then((response)=>{
-                 this.isLoading = false;
-                if(response.data.items){
-                   swal.fire({
-                    text: "تم حفظ التغييرات بنجاح",
-                    icon: "success",
-                    timer: 2000,
-                    button: false
-                    }); 
-                    this.closeModal()
-                    this.fetchItems()           
+          }
 
-                }else{
-                    swal.fire({
-                    text: response.data.message,
-                    icon: 'error',
-                    timer: false,
-                    button: true
-                    });
-                }             
-            
-          }).catch(error => {
-                    swal.fire({
-                    text: error,
-                    icon: 'error',
-                    timer: false,
-                    button: true
-                    });
+          let form = new FormData();
+
+          // الحقول المشتركة بين الجميع
+          form.append('name', this.formData.name);
+          form.append('mobile', this.formData.mobile);
+          form.append('email', this.formData.email);
+          form.append('user_type', this.formData.user_type);
+
+          if (this.ItemID == null) {
+            form.append('password', this.formData.password);
+            form.append('confirm_password', this.formData.confirm_password);
+          }
+
+          form.append('position', this.formData.position);
+          form.append('level', this.formData.level);
+
+          if (this.formData.department) {
+            form.append('department', this.formData.department.id);
+          }
+
+          // إذا المستخدم فيندور نضيف بيانات الشركة
+          if (this.formData.user_type === 'vendor') {
+            form.append('company_name', this.formData.company_name);
+            form.append('company_cr', this.formData.company_cr);
+            form.append('company_mobile', this.formData.company_mobile);
+            form.append('unit_address', this.formData.unit_address);
+            form.append('street_address', this.formData.street_address);
+            form.append('city_address', this.formData.city_address);
+            form.append('zip_address', this.formData.zip_address);
+            form.append('country_address', this.formData.country_address);
+            form.append('services', this.formData.services);
+            form.append('signee_full_name', this.formData.signee_full_name);
+          } else {
+            // المستخدم العادي فقط
+            form.append('services', this.formData.services);
+          }
+
+          if (this.logo) {
+            form.append('logo', this.logo);
+          }
+
+          if (this.ItemID != '') {
+            form.append('Item_id', this.ItemID);
+          }
+
+          axios.post(this.URL, form, config)
+            .then((response) => {
+              this.isLoading = false;
+              if (response.data.items) {
+                swal.fire({
+                  text: "تم حفظ التغييرات بنجاح",
+                  icon: "success",
+                  timer: 2000,
+                  button: false
                 });
-
-          
+                this.closeModal();
+                this.fetchItems();
+              } else {
+                swal.fire({
+                  text: response.data.message,
+                  icon: 'error',
+                  timer: false,
+                  button: true
+                });
+              }
+            })
+            .catch(error => {
+              this.isLoading = false;
+              swal.fire({
+                text: error?.response?.data?.message || 'حدث خطأ أثناء الحفظ',
+                icon: 'error',
+                timer: false,
+                button: true
+              });
+            });
         },
 
+
+ 
 
         addEditItemPassword() {
 

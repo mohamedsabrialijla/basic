@@ -227,7 +227,12 @@ export default {
         localStorage.setItem('user_type', response.data.items.user_type); 
        
           let url = window.location.origin ;
-          window.open(url+'/dashboard',"_self")
+          if(response.data.items.user_type == 'vendor'){
+            window.open(url+'/dashboard/vendor',"_self")
+          }else{
+            window.open(url+'/dashboard',"_self")
+          }
+          
         
         
         

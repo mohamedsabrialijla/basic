@@ -639,30 +639,17 @@
 
 
 
+
+      <!-- Step 6 -->
+      <div v-if="currentStep === 5" class="col-12">
+
+        <VenderResponse></VenderResponse>
+           
+      </div>
+
+
+
     </div>
-
-
-
-
-
-
-      
-
-    
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -690,6 +677,7 @@ import Technical from '../buyer/Technical.vue';
 import PDFHtml from '../buyer/PDFHtml.vue';
 import VendorsResponseExcel from '../buyer/VendorsResponseExcel.vue';
 import TPS from '../buyer/TPS.vue';
+import VenderResponse from '../buyer/VenderResponse.vue';
 import WordFile from '../Review/WordFile.vue';
  Quill.register({
   'modules/better-table': QuillBetterTable
@@ -700,7 +688,7 @@ import { nextTick } from 'vue';
  
 export default {
   components: {
-    Pagination,Multiselect,PricingSheet,Technical,PDFHtml,VendorsResponseExcel,TPS,WordFile
+    Pagination,Multiselect,PricingSheet,Technical,PDFHtml,VendorsResponseExcel,TPS,WordFile,VenderResponse
   },
     data() {
         return {
@@ -733,7 +721,7 @@ export default {
             },
 
             currentStep: 0,
-            steps: ["Create RFP", "Scope Review", "Soi Response" , "TPS", "RFP Publish", "Selection","Award"],
+            steps: ["Create RFP", "Scope Review", "Soi Response" , "TPS", "RFP Publish", "vendor response","technical opening"],
 
             logo:'',
             quill: null,

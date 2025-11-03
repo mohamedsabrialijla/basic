@@ -35,72 +35,100 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
-        // dd($request->all());
         $id = auth()->id();
         $user = User::query()->findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email'=>'required|email|unique:users',
-            'mobile'=>'required|numeric|min:8|unique:users',
-            // 'department' => 'required' ,
-            'password' => 'required|min:6',
-            'confirm_password' => 'required|min:6|same:password',
-            'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
-           
+        if($request->user_type == 'vendor'){
+
+            $validator = Validator::make($request->all(), [
+            'company_name'     => 'required|string|max:255',
+            'company_cr'       => 'required|string|max:255',
+            'company_mobile'   => 'required|numeric|min:8',
+            'unit_address'     => 'required|string|max:255',
+            'street_address'   => 'required|string|max:255',
+            'city_address'     => 'required|string|max:255',
+            'zip_address'      => 'required|string|max:20',
+            'country_address'  => 'required|string|max:255',
+            'services'         => 'required|string|max:255',
+
+            'name'             => 'required|string|max:255',
+            'email'            => 'required|email|unique:users,email,' . $item->id,
+            'mobile'           => 'required|numeric|min:8|unique:users,mobile,' . $item->id,
+            'signee_full_name' => 'required|string|max:255',
+            'position'         => 'required|string|max:255',
+
+            'logo'             => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-
-
-
-        if ($validator->fails()) {
-            return mainResponse(false, '' , null, 203, 'items',$validator);
         }else{
 
-                $item = New User;
-                $item->company_id = company_auth_id();
-                $item->mobile = $request->mobile;
-                $item->email = $request->email;
-                $item->name = $request->name;
-                $item->password = bcrypt($request->password);
-                $item->pwd = $request->password;
-                $item->department = $request->department;
-                $item->user_type = $request->user_type;
-                // $item->documents = json_encode($request->documents);
-                $item->created_by = $id;
-                $item->user_type = $request->user_type;
-                $item->services = $request->services;
+            $validator = Validator::make($request->all(), [
+                
+                'services'         => 'required|string|max:255',
+                'name'             => 'required|string|max:255',
+                'email'            => 'required|email|unique:users,email,' . $item->id,
+                'mobile'           => 'required|numeric|min:8|unique:users,mobile,' . $item->id,
+                'position'         => 'required|string|max:255',
 
-               
-                if($request->hasFile('logo') && $request->file("logo")!='')
-                {
-                    if ($request->file("logo")->isValid())
-                    {
-                        $destinationPath=public_path('uploads/user');
+                'logo'             => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
+            ]);
 
-                        $extension=strtolower($request->file("logo")->getClientOriginalExtension());
-                        $array= $this->image_extensions();
-                        if(in_array($extension,$array))
-                        {
-                            $fileName=uniqid().'.'.$extension;
-                            $request->file("logo")->move($destinationPath, $fileName);
-                        }else{
-                            return response()->json(['message'=> 'file:jpg,png,jpeg,gif,bmp,pdf', 'code'=>201 , 'status'=>false]);
-                        }
-                    }
-                }
-                if(isset($fileName)){$item->logo='uploads/user/'.$fileName;}
-
-
-                $item->save();
-
-              
-
-                $message ="success opearation";
-                return mainResponse(true, $message , $item, 200, 'items','');
-       
         }
+
+        
+
+        if ($validator->fails()) {
+            return mainResponse(false, '', null, 203, 'items', $validator);
+        }
+
+        $item = new User;
+        $item->company_id       = company_auth_id();
+        $item->user_type        = $request->user_type;
+        $item->created_by       = $id;
+
+        // Company Info
+        $item->company_name     = $request->company_name;
+        $item->company_cr       = $request->company_cr;
+        $item->company_mobile   = $request->company_mobile;
+        $item->unit_address     = $request->unit_address;
+        $item->street_address   = $request->street_address;
+        $item->city_address     = $request->city_address;
+        $item->zip_address      = $request->zip_address;
+        $item->country_address  = $request->country_address;
+
+        // Contact Person Info
+        $item->name             = $request->name;
+        $item->email            = $request->email;
+        $item->mobile           = $request->mobile;
+        $item->signee_full_name = $request->signee_full_name;
+        $item->position         = $request->position;
+        $item->services         = $request->services;
+
+        // Password
+        $item->password = bcrypt($request->password);
+        $item->pwd      = $request->password;
+
+        // Upload logo
+        if ($request->hasFile('logo') && $request->file("logo")->isValid()) {
+            $destinationPath = public_path('uploads/user');
+            $extension = strtolower($request->file("logo")->getClientOriginalExtension());
+            $array = $this->image_extensions();
+
+            if (in_array($extension, $array)) {
+                $fileName = uniqid() . '.' . $extension;
+                $request->file("logo")->move($destinationPath, $fileName);
+                $item->logo = 'uploads/user/' . $fileName;
+            } else {
+                return response()->json(['message' => 'file:jpg,png,jpeg,gif,bmp,pdf', 'code' => 201, 'status' => false]);
+            }
+        }
+
+        $item->save();
+
+        $message = "success operation";
+        return mainResponse(true, $message, $item, 200, 'items', '');
     }
+
 
  
 
@@ -109,62 +137,99 @@ class UserController extends Controller
         // dd($request->all());
 
         $id = auth()->id();
-        $user = User::query()->findOrFail($request->Item_id);
 
-       $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'mobile' => 'required|numeric|min:8|unique:users,mobile,' . $user->id,
-            // 'department' => 'required',
-            //'logo' => 'nullable|file|mimes:jpeg,png,jpg|max:2048'
+        $item = User::findOrFail($request->Item_id);
+
+
+        if($request->user_type == 'vendor'){
+
+            $validator = Validator::make($request->all(), [
+            'company_name'     => 'required|string|max:255',
+            'company_cr'       => 'required|string|max:255',
+            'company_mobile'   => 'required|numeric|min:8',
+            'unit_address'     => 'required|string|max:255',
+            'street_address'   => 'required|string|max:255',
+            'city_address'     => 'required|string|max:255',
+            'zip_address'      => 'required|string|max:20',
+            'country_address'  => 'required|string|max:255',
+            'services'         => 'required|string|max:255',
+
+            'name'             => 'required|string|max:255',
+            'email'            => 'required|email|unique:users,email,' . $item->id,
+            'mobile'           => 'required|numeric|min:8|unique:users,mobile,' . $item->id,
+            'signee_full_name' => 'required|string|max:255',
+            'position'         => 'required|string|max:255',
+
+            'logo'             => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        }else{
+
+            $validator = Validator::make($request->all(), [
+                
+                'services'         => 'required|string|max:255',
+                'name'             => 'required|string|max:255',
+                'email'            => 'required|email|unique:users,email,' . $item->id,
+                'mobile'           => 'required|numeric|min:8|unique:users,mobile,' . $item->id,
+                'position'         => 'required|string|max:255',
+
+                'logo'             => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
+            ]);
+
+        }
+
+        
 
 
 
 
         if ($validator->fails()) {
-            return mainResponse(false, '' , null, 203, 'items',$validator);
-        }else{
-
-                $item = User::findOrFail($request->Item_id);
-                $item->mobile = $request->mobile;
-                $item->email = $request->email;
-                $item->name = $request->name;
-                $item->department = $request->department;
-                // $item->documents = json_encode($request->documents);
-                $item->user_type = $request->user_type;
-                $item->created_by = $id;
-                $item->services = $request->services;
-               
-                if($request->hasFile('logo') && $request->file("logo")!='')
-                {
-                    if ($request->file("logo")->isValid())
-                    {
-                        $destinationPath=public_path('uploads/user');
-
-                        $extension=strtolower($request->file("logo")->getClientOriginalExtension());
-                        $array= $this->image_extensions();
-                        if(in_array($extension,$array))
-                        {
-                            $fileName=uniqid().'.'.$extension;
-                            $request->file("logo")->move($destinationPath, $fileName);
-                        }else{
-                            return response()->json(['message'=> 'file:jpg,png,jpeg,gif,bmp,pdf', 'code'=>201 , 'status'=>false]);
-                        }
-                    }
-                }
-                if(isset($fileName)){$item->logo='uploads/user/'.$fileName;}
-
-
-                $item->save();
-
-
-                $message ="success opearation";
-                return mainResponse(true, $message , $item, 200, 'items','');
-       
+            return mainResponse(false, '', null, 203, 'items', $validator);
         }
+
+        $item->company_id       = company_auth_id();
+        $item->user_type        = $request->user_type;
+        $item->created_by       = $id;
+
+        // Company Info
+        $item->company_name     = $request->company_name;
+        $item->company_cr       = $request->company_cr;
+        $item->company_mobile   = $request->company_mobile;
+        $item->unit_address     = $request->unit_address;
+        $item->street_address   = $request->street_address;
+        $item->city_address     = $request->city_address;
+        $item->zip_address      = $request->zip_address;
+        $item->country_address  = $request->country_address;
+
+        // Contact Person Info
+        $item->name             = $request->name;
+        $item->email            = $request->email;
+        $item->mobile           = $request->mobile;
+        $item->signee_full_name = $request->signee_full_name;
+        $item->position         = $request->position;
+        $item->services         = $request->services;
+
+        // Upload logo
+        if ($request->hasFile('logo') && $request->file("logo")->isValid()) {
+            $destinationPath = public_path('uploads/user');
+            $extension = strtolower($request->file("logo")->getClientOriginalExtension());
+            $array = $this->image_extensions();
+
+            if (in_array($extension, $array)) {
+                $fileName = uniqid() . '.' . $extension;
+                $request->file("logo")->move($destinationPath, $fileName);
+                $item->logo = 'uploads/user/' . $fileName;
+            } else {
+                return response()->json(['message' => 'file:jpg,png,jpeg,gif,bmp,pdf', 'code' => 201, 'status' => false]);
+            }
+        }
+
+        $item->save();
+
+        $message = "success operation";
+        return mainResponse(true, $message, $item, 200, 'items', '');
     }
+
 
 
      public function edit_password(Request $request)

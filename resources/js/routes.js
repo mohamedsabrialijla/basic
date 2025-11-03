@@ -4,8 +4,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Landing from './components/Website/pages/Landing.vue';
 import Login from './components/Website/auth/Login.vue';
 import AuthLayout from './components/Website/auth/AuthLayout.vue';
+
 import Dashboard from './components/Dashboard/pages/Dashboard.vue';
 import DashboardVendor from './components/Dashboard/pages/DashboardVendor.vue';
+
 import Pricing from './components/Dashboard/pages/buyer/Pricing.vue';
 import PricingSheet from './components/Dashboard/pages/buyer/PricingSheet.vue';
 import PDFHtml from './components/Dashboard/pages/buyer/PDFHtml.vue';
@@ -86,13 +88,15 @@ const routes = [
 
     { 
         path: '/:locale/dashboard', 
-        component: Dashboard, 
+        component: Dashboard,
+         name: 'dashboard', 
         meta: { requiresAuth: true } 
     },
 
     { 
-        path: '/:locale/vendor', 
+        path: '/:locale/dashboard/vendor', 
         component: DashboardVendor, 
+        name: 'dashboard.vendor',
         meta: { requiresAuth: true } 
     },
 

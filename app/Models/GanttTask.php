@@ -11,4 +11,12 @@ class GanttTask extends Model
         'parent', 'number', 'text', 'duration',
         'reference', 'quantity', 'uom', 'unit_price', 'total_price','section_id','rfp_id'
     ];
+
+
+
+    public function questions()
+{
+    return $this->morphMany(Question::class, 'questionable');
+}
+
 }

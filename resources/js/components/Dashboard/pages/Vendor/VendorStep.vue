@@ -25,7 +25,7 @@
           </div>
         </div>
 
-        <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 65%;margin: auto;">
+        <div class="d-flex align-items-center flex-wrap d-grid gap-2" style="gap:3.5rem !important;width: 73%;margin: auto;">
 
           <div class="d-flex align-items-center"  v-for="(step, index) in steps" 
                 :key="index" 
@@ -55,7 +55,7 @@
             <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
               <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
                 <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-                  <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Vendor SOI Response</h1>
+                  <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">RFP Overview</h1>
                   
 
 
@@ -99,75 +99,6 @@
 
  
 
-                   <span class="indicator-label" style="font-size: 17px;"> Complete SOI Criteiria</span>
-                  <table class="table table-bordered">
-                    <thead class="thead-light" style="background: #f4f4f4;font-weight: bold;">
-                      <tr >
-                        <th scope="col" width="5%">NO</th>
-                        <th scope="col" width="60%">SOI Criteria</th>
-                        <th scope="col" >Status &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Attachment</th>
-                        <th scope="col">File</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(item,index) in ItemsCriteria" :key="item.id">
-                        <td>{{index+1}}</td>
-                        <td style="    width: 394px;">{{item.name}}</td>
-                        <td style="display: flex;">
-                   
-                          <span v-if="item.criteria?.file || item.criteria?.approve " :class="getStatusClass('Completed')" class="btn btn-sm " style="height: 36px">
-                            Completed
-                          </span>
-
-
-                          <span v-else-if="item.criteria?.approve != 'true'"  class="btn btn-sm btn-light-warning" style="height: 36px">
-                            Ready
-                          </span >
-                          <span v-else  class="btn btn-sm btn-light-warning" style="height: 36px">
-                            Ready
-                          </span>
-
-                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-                          <div class="form-check form-switch form-check-custom form-check-success form-check-solid" v-if="item.type_cretiria == 'yesORno'">
-                              <input disabled v-model="item.answer" @change="ApproveDocument(item.id, item.answer)" class="form-check-input " type="checkbox" value=""  id="kt_flexSwitchCustomDefault_1_1" style="cursor:pointer;"   :checked="item.criteria && item.criteria?.approve == 'true' ">
-
-                              <label class="form-check-label" for="kt_flexSwitchCustomDefault_1_1">
-                                  Yes
-                              </label>
-                          </div>
-
-                          <!-- عنصر الرفع المخفي -->
-
-                         <div class="fv-row mb-7" v-else>                          
-                            <div class="image-input image-input-outline image-input-placeholder" data-kt-image-input="true">
-                              <div class="image-input-wrapper w-5px h-5px"></div>
-                              <label class="btn btn-icon btn-circle btn-active-color-info w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar" style="margin-left: 22px;">
-                                <i class="fas fa-file fs-2" style="cursor: pointer">
-                                  <span class="path1"></span>
-                                  <span class="path2"></span>
-                                </i>
-                                <input  type="file" name="file" @change="onFileChange($event, item.id, item.answer)" accept="*" />
-                                <input type="hidden" name="avatar_remove" />
-                              </label>
-                             
-                             
-                            </div>
-                          </div>
-
-                        </td>
-
-  
-                        <td>
-                          <a v-if="item.criteria?.file" :href="item.criteria.file" target="_blank">Open</a>
-                        </td>
-
-
-                      </tr>
-                      
-                    </tbody>
-                  </table>
-
 
 
               </div>
@@ -195,7 +126,7 @@
 
       <!-- Step 4 -->
       <div v-if="currentStep === 3" class="col-12">
-        step Four
+        <CompanyInformation></CompanyInformation>
       </div>
 
 
@@ -305,27 +236,6 @@
 
 
 
-      
-
-    
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </template>
 
 
@@ -344,9 +254,10 @@ import Quill from 'quill';
 import QuillBetterTable from 'quill-better-table';
 import 'quill/dist/quill.snow.css';
 import 'quill-better-table/dist/quill-better-table.css';
-import WordFile from '../Review/WordFile.vue';
+import WordFile from './WordFile.vue';
 import PricingSheetView from './PricingSheetView.vue';
 import TechnicalView from './TechnicalView.vue';
+import CompanyInformation from './CompanyInformation.vue';
 
  Quill.register({
   'modules/better-table': QuillBetterTable
@@ -357,7 +268,7 @@ import { nextTick } from 'vue';
  
 export default {
   components: {
-    Pagination,Multiselect,WordFile,PricingSheetView,TechnicalView  
+    Pagination,Multiselect,WordFile,PricingSheetView,TechnicalView,CompanyInformation  
   },
     data() {
         return {
@@ -388,7 +299,7 @@ export default {
             },
 
             currentStep: 0,
-            steps: ["RFP", "Pricing sheet", "Technical Proposal" ,"Company Information and Authorized Signee"],
+            steps: ["RFP", "Pricing sheet", "Technical Acceptance criteria" ,"Company Information and Authorized Signee"],
 
             logo:'',
             quill: null,
